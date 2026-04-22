@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>WE-NEED-U</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:#000;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;display:flex;justify-content:center;}
+#app{width:100%;max-width:430px;height:100vh;height:100dvh;background:#07070d;display:flex;flex-direction:column;overflow:hidden;position:relative;-webkit-overflow-scrolling:touch;}
+.pg{display:none;flex-direction:column;height:100%;}
+.pg.on{display:flex;}
+
+/* AUTH */
+.auth-pg{background:#07070d;align-items:center;justify-content:center;padding:2rem;}
+.logo{font-size:34px;font-weight:900;color:#fff;margin-bottom:6px;}
+.logo b{color:#7c6af7;font-weight:900;}
+.sub{font-size:13px;color:#666;margin-bottom:2rem;text-align:center;}
+.card{background:#111;border:1px solid #222;border-radius:20px;padding:1.5rem;width:100%;max-width:320px;}
+.ctitle{font-size:20px;font-weight:700;color:#fff;margin-bottom:14px;text-align:center;}
+.errtxt{font-size:12px;color:#e24b4a;text-align:center;margin-bottom:8px;min-height:18px;}
+.inp{width:100%;background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none;margin-bottom:10px;display:block;-webkit-appearance:none;border-radius:10px;}
+.inp:focus{border-color:#7c6af7;}
+.inp::placeholder{color:#555;}
+.mbtn{width:100%;padding:13px;border-radius:12px;background:#7c6af7;border:none;color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:12px;display:block;-webkit-appearance:none;}
+.sw{font-size:13px;color:#666;text-align:center;}
+.sw span{color:#7c6af7;cursor:pointer;}
+
+/* FEED */
+.feed-pg{background:#000;position:relative;}
+.feed-body{flex:1;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
+.feed-body::-webkit-scrollbar{display:none;}
+.slide{height:calc(100vh - 70px);height:calc(100dvh - 70px);scroll-snap-align:start;position:relative;overflow:hidden;background:#000;flex-shrink:0;}
+.s-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.93) 0%,transparent 50%,rgba(0,0,0,0.3) 100%);pointer-events:none;z-index:1;}
+.s-top{position:absolute;top:0;left:0;right:0;padding:40px 14px 8px;display:flex;justify-content:space-between;align-items:center;z-index:2;}
+.s-logo{font-size:17px;font-weight:900;color:#fff;}
+.s-logo b{color:#7c6af7;}
+.s-postbtn{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;font-size:11px;padding:6px 12px;border-radius:20px;cursor:pointer;-webkit-appearance:none;}
+.s-right{position:absolute;right:12px;bottom:130px;display:flex;flex-direction:column;gap:16px;align-items:center;z-index:2;}
+.s-rbtn{display:flex;flex-direction:column;align-items:center;gap:4px;border:none;background:none;cursor:pointer;}
+.s-rico{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:22px;}
+.s-rlbl{font-size:9px;color:rgba(255,255,255,0.8);font-weight:500;}
+.s-info{position:absolute;bottom:68px;left:14px;right:68px;z-index:2;}
+.s-handle{font-size:14px;font-weight:700;color:#fff;margin-bottom:2px;}
+.s-loc{font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:5px;}
+.s-mode{display:inline-block;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:10px;padding:3px 10px;border-radius:20px;margin-bottom:5px;}
+.s-title{font-size:16px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:4px;}
+.s-desc{font-size:12px;color:rgba(255,255,255,0.8);line-height:1.4;}
+.s-acts{position:absolute;bottom:0;left:0;right:0;display:flex;gap:8px;padding:8px 12px 10px;z-index:2;}
+.s-btn{flex:1;padding:12px 4px;border-radius:13px;border:none;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;-webkit-appearance:none;}
+.s-btn:active{opacity:0.7;}
+.btn-c{background:#7c6af7;color:#fff;flex:2;}
+.btn-i{background:#e8a020;color:#fff;flex:2;}
+.btn-p{background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.2);flex:1;}
+.btn-sent{opacity:0.5;}
+.snd-btn{position:absolute;top:95px;right:14px;background:rgba(0,0,0,0.6);border:2px solid rgba(255,255,255,0.25);color:#fff;width:42px;height:42px;border-radius:50%;font-size:17px;cursor:pointer;z-index:3;display:flex;align-items:center;justify-content:center;-webkit-appearance:none;}
+.snd-btn.on{background:rgba(124,106,247,0.8);border-color:#7c6af7;}
+.prog{position:absolute;top:0;left:0;right:0;height:2px;background:rgba(255,255,255,0.1);z-index:2;}
+.prog-fill{height:100%;background:#7c6af7;width:0%;}
+.toast{position:absolute;top:44%;left:50%;transform:translate(-50%,-50%);padding:9px 18px;border-radius:22px;font-size:13px;font-weight:700;color:#fff;pointer-events:none;opacity:0;z-index:10;white-space:nowrap;}
+
+/* BOTTOM NAV */
+.bnav{display:flex;justify-content:space-around;padding:10px 0 20px;background:rgba(0,0,0,0.97);border-top:0.5px solid rgba(255,255,255,0.08);flex-shrink:0;}
+.nb{display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:none;cursor:pointer;padding:4px 14px;-webkit-appearance:none;}
+.nb-ico{font-size:22px;}
+.nb-lbl{font-size:9px;color:rgba(255,255,255,0.35);font-weight:500;}
+.nb.on .nb-lbl{color:#7c6af7;}
+
+/* INNER PAGES */
+.inner-pg{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#07070d;min-height:0;}
+.pg-top{padding:48px 14px 12px;border-bottom:0.5px solid #1e1e1e;flex-shrink:0;}
+.pg-title{font-size:20px;font-weight:700;color:#fff;}
+.pg-body{flex:1;overflow-y:scroll;padding:14px;-webkit-overflow-scrolling:touch;min-height:0;}
+.pg-body::-webkit-scrollbar{display:none;}
+
+/* POST */
+.upload-box{border:2px dashed rgba(124,106,247,0.4);border-radius:14px;padding:20px;text-align:center;cursor:pointer;margin-bottom:14px;background:rgba(124,106,247,0.04);}
+.upload-ico{font-size:28px;margin-bottom:6px;}
+.upload-ttl{font-size:14px;font-weight:500;color:#fff;margin-bottom:2px;}
+.upload-sub{font-size:11px;color:#666;}
+.vidprev{width:100%;border-radius:12px;display:none;margin-bottom:14px;max-height:180px;object-fit:cover;}
+.uploading{display:none;text-align:center;padding:8px;font-size:12px;color:#7c6af7;font-weight:500;}
+.uploading.on{display:block;}
+.fg{margin-bottom:13px;}
+.fl{font-size:12px;color:#888;margin-bottom:5px;display:block;font-weight:500;}
+.fi{width:100%;background:#111;border:1px solid #222;border-radius:10px;padding:11px 14px;color:#fff;font-size:13px;outline:none;-webkit-appearance:none;display:block;}
+.fi:focus{border-color:#7c6af7;}
+.fi::placeholder{color:#555;}
+textarea.fi{min-height:75px;resize:vertical;}
+.mrow{display:flex;gap:8px;}
+.mdb{flex:1;padding:10px 4px;border-radius:10px;border:1px solid #333;background:#111;color:#555;font-size:11px;font-weight:500;cursor:pointer;-webkit-appearance:none;}
+.mdb.sc{border-color:#7c6af7;background:rgba(124,106,247,0.1);color:#a99cf9;}
+.mdb.si{border-color:#e8a020;background:rgba(232,160,32,0.1);color:#f5c97a;}
+.mdb.sb{border-color:#d4537e;background:rgba(212,83,126,0.1);color:#e886a8;}
+.post-fixed{padding:10px 14px 8px;background:#07070d;border-top:1px solid #1e1e1e;flex-shrink:0;}
+.pbtn{width:100%;padding:13px;border-radius:12px;background:#7c6af7;border:none;color:#fff;font-size:15px;font-weight:600;cursor:pointer;-webkit-appearance:none;display:block;}
+.pbtn:active{opacity:0.8;}
+
+/* MATCHES */
+.match-tabs{display:flex;border-bottom:1px solid #1e1e1e;flex-shrink:0;}
+.mtab{flex:1;padding:12px 4px;text-align:center;font-size:13px;font-weight:600;color:#555;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;}
+.mtab.invest-tab.active{color:#e8a020;border-bottom-color:#e8a020;}
+.mtab.collab-tab.active{color:#7c6af7;border-bottom-color:#7c6af7;}
+.match-panels{flex:1;display:flex;overflow:hidden;min-height:0;}
+.match-panel{flex:1;overflow-y:scroll;padding:12px;-webkit-overflow-scrolling:touch;display:none;}
+.match-panel::-webkit-scrollbar{display:none;}
+.match-panel.active{display:block;}
+.mrow-item{background:#111;border:1px solid #1e1e1e;border-radius:14px;padding:12px;display:flex;gap:10px;align-items:center;cursor:pointer;margin-bottom:8px;position:relative;}
+.mrow-item.pending{border-color:#2a2a1e;background:#18180e;}
+.mrow-item.accepted{border-color:#1a1e2a;}
+.mrow-item:active{opacity:0.7;}
+.mav{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;}
+.mname{font-size:13px;font-weight:500;color:#fff;}
+.mproj{font-size:11px;color:#666;margin-top:2px;}
+.mbadge{font-size:9px;font-weight:500;padding:2px 7px;border-radius:10px;display:inline-block;margin-top:3px;}
+.mstatus{font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;white-space:nowrap;}
+.mstatus.pending{background:rgba(232,160,32,0.15);color:#f5c97a;}
+.mstatus.accepted{background:rgba(46,160,67,0.15);color:#4ade80;}
+.mstatus.denied{background:rgba(100,100,100,0.15);color:#666;}
+.m-empty{text-align:center;padding:3rem 1rem;font-size:13px;color:#555;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.m-empty-ico{font-size:36px;}
+/* SWIPE OVERLAYS */
+.swipe-invest{position:absolute;top:50%;left:20px;transform:translateY(-50%);background:rgba(232,160,32,0.9);color:#fff;font-size:22px;font-weight:800;padding:12px 20px;border-radius:16px;opacity:0;transition:opacity 0.1s;z-index:10;pointer-events:none;border:3px solid #f5c97a;}
+.swipe-collab{position:absolute;top:50%;right:20px;transform:translateY(-50%);background:rgba(124,106,247,0.9);color:#fff;font-size:22px;font-weight:800;padding:12px 20px;border-radius:16px;opacity:0;transition:opacity 0.1s;z-index:10;pointer-events:none;border:3px solid #a99cf9;}
+/* PROFILE GRID */
+.proj-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:4px 0;}
+.proj-cell{position:relative;border-radius:10px;overflow:hidden;background:#111;aspect-ratio:9/16;cursor:pointer;}
+.proj-cell video{width:100%;height:100%;object-fit:cover;display:block;}
+.proj-cell-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;}
+.proj-cell-info{position:absolute;bottom:0;left:0;right:0;padding:6px 8px;background:linear-gradient(to top,rgba(0,0,0,0.9) 0%,transparent 100%);}
+.proj-cell-title{font-size:10px;font-weight:600;color:#fff;line-height:1.3;margin-bottom:2px;}
+.proj-cell-badge{font-size:8px;padding:1px 5px;border-radius:6px;display:inline-block;}
+.proj-cell-stats{font-size:9px;color:rgba(255,255,255,0.5);margin-top:2px;}
+/* POST DETAIL MODAL */
+.post-detail-mask{display:none;position:absolute;inset:0;background:#000;z-index:300;flex-direction:column;}
+.post-detail-mask.on{display:flex;}
+.pd-video-wrap{height:55%;position:relative;background:#000;overflow:hidden;flex-shrink:0;}
+.pd-video-wrap video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.pd-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.7) 0%,transparent 60%);pointer-events:none;z-index:1;}
+.pd-back{position:absolute;top:48px;left:14px;background:rgba(0,0,0,0.5);border:none;color:#fff;font-size:22px;width:40px;height:40px;border-radius:50%;cursor:pointer;z-index:3;display:flex;align-items:center;justify-content:center;-webkit-appearance:none;}
+.pd-play-ico{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:44px;z-index:2;pointer-events:none;opacity:0;transition:opacity 0.3s;}
+.pd-requests-btn{position:absolute;top:48px;right:14px;background:rgba(124,106,247,0.85);border:none;color:#fff;font-size:12px;font-weight:700;padding:8px 14px;border-radius:20px;cursor:pointer;z-index:3;-webkit-appearance:none;}
+.pd-body{flex:1;overflow-y:scroll;-webkit-overflow-scrolling:touch;background:#07070d;padding:14px;}
+.pd-body::-webkit-scrollbar{display:none;}
+.pd-handle{font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:3px;}
+.pd-title{font-size:18px;font-weight:800;color:#fff;margin-bottom:4px;line-height:1.2;}
+.pd-mode{display:inline-block;font-size:10px;padding:3px 10px;border-radius:20px;margin-bottom:8px;}
+.pd-desc{font-size:12px;color:rgba(255,255,255,0.6);line-height:1.5;margin-bottom:14px;}
+.pd-stats-row{display:flex;gap:8px;margin-bottom:16px;}
+.pd-stat{flex:1;background:#111;border:1px solid #1e1e1e;border-radius:12px;padding:10px 6px;text-align:center;cursor:pointer;}
+.pd-stat:active{opacity:0.7;}
+.pd-stat-val{font-size:20px;font-weight:700;}
+.pd-stat-lbl{font-size:9px;color:rgba(255,255,255,0.4);margin-top:2px;}
+.pd-stat.invest .pd-stat-val{color:#f5c97a;}
+.pd-stat.collab .pd-stat-val{color:#a99cf9;}
+.pd-stat.views .pd-stat-val{color:#6ee7b7;}
+.pd-stat.likes .pd-stat-val{color:#f87171;}
+.pd-comments-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:10px;}
+.pd-comment{padding:10px 0;border-bottom:1px solid #1a1a1a;}
+.pd-comment-name{font-size:12px;font-weight:600;color:#a99cf9;margin-bottom:3px;}
+.pd-comment-text{font-size:13px;color:#ccc;line-height:1.4;}
+.pd-comment-reply{font-size:11px;color:#555;margin-top:4px;padding-left:10px;border-left:2px solid #2a2a3e;}
+/* LIKES SHEET */
+.likes-sheet{display:none;position:absolute;inset:0;background:rgba(0,0,0,0.7);z-index:400;align-items:flex-end;}
+.likes-sheet.on{display:flex;}
+/* REQUESTS SHEET */
+.req-sheet{display:none;position:absolute;inset:0;background:rgba(0,0,0,0.7);z-index:400;align-items:flex-end;}
+.req-sheet.on{display:flex;}
+.req-inner{background:#13131f;border-radius:20px 20px 0 0;width:100%;max-height:75%;display:flex;flex-direction:column;}
+.req-top{display:flex;justify-content:space-between;align-items:center;padding:16px 16px 10px;border-bottom:1px solid #1e1e1e;flex-shrink:0;}
+.req-top-title{font-size:15px;font-weight:700;color:#fff;}
+.req-close{background:none;border:none;color:#666;font-size:22px;cursor:pointer;-webkit-appearance:none;}
+.req-list{overflow-y:scroll;-webkit-overflow-scrolling:touch;padding:10px 12px 20px;flex:1;min-height:0;}
+.req-list::-webkit-scrollbar{display:none;}
+.req-item{background:#1a1a2e;border:1px solid #2a2a3e;border-radius:14px;padding:12px;margin-bottom:8px;}
+.req-item-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.req-item-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;}
+.req-item-name{font-size:13px;font-weight:600;color:#fff;}
+.req-item-loc{font-size:11px;color:#666;margin-top:1px;}
+.req-item-type{font-size:10px;padding:2px 8px;border-radius:10px;display:inline-block;margin-top:3px;}
+.req-btns{display:flex;gap:8px;}
+.req-btn{flex:1;padding:10px;border-radius:12px;border:none;font-size:13px;font-weight:600;cursor:pointer;-webkit-appearance:none;}
+.req-btn.accept{background:#7c6af7;color:#fff;}
+.req-btn.deny{background:transparent;color:#555;border:1px solid #2a2a3e;}
+.req-empty{text-align:center;padding:2rem;font-size:13px;color:#555;}
+
+/* PROFILE */
+.prof-top{padding:54px 14px 18px;text-align:center;border-bottom:0.5px solid #1e1e1e;}
+.pav-wrap{position:relative;width:88px;height:88px;margin:0 auto 10px;cursor:pointer;}
+.pav{width:88px;height:88px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:26px;background:linear-gradient(135deg,#4a3ab7,#7c6af7);color:#fff;overflow:hidden;border:3px solid #2a2a3e;}
+.pav img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.pav-edit{position:absolute;bottom:2px;right:2px;width:26px;height:26px;background:#7c6af7;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;border:2px solid #07070d;}
+.pname{font-size:20px;font-weight:700;color:#fff;margin-bottom:3px;}
+.ploc{font-size:12px;color:#666;margin-bottom:14px;}
+.pstats{display:flex;justify-content:center;gap:28px;}
+.psv{font-size:19px;font-weight:600;color:#a99cf9;}
+.psl{font-size:10px;color:#666;}
+.logbtn{width:100%;padding:11px;border-radius:10px;border:1px solid #e24b4a;background:transparent;color:#e24b4a;font-size:13px;font-weight:500;cursor:pointer;-webkit-appearance:none;margin-bottom:14px;}
+
+/* CHAT */
+.chat-top{padding:44px 14px 12px;display:flex;align-items:center;gap:10px;border-bottom:0.5px solid #1e1e1e;flex-shrink:0;background:#07070d;}
+.cbk{font-size:22px;color:#7c6af7;background:none;border:none;cursor:pointer;-webkit-appearance:none;}
+.cwho{font-size:15px;font-weight:500;color:#fff;}
+.msgs{flex:1;overflow-y:scroll;padding:14px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch;}
+.msgs::-webkit-scrollbar{display:none;}
+.msg{display:flex;}
+.msg.me{justify-content:flex-end;}
+.mbub{padding:10px 14px;border-radius:16px;font-size:13px;line-height:1.5;max-width:75%;}
+.msg.them .mbub{background:#111;border:1px solid #1e1e1e;color:#fff;border-bottom-left-radius:4px;}
+.msg.me .mbub{background:#7c6af7;color:#fff;border-bottom-right-radius:4px;}
+.cinput{display:flex;gap:8px;padding:10px 14px 22px;border-top:0.5px solid #1e1e1e;flex-shrink:0;background:#07070d;}
+.cbox{flex:1;background:#111;border:1px solid #222;border-radius:20px;padding:10px 16px;color:#fff;font-size:13px;outline:none;-webkit-appearance:none;}
+.cbox:focus{border-color:#7c6af7;}
+.csend{width:40px;height:40px;border-radius:50%;background:#7c6af7;border:none;color:#fff;font-size:16px;cursor:pointer;-webkit-appearance:none;flex-shrink:0;}
+
+/* CREATOR MODAL */
+.cmask{display:none;position:absolute;inset:0;background:rgba(0,0,0,0.8);z-index:200;align-items:flex-end;}
+.cmask.on{display:flex;}
+.cmodal{background:#111;border-radius:24px 24px 0 0;padding:20px;width:100%;max-height:65vh;overflow-y:auto;}
+.cmx{float:right;background:none;border:none;color:#666;font-size:20px;cursor:pointer;-webkit-appearance:none;}
+.cmav{width:66px;height:66px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:22px;margin:10px auto 10px;}
+.cmname{font-size:18px;font-weight:700;color:#fff;text-align:center;margin-bottom:3px;}
+.cmloc{font-size:12px;color:#666;text-align:center;margin-bottom:12px;}
+.cmproj{background:#1a1a1a;border-radius:12px;padding:12px;}
+.cmpt{font-size:14px;font-weight:500;color:#fff;margin-bottom:4px;}
+.cmpd{font-size:12px;color:#666;line-height:1.5;}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- LOGIN -->
+<div class="pg on auth-pg" id="pg-login">
+  <div class="logo">WE-NEED-<b>U</b></div>
+  <div class="sub">Post your idea. Find who you need.</div>
+  <div class="card">
+    <div class="ctitle">Welcome back 👋</div>
+    <div class="errtxt" id="lerr"></div>
+    <button class="gbtn" id="google-login-btn" onclick="triggerGoogleSignIn()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      Continue with Google
+    </button>
+    <div id="g-btn-container" style="width:100%;margin-bottom:8px"></div>
+    <div class="auth-divider"><span>or sign in with email</span></div>
+    <input class="inp" type="email" placeholder="Email address" id="lemail" autocomplete="email"/>
+    <input class="inp" type="password" placeholder="Password" id="lpw" autocomplete="current-password"/>
+    <button class="mbtn" id="lbtn">Sign In</button>
+    <div class="sw">No account? <span id="gosu">Create one free</span></div>
+  </div>
+</div>
+
+<!-- SIGNUP -->
+<div class="pg auth-pg" id="pg-signup">
+  <div class="logo">WE-NEED-<b>U</b></div>
+  <div class="sub">Where builders meet investors</div>
+  <div class="card">
+    <div class="ctitle">Create account ✨</div>
+    <div class="errtxt" id="serr"></div>
+    <button class="gbtn" id="google-signup-btn" onclick="triggerGoogleSignIn()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      Sign up with Google
+    </button>
+    <div class="auth-divider"><span>or create with email</span></div>
+    <input class="inp" type="text" placeholder="Full name" id="sname" autocomplete="name"/>
+    <input class="inp" type="email" placeholder="Email address" id="semail" autocomplete="email"/>
+    <input class="inp" type="password" placeholder="Password (min 6 chars)" id="spw" autocomplete="new-password"/>
+    <input class="inp" type="text" placeholder="Location e.g. Moorhead MN" id="sloc"/>
+    <button class="mbtn" id="sbtn">Create Account</button>
+    <div class="sw">Have account? <span id="goli">Sign in</span></div>
+  </div>
+</div>
+
+<!-- FEED -->
+<div class="pg feed-pg" id="pg-feed">
+  <div class="feed-body" id="feed-body"></div>
+  <div class="bnav">
+    <button class="nb on" id="n1"><div class="nb-ico">🔥</div><div class="nb-lbl" style="color:#7c6af7">Feed</div></button>
+    <button class="nb" id="n2"><div class="nb-ico">⚡</div><div class="nb-lbl">Matches</div></button>
+    <button class="nb" id="n3"><div class="nb-ico">＋</div><div class="nb-lbl">Post</div></button>
+    <button class="nb" id="n4"><div class="nb-ico">👤</div><div class="nb-lbl">Profile</div></button>
+  </div>
+</div>
+
+<!-- MATCHES -->
+<div class="pg" id="pg-matches">
+  <div class="inner-pg">
+    <div class="pg-top" style="padding-bottom:0;">
+      <div class="pg-title" style="margin-bottom:12px;">Your Matches</div>
+      <div class="match-tabs">
+        <div class="mtab invest-tab active" id="tab-invest" onclick="switchTab('invest')">💰 Invest</div>
+        <div class="mtab collab-tab" id="tab-collab" onclick="switchTab('collab')">⚡ Collab</div>
+      </div>
+    </div>
+    <div class="match-panels">
+      <div class="match-panel active" id="panel-invest"><div class="m-empty"><div class="m-empty-ico">💰</div><div>No invest matches yet</div></div></div>
+      <div class="match-panel" id="panel-collab"><div class="m-empty"><div class="m-empty-ico">⚡</div><div>No collab matches yet</div></div></div>
+    </div>
+  </div>
+  <div class="bnav">
+    <button class="nb" id="n5"><div class="nb-ico">🔥</div><div class="nb-lbl">Feed</div></button>
+    <button class="nb on" id="n6"><div class="nb-ico">⚡</div><div class="nb-lbl" style="color:#7c6af7">Matches</div></button>
+    <button class="nb" id="n7"><div class="nb-ico">＋</div><div class="nb-lbl">Post</div></button>
+    <button class="nb" id="n8"><div class="nb-ico">👤</div><div class="nb-lbl">Profile</div></button>
+  </div>
+</div>
+
+<!-- POST -->
+<div class="pg" id="pg-post" style="flex-direction:column;">
+  <div class="inner-pg" style="flex:1;display:flex;flex-direction:column;min-height:0;">
+    <div class="pg-top"><div class="pg-title">Post Your Idea</div></div>
+    <div class="pg-body" style="flex:1;overflow-y:scroll;-webkit-overflow-scrolling:touch;min-height:0;">
+      <div class="upload-box" id="upbox">
+        <div class="upload-ico">🎥</div>
+        <div class="upload-ttl">Upload your pitch video</div>
+        <div class="upload-sub">Tap to select from camera roll</div>
+        <input type="file" id="vfile" accept="video/*" style="display:none"/>
+      </div>
+      <video class="vidprev" id="vprev" controls></video>
+      <div class="uploading" id="uping">⏳ Uploading video...</div>
+      <div class="fg"><label class="fl">Project title *</label><input class="fi" type="text" placeholder="e.g. AI fitness coach app" id="ptitle"/></div>
+      <div class="fg"><label class="fl">What are you building? *</label><textarea class="fi" placeholder="Describe your idea..." id="pdesc"></textarea></div>
+      <div class="fg"><label class="fl">Category</label>
+        <select class="fi" id="pcat">
+          <option>Technology</option><option>Design</option><option>Business</option><option>Healthcare</option><option>Education</option><option>Sustainability</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Looking for *</label>
+        <div class="mrow">
+          <button class="mdb" id="mc">⚡ Collaborators</button>
+          <button class="mdb" id="mi">💰 Investors</button>
+          <button class="mdb" id="mb">⭐ Both</button>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Skills needed</label><input class="fi" type="text" placeholder="React, Marketing, Design..." id="pskills"/></div>
+    </div>
+  </div>
+  <div class="post-fixed">
+    <button class="pbtn" id="pbtn">Post to Feed →</button>
+  </div>
+  <div class="bnav">
+    <button class="nb" id="n9"><div class="nb-ico">🔥</div><div class="nb-lbl">Feed</div></button>
+    <button class="nb" id="n10"><div class="nb-ico">⚡</div><div class="nb-lbl">Matches</div></button>
+    <button class="nb on" id="n11"><div class="nb-ico">＋</div><div class="nb-lbl" style="color:#7c6af7">Post</div></button>
+    <button class="nb" id="n12"><div class="nb-ico">👤</div><div class="nb-lbl">Profile</div></button>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div class="pg" id="pg-profile">
+  <div class="inner-pg">
+    <div class="prof-top">
+      <div class="pav-wrap" id="pav-wrap">
+        <div class="pav" id="pav">ST</div>
+        <div class="pav-edit">📷</div>
+        <input type="file" id="avatar-file" accept="image/*" style="display:none"/>
+      </div>
+      <div class="pname" id="pname">Solomon</div>
+      <div class="ploc" id="ploc">Moorhead, MN</div>
+      <div class="pstats">
+        <div><div class="psv" id="sp">0</div><div class="psl">Projects</div></div>
+        <div><div class="psv" id="sm">0</div><div class="psl">Matches</div></div>
+      </div>
+    </div>
+    <div class="pg-body">
+      <button class="logbtn" id="logbtn" style="margin-top:14px;">Sign Out</button>
+      <div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:1px;margin:16px 0 10px;">My Projects</div>
+      <div id="myprojs"><div style="text-align:center;padding:2rem 0;font-size:13px;color:#666;">No projects yet.</div></div>
+    </div>
+  </div>
+  <div class="bnav">
+    <button class="nb" id="n13"><div class="nb-ico">🔥</div><div class="nb-lbl">Feed</div></button>
+    <button class="nb" id="n14"><div class="nb-ico">⚡</div><div class="nb-lbl">Matches</div></button>
+    <button class="nb" id="n15"><div class="nb-ico">＋</div><div class="nb-lbl">Post</div></button>
+    <button class="nb on" id="n16"><div class="nb-ico">👤</div><div class="nb-lbl" style="color:#7c6af7">Profile</div></button>
+  </div>
+</div>
+
+<!-- CHAT -->
+<div class="pg" id="pg-chat" style="background:#07070d;">
+  <div class="inner-pg">
+    <div class="chat-top">
+      <button class="cbk" id="cbk">←</button>
+      <div id="cav" style="width:36px;height:36px;border-radius:50%;background:#1e1a10;color:#e8a020;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;">?</div>
+      <div class="cwho" id="cwho">Chat</div>
+    </div>
+    <div class="msgs" id="msgs"></div>
+    <div class="cinput">
+      <input class="cbox" type="text" placeholder="Type a message..." id="cbox"/>
+      <button class="csend" id="csend">→</button>
+    </div>
+  </div>
+</div>
+
+<!-- CREATOR MODAL -->
+<div class="cmask" id="cmask">
+  <div class="cmodal">
+    <button class="cmx" id="cmx">✕</button>
+    <div style="clear:both;text-align:center;">
+      <div class="cmav" id="cmav">?</div>
+      <div class="cmname" id="cmname"></div>
+      <div class="cmloc" id="cmloc"></div>
+    </div>
+    <div class="cmproj" id="cmproj"></div>
+  </div>
+</div>
+
+<!-- COMMENTS MODAL -->
+<div class="cmask" id="comments-mask">
+  <div class="cmodal" style="max-height:80vh;display:flex;flex-direction:column;">
+    <button class="cmx" id="comments-close">✕</button>
+    <div style="clear:both;margin-bottom:12px;">
+      <div style="font-size:16px;font-weight:700;color:#fff;" id="comments-title">Comments</div>
+    </div>
+    <div id="reply-bar" style="display:none;background:#1a1a2e;border-radius:8px;padding:8px 12px;margin-bottom:8px;font-size:12px;color:#a99cf9;display:flex;justify-content:space-between;align-items:center;">
+      <span id="reply-label">↩️ Replying to...</span>
+      <button id="cancel-reply" style="background:none;border:none;color:#666;font-size:16px;cursor:pointer;">✕</button>
+    </div>
+    <div id="comments-list" style="flex:1;overflow-y:scroll;-webkit-overflow-scrolling:touch;min-height:0;max-height:340px;margin-bottom:12px;"></div>
+    <div style="display:flex;gap:8px;padding-top:10px;border-top:1px solid #222;">
+      <input id="comment-input" type="text" placeholder="Write a comment..." style="flex:1;background:#1a1a1a;border:1px solid #333;border-radius:20px;padding:10px 16px;color:#fff;font-size:13px;outline:none;"/>
+      <button id="comment-send" style="width:40px;height:40px;border-radius:50%;background:#7c6af7;border:none;color:#fff;font-size:16px;cursor:pointer;flex-shrink:0;">→</button>
+    </div>
+  </div>
+</div>
+
+<!-- POST DETAIL MODAL -->
+<div class="post-detail-mask" id="post-detail-mask">
+  <div class="pd-video-wrap" id="pd-video-wrap">
+    <div class="pd-grad"></div>
+    <div class="pd-play-ico" id="pd-play-ico">▶</div>
+    <button class="pd-back" id="pd-back">←</button>
+    <button class="pd-requests-btn" id="pd-requests-btn">📩 Requests <span id="pd-req-count"></span></button>
+  </div>
+  <div class="pd-body" id="pd-body">
+    <div class="pd-handle" id="pd-handle"></div>
+    <div class="pd-title" id="pd-title"></div>
+    <div class="pd-mode" id="pd-mode"></div>
+    <div class="pd-desc" id="pd-desc"></div>
+    <div class="pd-stats-row">
+      <div class="pd-stat invest"><div class="pd-stat-val" id="pd-invest">0</div><div class="pd-stat-lbl">💰 Invests</div></div>
+      <div class="pd-stat collab"><div class="pd-stat-val" id="pd-collab">0</div><div class="pd-stat-lbl">⚡ Collabs</div></div>
+      <div class="pd-stat likes" id="pd-likes-btn"><div class="pd-stat-val" id="pd-likes">0</div><div class="pd-stat-lbl">❤️ Likes</div></div>
+      <div class="pd-stat views"><div class="pd-stat-val" id="pd-views">0</div><div class="pd-stat-lbl">👁 Views</div></div>
+    </div>
+    <div class="pd-comments-title">💬 Comments</div>
+    <div id="pd-comments-list"><div style="font-size:12px;color:#555;text-align:center;padding:1rem;">No comments yet</div></div>
+  </div>
+  <!-- LIKES SHEET -->
+  <div class="likes-sheet" id="likes-sheet">
+    <div class="req-inner">
+      <div class="req-top">
+        <div class="req-top-title">❤️ Liked by</div>
+        <button class="req-close" id="likes-close">✕</button>
+      </div>
+      <div class="req-list" id="likes-list"><div class="req-empty">No likes yet</div></div>
+    </div>
+  </div>
+  <!-- REQUESTS SHEET -->
+  <div class="req-sheet" id="req-sheet">
+    <div class="req-inner">
+      <div class="req-top">
+        <div class="req-top-title">📩 Match Requests</div>
+        <button class="req-close" id="req-close">✕</button>
+      </div>
+      <div class="req-list" id="req-list"><div class="req-empty">No pending requests</div></div>
+    </div>
+  </div>
+</div>
+<script>
+var API='https://workmatch-backend.onrender.com/api';
+var token=localStorage.getItem('wm_token')||null;
+var user=JSON.parse(localStorage.getItem('wm_user')||'null');
+var postMode=null;
+var convId=null;
+var selVid=null;
+var liked={};
+var saved={};
+var currentProjectId=null;
+var soundUnlocked=false;
+
+function unlockSound(){
+  document.querySelectorAll('video').forEach(function(v){
+    v.muted=false;
+    v.volume=1;
+    v.play().catch(function(){});
+  });
+}
+
+// Auto play/pause and sound when scrolling like TikTok
+function setupFeedObserver(){
+  var observer=new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      var vid=entry.target.querySelector('video');
+      if(!vid)return;
+      if(entry.isIntersecting){
+        vid.muted=!soundUnlocked;
+        vid.play().catch(function(){});
+      } else {
+        vid.pause();
+      }
+    });
+  },{threshold:0.7});
+  document.querySelectorAll('.slide').forEach(function(slide){
+    observer.observe(slide);
+  });
+}
+var CLR=[{bg:'#160f2e',c:'#a99cf9'},{bg:'#0a1a10',c:'#1db975'},{bg:'#1e1408',c:'#e8a020'},{bg:'#1e0818',c:'#d4537e'},{bg:'#101810',c:'#639922'},{bg:'#0e1a1e',c:'#22d3ee'}];
+function clr(id){return CLR[Math.abs(((id||'').charCodeAt(0)||0))%CLR.length];}
+function ini(n){return(n||'?').split(' ').map(function(x){return x[0];}).join('').substring(0,2).toUpperCase();}
+async function api(path,method,body){
+  var h={'Content-Type':'application/json'};
+  if(token)h['Authorization']='Bearer '+token;
+  var o={method:method||'GET',headers:h};
+  if(body)o.body=JSON.stringify(body);
+  try{
+    // 90 second timeout — handles Render cold start
+    var controller=new AbortController();
+    var timeout=setTimeout(function(){controller.abort();},90000);
+    o.signal=controller.signal;
+    var r=await fetch(API+path,o);
+    clearTimeout(timeout);
+    var d=await r.json();
+    return{ok:r.ok,data:d};
+  }
+  catch(e){
+    if(e.name==='AbortError') return{ok:false,data:{message:'Server is taking too long. Please try again.'}};
+    return{ok:false,data:{message:'Connection error. Check your internet.'}};
+  }
+}
+function show(id){document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');});document.getElementById(id).classList.add('on');}
+function enterApp(){
+  show('pg-feed');
+  loadFeed();
+  loadProfile();
+  if(typeof checkUnreadCount==='function') setTimeout(checkUnreadCount,1000);
+}
+
+// LOGIN
+document.getElementById('lbtn').onclick=async function(){
+  var em=document.getElementById('lemail').value.trim();
+  var pw=document.getElementById('lpw').value.trim();
+  var err=document.getElementById('lerr');
+  if(!em||!pw){err.textContent='Enter email and password.';return;}
+  err.textContent='';
+  this.textContent='Signing in...';this.disabled=true;
+  err.textContent='';
+  var slowTimer2 = setTimeout(function(){ err.style.color='#7c6af7'; err.textContent='Starting up server... please wait 30 seconds ☕'; }, 5000);
+  var r=await api('/auth/login','POST',{email:em,password:pw});
+  clearTimeout(slowTimer2);
+  err.style.color='#e24b4a';
+  this.textContent='Sign In';this.disabled=false;
+  if(r.ok){token=r.data.token;user=r.data.user;localStorage.setItem('wm_token',token);localStorage.setItem('wm_user',JSON.stringify(user));enterApp();}
+  else{err.textContent=r.data.message||'Login failed.';}
+};
+
+// SIGNUP
+document.getElementById('sbtn').onclick=async function(){
+  var name=document.getElementById('sname').value.trim();
+  var em=document.getElementById('semail').value.trim();
+  var pw=document.getElementById('spw').value.trim();
+  var loc=document.getElementById('sloc').value.trim();
+  var err=document.getElementById('serr');
+  if(!name||!em||!pw){err.textContent='Fill in all fields.';return;}
+  if(pw.length<6){err.textContent='Password needs 6+ characters.';return;}
+  err.textContent='';
+  this.textContent='Creating...';this.disabled=true;
+  err.textContent='';
+  // Show message if taking long (Render sleeping)
+  var slowTimer = setTimeout(function(){ err.style.color='#7c6af7'; err.textContent='Starting up server... please wait 30 seconds ☕'; }, 5000);
+  var r=await api('/auth/signup','POST',{full_name:name,email:em,password:pw,location:loc});
+  clearTimeout(slowTimer);
+  err.style.color='#e24b4a';
+  this.textContent='Create Account';this.disabled=false;
+  if(r.ok){
+    token=r.data.token;user=r.data.user;
+    localStorage.setItem('wm_token',token);
+    localStorage.setItem('wm_user',JSON.stringify(user));
+    enterApp();
+  } else if(r.data.message && r.data.message.indexOf('already exists')>-1){
+    // Account was created but response timed out — try logging in
+    err.style.color='#7c6af7';
+    err.textContent='Account found! Signing you in...';
+    var lr=await api('/auth/login','POST',{email:em,password:pw});
+    if(lr.ok){
+      token=lr.data.token;user=lr.data.user;
+      localStorage.setItem('wm_token',token);
+      localStorage.setItem('wm_user',JSON.stringify(user));
+      enterApp();
+    } else {
+      err.style.color='#e24b4a';
+      err.textContent='Account exists. Please sign in instead.';
+      setTimeout(function(){show('pg-login');document.getElementById('lemail').value=em;},1500);
+    }
+  } else {
+    err.textContent=r.data.message||'Signup failed.';
+  }
+};
+
+document.getElementById('gosu').onclick=function(){show('pg-signup');};
+document.getElementById('goli').onclick=function(){show('pg-login');};
+
+// NAV
+function goFeed(){show('pg-feed');loadFeed();}
+function goMatch(){show('pg-matches');loadMatches();}
+function goPost(){show('pg-post');}
+function goProf(){show('pg-profile');loadProfile();}
+document.getElementById('n1').onclick=goFeed;
+document.getElementById('n2').onclick=goMatch;
+document.getElementById('n3').onclick=goPost;
+document.getElementById('n4').onclick=goProf;
+document.getElementById('n5').onclick=goFeed;
+document.getElementById('n6').onclick=goMatch;
+document.getElementById('n7').onclick=goPost;
+document.getElementById('n8').onclick=goProf;
+document.getElementById('n9').onclick=goFeed;
+document.getElementById('n10').onclick=goMatch;
+document.getElementById('n11').onclick=goPost;
+document.getElementById('n12').onclick=goProf;
+document.getElementById('n13').onclick=goFeed;
+document.getElementById('n14').onclick=goMatch;
+document.getElementById('n15').onclick=goPost;
+document.getElementById('n16').onclick=goProf;
+document.getElementById('cbk').onclick=function(){show('pg-matches');};
+document.getElementById('logbtn').onclick=function(){
+  token=null;user=null;localStorage.removeItem('wm_token');localStorage.removeItem('wm_user');show('pg-login');
+};
+document.getElementById('cmx').onclick=function(){document.getElementById('cmask').classList.remove('on');};
+document.getElementById('cmask').onclick=function(e){if(e.target===this)this.classList.remove('on');};
+
+// FEED
+async function loadFeed(){
+  var fb=document.getElementById('feed-body');
+  fb.innerHTML='<div style="height:80vh;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.4);font-size:13px;">Loading...</div>';
+  var r=await api('/projects?limit=20');
+  fb.innerHTML='';
+  if(!r.ok||!r.data.projects||!r.data.projects.length){
+    fb.innerHTML='<div style="height:80vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;"><div style="font-size:44px;">💡</div><div style="color:rgba(255,255,255,0.5);font-size:14px;text-align:center;padding:0 2rem;">No projects yet!<br>Post your first idea.</div></div>';
+    return;
+  }
+  r.data.projects.forEach(function(p){fb.appendChild(buildSlide(p));});
+  setupFeedObserver();
+}
+
+function buildSlide(p){
+  var s=document.createElement('div');
+  s.className='slide';
+  var q=clr(p.id);
+  var mode=p.mode==='collab'?'⚡ Seeking Collaborators':p.mode==='invest'?'💰 Seeking Investors':'⚡💰 Collab + Invest';
+
+  // BG
+  if(p.video_url){
+    var vid=document.createElement('video');
+    vid.src=p.video_url;
+    vid.setAttribute('playsinline','');
+    vid.setAttribute('loop','');
+    vid.muted=true;
+    vid.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
+    vid.onclick=function(){
+      if(!soundUnlocked){
+        soundUnlocked=true;
+        unlockSound();
+      } else {
+        if(vid.paused)vid.play();else vid.pause();
+      }
+    };
+    vid.dataset.vidEl='true';
+    s.appendChild(vid);
+    setTimeout(function(){vid.play().catch(function(){});},300);
+  }else{
+    var ph=document.createElement('div');
+    ph.style.cssText='position:absolute;inset:0;background:linear-gradient(160deg,'+q.bg+' 0%,#000 100%);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;';
+    var av=document.createElement('div');
+    av.style.cssText='width:86px;height:86px;border-radius:50%;background:'+q.bg+';border:3px solid '+q.c+'44;color:'+q.c+';display:flex;align-items:center;justify-content:center;font-weight:900;font-size:28px;';
+    av.textContent=ini(p.creator_name);
+    var lbl=document.createElement('div');
+    lbl.style.cssText='font-size:11px;color:rgba(255,255,255,0.3);';
+    lbl.textContent='No video — swipe to connect';
+    ph.appendChild(av);ph.appendChild(lbl);
+    s.appendChild(ph);
+  }
+
+  // Gradient
+  var g=document.createElement('div');g.className='s-grad';s.appendChild(g);
+
+  // Progress
+  var pr=document.createElement('div');pr.className='prog';
+  var pf=document.createElement('div');pf.className='prog-fill';pf.id='pf-'+p.id;
+  pr.appendChild(pf);s.appendChild(pr);
+  var w=0;var pt=setInterval(function(){w+=0.2;var el=document.getElementById('pf-'+p.id);if(!el){clearInterval(pt);return;}if(w>=100){clearInterval(pt);return;}el.style.width=w+'%';},100);
+
+  // Top
+  var tp=document.createElement('div');tp.className='s-top';
+  tp.innerHTML='<div class="s-logo">WE-NEED-<b style="color:#7c6af7">U</b></div>';
+  var pb=document.createElement('button');pb.className='s-postbtn';pb.textContent='+ Post idea';
+  pb.onclick=function(){show('pg-post');};
+  var bellWrap=document.createElement('div');
+  bellWrap.style.cssText='position:relative;display:flex;align-items:center;';
+  var bellBtn=document.createElement('button');
+  bellBtn.style.cssText='background:none;border:none;cursor:pointer;font-size:22px;padding:4px;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.9));';
+  bellBtn.textContent='🔔';
+  bellBtn.onclick=function(){show('pg-notifications');loadNotifications();};
+  var bellBadge=document.createElement('div');
+  bellBadge.id='bell-badge-'+p.id;
+  bellBadge.className='bell-badge';
+  bellBadge.style.cssText='display:none;position:absolute;top:0;right:0;background:#e24b4a;color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;align-items:center;justify-content:center;';
+  bellWrap.appendChild(bellBtn);bellWrap.appendChild(bellBadge);
+  tp.appendChild(bellWrap);
+  tp.appendChild(pb);s.appendChild(tp);
+
+  // Right actions
+  var ra=document.createElement('div');ra.className='s-right';
+  // Profile avatar at top of right sidebar
+    var ra=document.createElement('div');ra.className='s-right';
+  var raAv=document.createElement('div');raAv.style.cssText='width:46px;height:46px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,0.6);background:'+q.bg+';color:'+q.c+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;margin-bottom:4px;';
+  if(p.creator_avatar){var raI=document.createElement('img');raI.src=p.creator_avatar;raI.style.cssText='width:100%;height:100%;object-fit:cover;';raI.onerror=function(){this.parentElement.textContent=ini(p.creator_name);};raAv.appendChild(raI);}else{raAv.textContent=ini(p.creator_name);}
+  ra.appendChild(raAv);
+  ra.innerHTML+=
+    avatarHtml+
+    '<button class="s-rbtn" id="lb-'+p.id+'"><div class="s-rico" id="li-'+p.id+'">🤍</div><div class="s-rlbl">Like</div></button>'+
+    '<button class="s-rbtn" id="sb-'+p.id+'"><div class="s-rico" id="si-'+p.id+'">🔖</div><div class="s-rlbl">Save</div></button>'+
+    '<button class="s-rbtn" id="cmb-'+p.id+'"><div class="s-rico">💬</div><div class="s-rlbl" id="cc-'+p.id+'">'+(p.comment_count||0)+'</div></button>'+
+    '<button class="s-rbtn" id="shb-'+p.id+'"><div class="s-rico">↗</div><div class="s-rlbl">Share</div></button>';
+  s.appendChild(ra);
+  setTimeout(function(){
+    var lb=document.getElementById('lb-'+p.id);
+    var sb=document.getElementById('sb-'+p.id);
+    var cmb=document.getElementById('cmb-'+p.id);
+    var shb=document.getElementById('shb-'+p.id);
+    if(lb)lb.onclick=function(){var ico=document.getElementById('li-'+p.id);if(liked[p.id]){liked[p.id]=false;ico.textContent='🤍';}else{liked[p.id]=true;ico.textContent='❤️';showToast(p.id,'❤️ Liked!','rgba(226,75,74,0.9)');}};
+    if(sb)sb.onclick=function(){var ico=document.getElementById('si-'+p.id);if(saved[p.id]){saved[p.id]=false;ico.textContent='🔖';}else{saved[p.id]=true;ico.textContent='⭐';showToast(p.id,'⭐ Saved!','rgba(232,160,32,0.9)');}};
+    if(cmb)cmb.onclick=function(){openComments(p.id,p.title);};
+    if(shb)shb.onclick=function(){if(navigator.share)navigator.share({title:p.title,url:location.href});else{navigator.clipboard&&navigator.clipboard.writeText(location.href).then(function(){showToast(p.id,'🔗 Copied!','rgba(124,106,247,0.9)');});}};
+  },0);
+
+  // Info
+  var info=document.createElement('div');info.className='s-info';
+    var avatarRow = document.createElement('div');
+  avatarRow.style.cssText = 'display:flex;align-items:center;margin-bottom:4px;';
+  var avatarEl = document.createElement('div');
+  avatarEl.style.cssText = 'width:36px;height:36px;border-radius:50%;overflow:hidden;flex-shrink:0;margin-right:8px;border:2px solid rgba(255,255,255,0.5);background:'+q.bg+';color:'+q.c+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;';
+  if(p.creator_avatar){ var avImg=document.createElement('img'); avImg.src=p.creator_avatar; avImg.style.cssText='width:100%;height:100%;object-fit:cover;'; avImg.onerror=function(){this.parentElement.textContent=ini(p.creator_name);}; avatarEl.appendChild(avImg); } else { avatarEl.textContent=ini(p.creator_name); }
+  var nameCol=document.createElement('div');
+  nameCol.innerHTML='<div class="s-handle">@'+(p.creator_name||'user').toLowerCase().replace(/\s+/g,'_')+'</div><div class="s-loc">'+(p.creator_location||'Entrepreneur')+'</div>';
+  avatarRow.appendChild(avatarEl); avatarRow.appendChild(nameCol); info.appendChild(avatarRow);
+  info.innerHTML+='<div class="s-mode">'+mode+'</div><div class="s-title">'+p.title+'</div><div class="s-desc">'+((p.description||'').substring(0,110))+(p.description&&p.description.length>110?'...':'')+'</div>';
+  s.appendChild(info);
+
+  // Actions
+  var acts=document.createElement('div');acts.className='s-acts';
+  var ib=document.createElement('button');ib.className='s-btn btn-i';ib.textContent='💰 Invest';
+  ib.onclick=function(){if(ib.classList.contains('btn-sent'))return;ib.classList.add('btn-sent');ib.textContent='💰 Sent!';showToast(p.id,'💰 Investment sent!','rgba(232,160,32,0.95)');api('/matches/swipe','POST',{project_id:p.id,action:'invest'});};
+  var cb=document.createElement('button');cb.className='s-btn btn-c';cb.textContent='⚡ Collab';
+  cb.onclick=function(){if(cb.classList.contains('btn-sent'))return;cb.classList.add('btn-sent');cb.textContent='⚡ Sent!';showToast(p.id,'⚡ Collab request sent!','rgba(124,106,247,0.95)');api('/matches/swipe','POST',{project_id:p.id,action:'collab'});};
+  var profb=document.createElement('button');profb.className='s-btn btn-p';profb.textContent='👤';
+  profb.onclick=function(){
+    var qc=clr(p.id);
+    var cmavEl = document.getElementById('cmav');
+    if(p.creator_avatar){
+      var cI=document.createElement('img');cI.src=p.creator_avatar;cI.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%;';cmavEl.innerHTML='';cmavEl.style.cssText='background:transparent;padding:0;overflow:hidden;';cmavEl.appendChild(cI);
+    } else {
+      cmavEl.textContent=ini(p.creator_name);
+      cmavEl.style.background=qc.bg;
+      cmavEl.style.color=qc.c;
+    }
+    document.getElementById('cmname').textContent=p.creator_name||'Entrepreneur';
+    document.getElementById('cmloc').textContent=p.creator_location||'';
+    document.getElementById('cmproj').innerHTML='<div class="cmpt">'+p.title+'</div><div class="cmpd">'+(p.description||'')+'</div>';
+    document.getElementById('cmask').classList.add('on');
+  };
+  acts.appendChild(ib);acts.appendChild(cb);acts.appendChild(profb);s.appendChild(acts);
+
+  // Swipe overlays
+  var si=document.createElement('div');si.className='swipe-invest';si.textContent='💰 Invest';s.appendChild(si);
+  var sc=document.createElement('div');sc.className='swipe-collab';sc.textContent='⚡ Collab';s.appendChild(sc);
+
+  // Horizontal swipe gesture
+  var txStart=0,txCur=0,swiping=false;
+  s.addEventListener('touchstart',function(e){
+    if(e.touches.length!==1)return;
+    txStart=e.touches[0].clientX;txCur=txStart;swiping=true;
+  },{passive:true});
+  s.addEventListener('touchmove',function(e){
+    if(!swiping||e.touches.length!==1)return;
+    txCur=e.touches[0].clientX;
+    var dx=txCur-txStart;
+    if(Math.abs(dx)>20){
+      if(dx<0){si.style.opacity=Math.min(1,Math.abs(dx)/80);sc.style.opacity=0;}
+      else{sc.style.opacity=Math.min(1,dx/80);si.style.opacity=0;}
+    }
+  },{passive:true});
+  s.addEventListener('touchend',function(){
+    if(!swiping)return;
+    swiping=false;
+    var dx=txCur-txStart;
+    si.style.opacity=0;sc.style.opacity=0;
+    if(Math.abs(dx)<60)return;
+    if(dx<-60){
+      if(!ib.classList.contains('btn-sent')){ib.classList.add('btn-sent');ib.textContent='💰 Sent!';showToast(p.id,'💰 Investment request sent!','rgba(232,160,32,0.95)');api('/matches/swipe','POST',{project_id:p.id,action:'invest'});}
+    } else if(dx>60){
+      if(!cb.classList.contains('btn-sent')){cb.classList.add('btn-sent');cb.textContent='⚡ Sent!';showToast(p.id,'⚡ Collab request sent!','rgba(124,106,247,0.95)');api('/matches/swipe','POST',{project_id:p.id,action:'collab'});}
+    }
+  },{passive:true});
+
+  // Toast
+  var t=document.createElement('div');t.className='toast';t.id='t-'+p.id;s.appendChild(t);
+  api('/projects/'+p.id+'/view','POST');
+  return s;
+}
+
+function showToast(id,msg,color){
+  var el=document.getElementById('t-'+id);
+  if(!el)return;
+  el.textContent=msg;el.style.background=color;el.style.opacity='1';
+  setTimeout(function(){el.style.opacity='0';},2500);
+}
+
+// MATCHES
+function switchTab(tab){
+  document.getElementById('tab-invest').classList.toggle('active',tab==='invest');
+  document.getElementById('tab-collab').classList.toggle('active',tab==='collab');
+  document.getElementById('panel-invest').classList.toggle('active',tab==='invest');
+  document.getElementById('panel-collab').classList.toggle('active',tab==='collab');
+}
+async function loadMatches(){
+  var pi=document.getElementById('panel-invest');
+  var pc=document.getElementById('panel-collab');
+  pi.innerHTML='<div class="m-empty"><div class="m-empty-ico">⏳</div><div>Loading...</div></div>';
+  pc.innerHTML='<div class="m-empty"><div class="m-empty-ico">⏳</div><div>Loading...</div></div>';
+  var r=await api('/matches/my-matches');
+  if(!r.ok||!r.data.matches||!r.data.matches.length){
+    pi.innerHTML='<div class="m-empty"><div class="m-empty-ico">💰</div><div>No invest matches yet</div></div>';
+    pc.innerHTML='<div class="m-empty"><div class="m-empty-ico">⚡</div><div>No collab matches yet</div></div>';
+    return;
+  }
+  function buildMatchCard(m){
+    var q=clr(m.other_user_id);
+    var isPending=m.status==='pending',isDenied=m.status==='denied';
+    var d=document.createElement('div');
+    d.className='mrow-item '+(isPending?'pending':isDenied?'pending':'accepted');
+    d.dataset.cid=m.conversation_id;d.dataset.name=m.other_user_name||'User';
+    d.dataset.pending=(isPending||isDenied)?'1':'0';
+    var statusLabel=isPending?'⏳ Pending':isDenied?'🕐 Check Back Later':'✅ Connected';
+    var statusClass=isPending?'pending':isDenied?'denied':'accepted';
+        var mavDiv=document.createElement('div');mavDiv.className='mav';
+    if(m.other_user_avatar){mavDiv.style.cssText='padding:0;overflow:hidden;'+(isPending||isDenied?'opacity:0.6;':'');var mI=document.createElement('img');mI.src=m.other_user_avatar;mI.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%;';mI.onerror=function(){this.parentElement.textContent=ini(m.other_user_name);};mavDiv.appendChild(mI);}
+    else{mavDiv.style.cssText='background:'+q.bg+';color:'+q.c+(isPending||isDenied?';opacity:0.6':'');mavDiv.textContent=ini(m.other_user_name);}
+    d.appendChild(mavDiv);
+    d.innerHTML+=
+      '<div style="flex:1;min-width:0;"><div class="mname">'+(m.other_user_name||'User')+'</div>'+
+      '<div class="mproj">'+(m.project_title||'Project')+'</div>'+
+      '<div style="font-size:10px;color:#555;margin-top:2px;">'+(m.direction==='sent'?'You requested':'Requested you')+'</div></div>'+
+      '<div class="mstatus '+statusClass+'">'+statusLabel+'</div>';
+    d.onclick=function(){if(this.dataset.pending==='1')return;openChat(this.dataset.cid,this.dataset.name);};
+    return d;
+  }
+  function buildPanel(matches,emptyIco,emptyMsg,panel){
+    if(!matches.length){panel.innerHTML='<div class="m-empty"><div class="m-empty-ico">'+emptyIco+'</div><div>'+emptyMsg+'</div></div>';return;}
+    panel.innerHTML='';
+    matches.forEach(function(m){panel.appendChild(buildMatchCard(m));});
+  }
+  buildPanel(r.data.matches.filter(function(m){return m.match_type==='invest';}),'💰','No invest matches yet',pi);
+  buildPanel(r.data.matches.filter(function(m){return m.match_type==='collab';}),'⚡','No collab matches yet',pc);
+}
+
+async function openChat(cid,name){
+  convId=cid;
+  document.getElementById('cwho').textContent=name;
+  document.getElementById('cav').textContent=ini(name);
+  document.getElementById('msgs').innerHTML='';
+  show('pg-chat');
+  var r=await api('/messages/'+cid);
+  if(r.ok&&r.data.messages){
+    var area=document.getElementById('msgs');
+    r.data.messages.forEach(function(m){
+      var d=document.createElement('div');
+      d.className='msg '+(m.sender_id===user.id?'me':'them');
+      d.innerHTML='<div class="mbub">'+m.content+'</div>';
+      area.appendChild(d);
+    });
+    area.scrollTop=area.scrollHeight;
+  }
+}
+
+document.getElementById('csend').onclick=sendMsg;
+document.getElementById('cbox').onkeydown=function(e){if(e.key==='Enter')sendMsg();};
+async function sendMsg(){
+  var inp=document.getElementById('cbox');
+  var text=inp.value.trim();
+  if(!text||!convId)return;
+  var area=document.getElementById('msgs');
+  var d=document.createElement('div');
+  d.className='msg me';
+  d.innerHTML='<div class="mbub">'+text+'</div>';
+  area.appendChild(d);inp.value='';area.scrollTop=area.scrollHeight;
+  await api('/messages/'+convId,'POST',{content:text});
+}
+
+// PROFILE
+async function loadProfile(){
+  if(!user)return;
+  var n=user.full_name||'User';
+  // avatar
+  var pavEl=document.getElementById('pav');
+  if(user.avatar_url){
+    pavEl.innerHTML='<img src="'+user.avatar_url+'" alt="avatar"/>';
+  } else {
+    pavEl.textContent=ini(n);
+  }
+  document.getElementById('pname').textContent=n;
+  document.getElementById('ploc').textContent=user.location||'Location not set';
+  var r=await api('/auth/me');
+  if(r.ok&&r.data.user){
+    var u=r.data.user;
+    // update cached user avatar
+    if(u.avatar_url){user.avatar_url=u.avatar_url;pavEl.innerHTML='<img src="'+u.avatar_url+'" alt="avatar"/>';}
+    if(u.stats){
+      document.getElementById('sp').textContent=u.stats.projects||0;
+      document.getElementById('sm').textContent=u.stats.matches||0;
+    }
+  }
+  var r2=await api('/projects/mine');
+  var el=document.getElementById('myprojs');
+  if(!r2.ok||!r2.data.projects||!r2.data.projects.length){
+    el.innerHTML='<div style="text-align:center;padding:2rem 0;font-size:13px;color:#666;">No projects yet.</div>';return;
+  }
+  var grid=document.createElement('div');grid.className='proj-grid';
+  r2.data.projects.forEach(function(p){
+    var q=clr(p.id);
+    var mc=p.mode==='collab'?'#7c6af7':p.mode==='invest'?'#e8a020':'#d4537e';
+    var ml=p.mode==='collab'?'⚡ Collab':p.mode==='invest'?'💰 Invest':'⭐ Both';
+    var cell=document.createElement('div');cell.className='proj-cell';
+    if(p.video_url){
+      var vid=document.createElement('video');
+      vid.src=p.video_url;vid.setAttribute('playsinline','');vid.muted=true;vid.preload='metadata';
+      cell.appendChild(vid);
+      var ico=document.createElement('div');
+      ico.style.cssText='position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:26px;color:rgba(255,255,255,0.8);z-index:1;';
+      ico.textContent='▶';cell.appendChild(ico);
+    } else {
+      var ph=document.createElement('div');ph.className='proj-cell-placeholder';
+      ph.style.cssText='background:linear-gradient(135deg,'+q.bg+',#000);color:'+q.c+';';
+      ph.textContent=ini(p.creator_name||n);cell.appendChild(ph);
+    }
+    var info=document.createElement('div');info.className='proj-cell-info';
+    info.innerHTML=
+      '<div class="proj-cell-title">'+p.title+'</div>'+
+      '<span class="proj-cell-badge" style="background:'+mc+'22;color:'+mc+';">'+ml+'</span>'+
+      '<div class="proj-cell-stats">'+
+        '<span style="color:#f5c97a;">'+(p.invest_count||0)+'</span> invest · '+
+        '<span style="color:#a99cf9;">'+(p.collab_count||0)+'</span> collab · '+
+        '<span style="color:#f87171;">'+(p.like_count||0)+'</span> ❤️'+
+      '</div>';
+    cell.appendChild(info);
+    cell.onclick=function(){openPostDetail(p);};
+    grid.appendChild(cell);
+  });
+  el.innerHTML='';el.appendChild(grid);
+}
+
+// AVATAR UPLOAD
+document.getElementById('pav-wrap').onclick=function(){
+  document.getElementById('avatar-file').click();
+};
+document.getElementById('avatar-file').onchange=async function(){
+  var f=this.files[0];if(!f)return;
+  var pavEl=document.getElementById('pav');
+  pavEl.innerHTML='<div style="font-size:11px;color:#aaa;">...</div>';
+  var reader=new FileReader();
+  reader.onload=async function(e){
+    var base64=e.target.result;
+    var r=await api('/auth/profile','PUT',{avatar_base64:base64});
+    if(r.ok&&r.data.user&&r.data.user.avatar_url){
+      user.avatar_url=r.data.user.avatar_url;
+      pavEl.innerHTML='<img src="'+user.avatar_url+'" alt="avatar"/>';
+      showAvatarToast('✅ Profile photo updated!');
+    } else {
+      pavEl.textContent=ini(user.full_name);
+      showAvatarToast('❌ Upload failed, try again');
+    }
+  };
+  reader.readAsDataURL(f);
+};
+function showAvatarToast(msg){
+  var t=document.createElement('div');
+  t.style.cssText='position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:999;';
+  t.textContent=msg;
+  document.getElementById('app').appendChild(t);
+  setTimeout(function(){t.remove();},2500);
+}
+var currentProjId=null,pdVid=null;
+function openPostDetail(p){
+  currentProjId=p.id;
+  var q=clr(p.id);
+  var mc=p.mode==='collab'?'#7c6af7':p.mode==='invest'?'#e8a020':'#d4537e';
+  var ml=p.mode==='collab'?'⚡ Seeking Collaborators':p.mode==='invest'?'💰 Seeking Investors':'⚡💰 Collab + Invest';
+  var wrap=document.getElementById('pd-video-wrap');
+  var old=wrap.querySelector('video,.pd-placeholder');if(old)old.remove();
+  pdVid=null;
+  if(p.video_url){
+    pdVid=document.createElement('video');
+    pdVid.src=p.video_url;pdVid.setAttribute('playsinline','');pdVid.setAttribute('loop','');
+    pdVid.muted=false;pdVid.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
+    wrap.insertBefore(pdVid,wrap.firstChild);
+    pdVid.play().catch(function(){pdVid.muted=true;pdVid.play();});
+    wrap.onclick=function(e){
+      if(e.target.closest('.pd-back')||e.target.closest('.pd-requests-btn'))return;
+      var ico=document.getElementById('pd-play-ico');
+      if(pdVid.paused){pdVid.play();ico.textContent='▶';ico.style.opacity='1';setTimeout(function(){ico.style.opacity='0';},600);}
+      else{pdVid.pause();ico.textContent='⏸';ico.style.opacity='1';}
+    };
+  } else {
+    var ph=document.createElement('div');ph.className='pd-placeholder';
+    ph.style.cssText='position:absolute;inset:0;background:linear-gradient(160deg,'+q.bg+',#000);display:flex;align-items:center;justify-content:center;font-size:52px;color:'+q.c+';';
+    ph.textContent=ini(p.creator_name||user.full_name);wrap.insertBefore(ph,wrap.firstChild);
+  }
+  document.getElementById('pd-handle').textContent='@'+(p.creator_name||user.full_name||'user').toLowerCase().replace(/\s+/g,'_');
+  document.getElementById('pd-title').textContent=p.title||'';
+  document.getElementById('pd-desc').textContent=p.description||'';
+  document.getElementById('pd-mode').textContent=ml;
+  document.getElementById('pd-mode').style.cssText='display:inline-block;font-size:10px;padding:3px 10px;border-radius:20px;background:'+mc+'22;color:'+mc+';margin-bottom:8px;';
+  document.getElementById('pd-invest').textContent=p.invest_count||0;
+  document.getElementById('pd-collab').textContent=p.collab_count||0;
+  document.getElementById('pd-views').textContent=p.views||0;
+  document.getElementById('pd-likes').textContent=p.like_count||0;
+  document.getElementById('post-detail-mask').classList.add('on');
+  api('/projects/'+p.id+'/requests').then(function(r){
+    if(r.ok&&r.data.requests){var cnt=r.data.requests.length;document.getElementById('pd-req-count').textContent=cnt>0?'('+cnt+')':'';}
+  });
+  loadDetailComments(p.id);
+}
+
+async function loadDetailComments(pid){
+  var list=document.getElementById('pd-comments-list');
+  list.innerHTML='<div style="font-size:12px;color:#555;text-align:center;padding:1rem;">Loading...</div>';
+  var r=await api('/projects/'+pid+'/comments');
+  if(!r.ok||!r.data.comments||!r.data.comments.length){
+    list.innerHTML='<div style="font-size:12px;color:#555;text-align:center;padding:1rem;">No comments yet</div>';return;
+  }
+  var comments=r.data.comments.filter(function(c){return !c.parent_id;});
+  var replies=r.data.comments.filter(function(c){return c.parent_id;});
+  list.innerHTML='';
+  comments.forEach(function(c){
+    var div=document.createElement('div');div.className='pd-comment';
+    var threadReplies=replies.filter(function(rep){return rep.parent_id===c.id;});
+    var repHtml=threadReplies.map(function(rep){
+      return '<div class="pd-comment-reply"><span style="color:#7c6af7;font-weight:600;font-size:10px;">'+(rep.user_name||'User')+'</span> <span style="font-size:11px;color:#999;">'+rep.content+'</span></div>';
+    }).join('');
+    div.innerHTML='<div class="pd-comment-name">'+(c.user_name||'User')+'</div><div class="pd-comment-text">'+c.content+'</div>'+repHtml;
+    list.appendChild(div);
+  });
+}
+
+document.getElementById('pd-back').onclick=function(){
+  if(pdVid){pdVid.pause();pdVid.remove();pdVid=null;}
+  var ph=document.getElementById('pd-video-wrap').querySelector('.pd-placeholder');if(ph)ph.remove();
+  document.getElementById('post-detail-mask').classList.remove('on');
+  document.getElementById('req-sheet').classList.remove('on');
+  document.getElementById('likes-sheet').classList.remove('on');
+};
+document.getElementById('pd-requests-btn').onclick=function(){openRequests();};
+document.getElementById('req-close').onclick=function(){document.getElementById('req-sheet').classList.remove('on');};
+document.getElementById('likes-close').onclick=function(){document.getElementById('likes-sheet').classList.remove('on');};
+document.getElementById('pd-likes-btn').onclick=async function(){
+  document.getElementById('likes-sheet').classList.add('on');
+  var list=document.getElementById('likes-list');
+  list.innerHTML='<div class="req-empty">Loading...</div>';
+  var r=await api('/projects/'+currentProjId+'/likes');
+  if(!r.ok||!r.data.likes||!r.data.likes.length){list.innerHTML='<div class="req-empty">No likes yet</div>';return;}
+  list.innerHTML='';
+  r.data.likes.forEach(function(u){
+    var q=clr(u.id);
+    var div=document.createElement('div');
+    div.style.cssText='display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #1e1e1e;';
+    div.innerHTML='<div style="width:38px;height:38px;border-radius:50%;background:'+q.bg+';color:'+q.c+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;">'+ini(u.full_name)+'</div>'+
+      '<div><div style="font-size:13px;font-weight:600;color:#fff;">'+u.full_name+'</div>'+
+      '<div style="font-size:11px;color:#666;">'+(u.location||'')+'</div></div>'+
+      '<div style="margin-left:auto;font-size:18px;">❤️</div>';
+    list.appendChild(div);
+  });
+};
+async function openRequests(){
+  document.getElementById('req-sheet').classList.add('on');
+  var list=document.getElementById('req-list');
+  list.innerHTML='<div class="req-empty">Loading...</div>';
+  var r=await api('/projects/'+currentProjId+'/requests');
+  if(!r.ok||!r.data.requests||!r.data.requests.length){list.innerHTML='<div class="req-empty">No pending requests 🎉</div>';return;}
+  list.innerHTML='';
+  r.data.requests.forEach(function(req){
+    var q=clr(req.requester_id);
+    var isInvest=req.match_type==='invest';
+    var typeStyle=isInvest?'background:rgba(232,160,32,0.15);color:#f5c97a;':'background:rgba(124,106,247,0.15);color:#a99cf9;';
+    var div=document.createElement('div');div.className='req-item';
+    div.innerHTML=
+      '<div class="req-item-top">'+
+        '<div class="req-item-av" style="background:'+q.bg+';color:'+q.c+';">'+ini(req.requester_name)+'</div>'+
+        '<div><div class="req-item-name">'+(req.requester_name||'User')+'</div>'+
+        '<div class="req-item-loc">'+(req.requester_location||'')+'</div>'+
+        '<span class="req-item-type" style="'+typeStyle+'">'+(isInvest?'💰 Wants to Invest':'⚡ Wants to Collab')+'</span></div>'+
+      '</div>'+
+      '<div class="req-btns">'+
+        '<button class="req-btn accept" data-id="'+req.id+'">✅ Accept</button>'+
+        '<button class="req-btn deny" data-id="'+req.id+'">Check Back Later</button>'+
+      '</div>';
+    div.querySelector('.accept').onclick=async function(){
+      var res=await api('/matches/'+this.dataset.id+'/accept','POST');
+      if(res.ok){
+        this.closest('.req-item').innerHTML='<div style="text-align:center;padding:10px;font-size:12px;color:#4ade80;">✅ Accepted! You are now connected.</div>';
+        loadMatches();
+        var cnt=list.querySelectorAll('.req-item').length;
+        document.getElementById('pd-req-count').textContent=cnt>0?'('+cnt+')':'';
+      }
+    };
+    div.querySelector('.deny').onclick=async function(){
+      var res=await api('/matches/'+this.dataset.id+'/deny','POST');
+      if(res.ok){
+        this.closest('.req-item').innerHTML='<div style="display:flex;align-items:center;gap:10px;padding:4px 0;"><div style="font-size:22px;">🕐</div><div><div style="font-size:12px;font-weight:600;color:#aaa;">Check Back Later</div></div></div>';
+        var cnt=list.querySelectorAll('.req-item').length;
+        document.getElementById('pd-req-count').textContent=cnt>0?'('+cnt+')':'';
+      }
+    };
+    list.appendChild(div);
+  });
+}
+
+// POST
+document.getElementById('mc').onclick=function(){setMode('collab');};
+document.getElementById('mi').onclick=function(){setMode('invest');};
+document.getElementById('mb').onclick=function(){setMode('both');};
+function setMode(m){
+  postMode=m;
+  document.getElementById('mc').className='mdb'+(m==='collab'?' sc':'');
+  document.getElementById('mi').className='mdb'+(m==='invest'?' si':'');
+  document.getElementById('mb').className='mdb'+(m==='both'?' sb':'');
+}
+document.getElementById('upbox').onclick=function(){document.getElementById('vfile').click();};
+document.getElementById('vfile').onchange=function(){
+  var f=this.files[0];if(!f)return;
+  selVid=f;
+  var vp=document.getElementById('vprev');
+  vp.src=URL.createObjectURL(f);vp.style.display='block';
+};
+document.getElementById('pbtn').onclick=async function(){
+  var title=document.getElementById('ptitle').value.trim();
+  var desc=document.getElementById('pdesc').value.trim();
+  var cat=document.getElementById('pcat').value;
+  var skills=document.getElementById('pskills').value.trim();
+  if(!title){alert('Please add a project title');return;}
+  if(!desc){alert('Please describe your project');return;}
+  if(!postMode){alert('Please select what you are looking for');return;}
+  this.disabled=true;this.textContent='Posting...';
+  var video_url=null;
+  if(selVid){
+    document.getElementById('uping').classList.add('on');
+    try{
+      var reader=new FileReader();
+      video_url=await new Promise(function(resolve,reject){
+        reader.onload=async function(e){
+          var r=await api('/upload','POST',{data:e.target.result,type:selVid.type});
+          if(r.ok&&r.data.url)resolve(r.data.url);
+          else reject(new Error(r.data.message||'Upload failed'));
+        };
+        reader.onerror=function(){reject(new Error('Read failed'));};
+        reader.readAsDataURL(selVid);
+      });
+    }catch(e){alert('Video upload failed. Posting without video.');video_url=null;}
+    document.getElementById('uping').classList.remove('on');
+  }
+  var r=await api('/projects','POST',{title:title,description:desc,category:cat,mode:postMode,tags:skills?skills.split(',').map(function(s){return s.trim();}):[],video_url:video_url});
+  this.disabled=false;this.textContent='Post to Feed →';
+  if(r.ok){
+    document.getElementById('ptitle').value='';document.getElementById('pdesc').value='';document.getElementById('pskills').value='';
+    document.getElementById('vprev').style.display='none';document.getElementById('vprev').src='';
+    selVid=null;postMode=null;setMode(null);
+    show('pg-feed');setTimeout(loadFeed,500);
+  }else{alert(r.data.message||'Failed to post.');}
+};
+
+// COMMENTS
+var replyToId=null;
+var replyToName=null;
+
+async function openComments(projectId, projectTitle){
+  currentProjectId=projectId;
+  replyToId=null;
+  replyToName=null;
+  document.getElementById('reply-bar').style.display='none';
+  document.getElementById('comment-input').placeholder='Write a comment...';
+  document.getElementById('comments-title').textContent='💬 '+projectTitle;
+  document.getElementById('comments-list').innerHTML='<div style="text-align:center;padding:1rem;font-size:12px;color:#666;">Loading comments...</div>';
+  document.getElementById('comments-mask').classList.add('on');
+  loadComments();
+}
+
+async function loadComments(){
+  var r=await api('/projects/'+currentProjectId+'/comments');
+  var list=document.getElementById('comments-list');
+  if(!r.ok||!r.data.comments||!r.data.comments.length){
+    list.innerHTML='<div style="text-align:center;padding:2rem;font-size:13px;color:#666;">No comments yet. Be the first!</div>';
+    return;
+  }
+  var comments=r.data.comments.filter(function(c){return !c.parent_id;});
+  var replies=r.data.comments.filter(function(c){return c.parent_id;});
+  list.innerHTML='';
+  comments.forEach(function(c){
+    var div=document.createElement('div');
+    div.style.cssText='padding:10px 0;border-bottom:1px solid #1e1e1e;';
+    div.innerHTML=
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">'+
+      '<div style="font-size:12px;font-weight:600;color:#a99cf9;">'+(c.user_name||'User')+'</div>'+
+      '<button onclick="setReply(\''+c.id+'\',\''+c.user_name+'\')" style="background:none;border:none;color:#666;font-size:11px;cursor:pointer;">↩️ Reply</button>'+
+      '</div>'+
+      '<div style="font-size:13px;color:#ccc;line-height:1.4;margin-bottom:6px;">'+c.content+'</div>';
+    var threadReplies=replies.filter(function(r){return r.parent_id===c.id;});
+    if(threadReplies.length){
+      var replyDiv=document.createElement('div');
+      replyDiv.style.cssText='margin-left:16px;border-left:2px solid #2a2a3e;padding-left:10px;';
+      threadReplies.forEach(function(rep){
+        replyDiv.innerHTML+=
+          '<div style="padding:6px 0;border-bottom:1px solid #1a1a1a;">'+
+          '<div style="font-size:11px;font-weight:600;color:#7c6af7;margin-bottom:2px;">'+(rep.user_name||'User')+'</div>'+
+          '<div style="font-size:12px;color:#aaa;line-height:1.4;">'+rep.content+'</div>'+
+          '</div>';
+      });
+      div.appendChild(replyDiv);
+    }
+    list.appendChild(div);
+  });
+}
+
+function setReply(commentId, userName){
+  replyToId=commentId;
+  replyToName=userName;
+  document.getElementById('reply-bar').style.display='flex';
+  document.getElementById('reply-label').textContent='↩️ Replying to '+userName;
+  document.getElementById('comment-input').placeholder='Reply to '+userName+'...';
+  document.getElementById('comment-input').focus();
+}
+
+document.getElementById('cancel-reply').onclick=function(){
+  replyToId=null;
+  replyToName=null;
+  document.getElementById('reply-bar').style.display='none';
+  document.getElementById('comment-input').placeholder='Write a comment...';
+};
+
+async function sendComment(){
+  var inp=document.getElementById('comment-input');
+  var text=inp.value.trim();
+  if(!text||!currentProjectId)return;
+  if(!token){alert('Please sign in to comment.');return;}
+  inp.value='';
+  var body={content:text};
+  if(replyToId)body.parent_id=replyToId;
+  var r=await api('/projects/'+currentProjectId+'/comments','POST',body);
+  if(r.ok){
+    replyToId=null;replyToName=null;
+    document.getElementById('reply-bar').style.display='none';
+    document.getElementById('comment-input').placeholder='Write a comment...';
+    loadComments();
+    var ccEl=document.getElementById('cc-'+currentProjectId);
+    if(ccEl)ccEl.textContent=parseInt(ccEl.textContent||0)+1;
+  }
+}
+
+document.getElementById('comment-send').onclick=sendComment;
+document.getElementById('comment-input').onkeydown=function(e){if(e.key==='Enter')sendComment();};
+document.getElementById('comments-close').onclick=function(){document.getElementById('comments-mask').classList.remove('on');};
+document.getElementById('comments-mask').onclick=function(e){if(e.target===this)this.classList.remove('on');};
+
+
+// ── GOOGLE SIGN IN (Capacitor-compatible) ──────
+var GOOGLE_CLIENT_ID = '855168386507-5tjaea79rg95ghmjb57eirpggeoapj9b.apps.googleusercontent.com';
+var BACKEND = 'https://workmatch-backend.onrender.com';
+
+function triggerGoogleSignIn() {
+  var errEl = document.getElementById('lerr') || document.getElementById('serr');
+  if(errEl) errEl.textContent = '';
+  
+  // Initialize Google One Tap with your domain
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: handleGoogleSignIn,
+    auto_select: false,
+    cancel_on_tap_outside: true,
+  });
+  
+  // Render button in a container
+  var container = document.getElementById('g-btn-container');
+  if(container) {
+    container.innerHTML = '';
+    google.accounts.id.renderButton(container, {
+      theme: 'filled_black',
+      size: 'large', 
+      width: 280,
+      text: 'continue_with',
+      shape: 'rectangular',
+    });
+    // Auto click the rendered button
+    setTimeout(function() {
+      var btn = container.querySelector('div[role=button]');
+      if(btn) btn.click();
+    }, 300);
+  }
+}
+
+// Called when app gets focus back after Google redirect
+async function handleGoogleCallback(code) {
+  var errEl = document.getElementById('lerr') || document.getElementById('serr');
+  var lbtn = document.getElementById('google-login-btn');
+  var sbtn = document.getElementById('google-signup-btn');
+
+  if(lbtn) lbtn.textContent = 'Signing in...';
+  if(sbtn) sbtn.textContent = 'Signing in...';
+
+  var r = await api('/auth/google/mobile', 'POST', { code: code, redirect_uri: BACKEND + '/api/auth/google/callback' });
+
+  var gIcon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>';
+  if(lbtn) lbtn.innerHTML = gIcon + ' Continue with Google';
+  if(sbtn) sbtn.innerHTML = gIcon + ' Sign up with Google';
+
+  if(r.ok) {
+    token = r.data.token;
+    user  = r.data.user;
+    localStorage.setItem('wm_token', token);
+    localStorage.setItem('wm_user', JSON.stringify(user));
+    enterApp();
+  } else {
+    if(errEl) errEl.textContent = r.data.message || 'Google sign in failed. Try again.';
+  }
+}
+
+// Listen for redirect back from Google
+window.addEventListener('message', function(e) {
+  if(e.data && e.data.type === 'google-auth' && e.data.code) {
+    handleGoogleCallback(e.data.code);
+  }
+});
+
+
+
+async function handleGoogleSignIn(googleResponse) {
+  var errEl = document.getElementById('lerr') || document.getElementById('serr');
+  var lbtn = document.getElementById('google-login-btn');
+  var sbtn = document.getElementById('google-signup-btn');
+  if(lbtn) lbtn.textContent = 'Signing in...';
+  if(sbtn) sbtn.textContent = 'Signing in...';
+  
+  var r = await api('/auth/google', 'POST', { id_token: googleResponse.credential });
+  
+  var gIcon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>';
+  if(lbtn) lbtn.innerHTML = gIcon + ' Continue with Google';
+  if(sbtn) sbtn.innerHTML = gIcon + ' Sign up with Google';
+  
+  if(r.ok) {
+    token = r.data.token;
+    user  = r.data.user;
+    localStorage.setItem('wm_token', token);
+    localStorage.setItem('wm_user', JSON.stringify(user));
+    enterApp();
+  } else {
+    if(errEl) errEl.textContent = r.data.message || 'Google sign in failed.';
+  }
+}
+
+async function exchangeGoogleToken(accessToken) {
+  var errEl = document.getElementById('lerr') || document.getElementById('serr');
+  var lbtn  = document.getElementById('google-login-btn');
+  var sbtn  = document.getElementById('google-signup-btn');
+  if(lbtn) lbtn.textContent = 'Signing in...';
+  if(sbtn) sbtn.textContent = 'Signing in...';
+  try {
+    var resp  = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: 'Bearer ' + accessToken }
+    });
+    var gUser = await resp.json();
+    var r     = await api('/auth/google/token', 'POST', { access_token: accessToken, user: gUser });
+    var gIcon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>';
+    if(lbtn) lbtn.innerHTML = gIcon + ' Continue with Google';
+    if(sbtn) sbtn.innerHTML = gIcon + ' Sign up with Google';
+    if(r.ok) {
+      token = r.data.token; user = r.data.user;
+      localStorage.setItem('wm_token', token);
+      localStorage.setItem('wm_user', JSON.stringify(user));
+      enterApp();
+    } else {
+      if(errEl) errEl.textContent = r.data.message || 'Google sign in failed.';
+    }
+  } catch(e) {
+    console.error('Exchange error:', e);
+    if(errEl) errEl.textContent = 'Google sign in failed. Try again.';
+  }
+}
+
+
+// ── NOTIFICATIONS ──────────────────────────
+async function loadNotifications() {
+  var list=document.getElementById('notif-list');
+  if(!list) return;
+  list.innerHTML='<div style="text-align:center;padding:40px;color:#555;font-size:14px;">Loading...</div>';
+  var r=await api('/notifications','GET');
+  if(!r.ok){list.innerHTML='<div style="text-align:center;padding:40px;color:#555;">Failed to load</div>';return;}
+  var notifs=r.data.notifications||[];
+  if(notifs.length===0){
+    list.innerHTML='<div style="text-align:center;padding:60px 20px;color:#555;font-size:14px;">No notifications yet<br><br>When someone invests, collabs,<br>likes or comments — it shows here 🔔</div>';
+    return;
+  }
+  var icons={invest:'💰',collab:'⚡',accepted:'✅',comment:'💬',like:'❤️',message:'📩'};
+  list.innerHTML=notifs.map(function(n){
+    var time=timeAgoN(n.created_at);
+    var icon=icons[n.type]||'🔔';
+    return '<div style="display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-bottom:1px solid #111;background:'+(n.is_read?'transparent':'rgba(124,106,247,0.06)')+';" onclick="markRead(\"'+n.id+'\")">'+
+      '<div style="font-size:24px;flex-shrink:0;">'+icon+'</div>'+
+      '<div style="flex:1;">'+
+        '<div style="font-size:14px;font-weight:'+(n.is_read?400:600)+';color:#fff;margin-bottom:3px;">'+n.title+'</div>'+
+        '<div style="font-size:13px;color:#888;line-height:1.4;">'+n.body+'</div>'+
+        '<div style="font-size:11px;color:#555;margin-top:4px;">'+time+'</div>'+
+      '</div>'+
+      (!n.is_read?'<div style="width:8px;height:8px;border-radius:50%;background:#7c6af7;flex-shrink:0;margin-top:6px;"></div>':'')+
+    '</div>';
+  }).join('');
+  updateNotifBadge(0);
+}
+
+function timeAgoN(d){
+  var s=Math.floor((Date.now()-new Date(d))/1000);
+  if(s<60) return 'Just now';
+  if(s<3600) return Math.floor(s/60)+'m ago';
+  if(s<86400) return Math.floor(s/3600)+'h ago';
+  return Math.floor(s/86400)+'d ago';
+}
+
+async function markRead(id){
+  await api('/notifications/'+id+'/read','PUT');
+}
+
+async function markAllRead(){
+  await api('/notifications/read-all','PUT');
+  loadNotifications();
+}
+
+function updateNotifBadge(count){
+  document.querySelectorAll('.bell-badge').forEach(function(b){
+    if(count>0){b.style.display='flex';b.textContent=count>9?'9+':count;}
+    else{b.style.display='none';}
+  });
+}
+
+async function checkUnreadCount(){
+  if(!token) return;
+  var r=await api('/notifications/unread-count','GET');
+  if(r.ok) updateNotifBadge(r.data.count);
+}
+
+setInterval(function(){ if(typeof checkUnreadCount==='function') checkUnreadCount(); },30000);
+
+// INIT
+window.onload=function(){
+  // Check if we're returning from Google OAuth redirect
+  var hash = window.location.hash;
+  if(hash && hash.indexOf('access_token') > -1) {
+    // Extract the access token from URL hash
+    var params = new URLSearchParams(hash.substring(1));
+    var accessToken = params.get('access_token');
+    if(accessToken) {
+      // Clear the hash from URL
+      history.replaceState(null, null, window.location.pathname);
+      // Exchange token for our JWT
+      exchangeGoogleToken(accessToken);
+      return;
+    }
+  }
+  if(token&&user)enterApp();
+};
+</script>
+</body>
+</html>
