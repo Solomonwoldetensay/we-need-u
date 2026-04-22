@@ -294,10 +294,13 @@ textarea.fi{min-height:75px;resize:vertical;}
 </div>
 
 <!-- MATCHES -->
-<div class="pg" id="pg-matches">
+<div class="pg" id="pg-matches" style="background:#0d0d0d;">
   <div class="inner-pg">
-    <div class="pg-top" style="padding-bottom:0;">
-      <div class="pg-title" style="margin-bottom:12px;">Your Matches</div>
+    <div class="pg-top" style="padding-bottom:0;background:#0d0d0d;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <button onclick="show('pg-feed');loadFeed();" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:0;">←</button>
+        <div class="pg-title" style="margin-bottom:0;">Messages & Matches</div>
+      </div>
       <div class="match-tabs">
         <div class="mtab invest-tab active" id="tab-invest" onclick="switchTab('invest')">💰 Invest</div>
         <div class="mtab collab-tab" id="tab-collab" onclick="switchTab('collab')">⚡ Collab</div>
@@ -619,19 +622,19 @@ function goPost(){show('pg-post');}
 function goProf(){show('pg-profile');loadProfile();}
 document.getElementById('n1').onclick=goFeed;
 document.getElementById('n2').onclick=goMatch;
-document.getElementById('n3').onclick=function(){show('pg-messages');loadMatches();};
+document.getElementById('n3').onclick=function(){show('pg-matches');loadMatches();};
 document.getElementById('n4').onclick=goProf;
 document.getElementById('n5').onclick=goFeed;
 document.getElementById('n6').onclick=goMatch;
-document.getElementById('n7').onclick=function(){show('pg-messages');loadMatches();};
+document.getElementById('n7').onclick=function(){show('pg-matches');loadMatches();};
 document.getElementById('n8').onclick=goProf;
 document.getElementById('n9').onclick=goFeed;
 document.getElementById('n10').onclick=goMatch;
-document.getElementById('n11').onclick=function(){show('pg-messages');loadMatches();};
+document.getElementById('n11').onclick=function(){show('pg-matches');loadMatches();};
 document.getElementById('n12').onclick=goProf;
 document.getElementById('n13').onclick=goFeed;
 document.getElementById('n14').onclick=goMatch;
-document.getElementById('n15').onclick=function(){show('pg-messages');loadMatches();};
+document.getElementById('n15').onclick=function(){show('pg-matches');loadMatches();};
 document.getElementById('n16').onclick=goProf;
 document.getElementById('cbk').onclick=function(){show('pg-matches');};
 document.getElementById('logbtn').onclick=function(){
