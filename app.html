@@ -385,6 +385,7 @@ textarea.fi{min-height:75px;resize:vertical;}
           <div class="psl">⚡ Collab</div>
         </div>
         <div><div class="psv" id="sp">0</div><div class="psl">Projects</div></div>
+        <div><div class="psv" id="sm">0</div><div class="psl">Matches</div></div>
       </div>
     </div>
     <div class="pg-body">
@@ -928,8 +929,8 @@ async function loadProfile(){
     // update cached user avatar
     if(u.avatar_url){user.avatar_url=u.avatar_url;pavEl.innerHTML='<img src="'+u.avatar_url+'" alt="avatar"/>';}
     if(u.stats){
-      document.getElementById('sp').textContent=u.stats.projects||0;
-      document.getElementById('sm').textContent=u.stats.matches||0;
+      var spEl=document.getElementById('sp'); if(spEl) spEl.textContent=u.stats.projects||0;
+      var smEl=document.getElementById('sm'); if(smEl) smEl.textContent=u.stats.matches||0;
     }
     // Load invest/collab counts
     var mr = await api('/matches/my-matches','GET');
