@@ -1481,6 +1481,8 @@ setInterval(function(){ if(token) safeCheckUnread(); },30000);
 
 // ── MESSAGES PAGE ──────────────────────────
 async function loadMessages(){
+  msgLastSeenAt = new Date(); // Record when user opened messages
+  updateMsgBadge(0);
   var list = document.getElementById('messages-list');
   if(!list) return;
   list.innerHTML = '<div style="text-align:center;padding:40px;color:#555;font-size:14px;">Loading...</div>';
@@ -1530,16 +1532,22 @@ function updateMsgBadge(count){
   });
 }
 
+var msgLastSeenAt = null;
 async function checkUnreadMessages(){
   if(!token) return;
   try {
     var r = await api('/matches/my-matches','GET');
     if(!r.ok) return;
-    var unread = (r.data.matches||[]).filter(function(m){ return m.status==='accepted' && m.last_message; }).length;
     // Don't show badge if Messages page is currently open
     var msgPageOpen = document.getElementById('pg-messages') && document.getElementById('pg-messages').classList.contains('on');
-    if(msgPageOpen) updateMsgBadge(0);
-    else updateMsgBadge(unread);
+    if(msgPageOpen){ updateMsgBadge(0); return; }
+    // Only count messages newer than last seen time
+    var unread = (r.data.matches||[]).filter(function(m){
+      if(m.status!=='accepted' || !m.last_message) return false;
+      if(!msgLastSeenAt) return true;
+      return m.last_message_at && new Date(m.last_message_at) > msgLastSeenAt;
+    }).length;
+    updateMsgBadge(unread);
   } catch(e){}
 }
 setInterval(function(){ if(token) checkUnreadMessages(); }, 30000);
