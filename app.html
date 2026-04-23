@@ -376,8 +376,15 @@ textarea.fi{min-height:75px;resize:vertical;}
       <div class="pname" id="pname">Solomon</div>
       <div class="ploc" id="ploc">Moorhead, MN</div>
       <div class="pstats">
+        <div onclick="showProfileRequests('invest')" style="cursor:pointer;">
+          <div class="psv" id="sp-invest">0</div>
+          <div class="psl">💰 Invest</div>
+        </div>
+        <div onclick="showProfileRequests('collab')" style="cursor:pointer;">
+          <div class="psv" id="sp-collab">0</div>
+          <div class="psl">⚡ Collab</div>
+        </div>
         <div><div class="psv" id="sp">0</div><div class="psl">Projects</div></div>
-        <div><div class="psv" id="sm">0</div><div class="psl">Matches</div></div>
       </div>
     </div>
     <div class="pg-body">
@@ -923,6 +930,13 @@ async function loadProfile(){
     if(u.stats){
       document.getElementById('sp').textContent=u.stats.projects||0;
       document.getElementById('sm').textContent=u.stats.matches||0;
+    }
+    // Load invest/collab counts
+    var mr = await api('/matches/my-matches','GET');
+    if(mr.ok && mr.data.matches){
+      var received = mr.data.matches.filter(function(m){ return m.direction==='received'; });
+      document.getElementById('sp-invest').textContent = received.filter(function(m){ return m.match_type==='invest'; }).length;
+      document.getElementById('sp-collab').textContent = received.filter(function(m){ return m.match_type==='collab'; }).length;
     }
   }
   var r2=await api('/projects/mine');
@@ -1546,6 +1560,31 @@ async function checkUnreadMessages(){
   } catch(e){}
 }
 
+
+async function showProfileRequests(type){
+  document.getElementById('profile-req-title').textContent = type==='invest' ? '💰 Investors' : '⚡ Collaborators';
+  document.getElementById('profile-req-list').innerHTML = '<div style="text-align:center;padding:20px;color:#555;">Loading...</div>';
+  document.getElementById('profile-req-mask').classList.add('on');
+  var r = await api('/matches/my-matches','GET');
+  if(!r.ok){ document.getElementById('profile-req-list').innerHTML = '<div style="text-align:center;padding:20px;color:#555;">Failed to load</div>'; return; }
+  var matches = (r.data.matches||[]).filter(function(m){ return m.match_type===type && m.direction==='received'; });
+  if(!matches.length){
+    document.getElementById('profile-req-list').innerHTML = '<div style="text-align:center;padding:30px;color:#555;font-size:13px;">No '+(type==='invest'?'investors':'collaborators')+' yet</div>';
+    return;
+  }
+  var html = matches.map(function(m){
+    var q = clr(m.other_user_id);
+    var statusColor = m.status==='accepted'?'#4ade80':m.status==='denied'?'#666':'#f5c97a';
+    var statusText = m.status==='accepted'?'✅ Connected':m.status==='denied'?'❌ Denied':'⏳ Pending';
+    return '<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #1a1a1a;">'+
+      '<div style="width:44px;height:44px;border-radius:50%;background:'+q.bg+';color:'+q.c+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;">'+(m.other_user_avatar?'<img src="'+m.other_user_avatar+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>':ini(m.other_user_name))+'</div>'+
+      '<div style="flex:1;"><div style="font-size:14px;font-weight:600;color:#fff;">'+( m.other_user_name||'User')+'</div>'+
+      '<div style="font-size:11px;color:#666;margin-top:2px;">'+m.project_title+'</div></div>'+
+      '<div style="font-size:11px;font-weight:600;color:'+statusColor+';">'+statusText+'</div>'+
+    '</div>';
+  }).join('');
+  document.getElementById('profile-req-list').innerHTML = html;
+}
 // INIT
 window.onload=function(){
   document.getElementById('nm1').onclick=function(){show('pg-feed');loadFeed();};
@@ -1581,6 +1620,17 @@ window.onload=function(){
     <button class="nb" id="nm2"><div class="nb-ico">⚡</div><div class="nb-lbl">Matches</div></button>
     <button class="nb on" id="nm3"><div class="nb-ico">✉️</div><div class="nb-lbl" style="color:#7c6af7">Messages</div></button>
     <button class="nb" id="nm4"><div class="nb-ico">👤</div><div class="nb-lbl">Profile</div></button>
+  </div>
+</div>
+
+<!-- PROFILE REQUESTS SHEET -->
+<div class="cmask" id="profile-req-mask">
+  <div class="cmodal" style="max-height:75vh;display:flex;flex-direction:column;">
+    <button class="cmx" id="profile-req-close">✕</button>
+    <div style="clear:both;margin-bottom:12px;">
+      <div style="font-size:16px;font-weight:700;color:#fff;" id="profile-req-title">Requests</div>
+    </div>
+    <div id="profile-req-list" style="flex:1;overflow-y:scroll;-webkit-overflow-scrolling:touch;min-height:0;max-height:400px;"></div>
   </div>
 </div>
 </body>
