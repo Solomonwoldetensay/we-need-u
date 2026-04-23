@@ -637,19 +637,19 @@ function goPost(){show('pg-post');}
 function goProf(){show('pg-profile');loadProfile();}
 document.getElementById('n1').onclick=goFeed;
 document.getElementById('n2').onclick=goMatch;
-document.getElementById('n3').onclick=function(){show('pg-messages');loadMessages();};
+document.getElementById('n3').onclick=function(){show('pg-messages');loadMessages();updateMsgBadge(0);};
 document.getElementById('n4').onclick=goProf;
 document.getElementById('n5').onclick=goFeed;
 document.getElementById('n6').onclick=goMatch;
-document.getElementById('n7').onclick=function(){show('pg-messages');loadMessages();};
+document.getElementById('n7').onclick=function(){show('pg-messages');loadMessages();updateMsgBadge(0);};
 document.getElementById('n8').onclick=goProf;
 document.getElementById('n9').onclick=goFeed;
 document.getElementById('n10').onclick=goMatch;
-document.getElementById('n11').onclick=function(){show('pg-messages');loadMessages();};
+document.getElementById('n11').onclick=function(){show('pg-messages');loadMessages();updateMsgBadge(0);};
 document.getElementById('n12').onclick=goProf;
 document.getElementById('n13').onclick=goFeed;
 document.getElementById('n14').onclick=goMatch;
-document.getElementById('n15').onclick=function(){show('pg-messages');loadMessages();};
+document.getElementById('n15').onclick=function(){show('pg-messages');loadMessages();updateMsgBadge(0);};
 document.getElementById('n16').onclick=goProf;
 document.getElementById('cbk').onclick=function(){show('pg-matches');};
 
@@ -1543,7 +1543,7 @@ setInterval(function(){ if(token) checkUnreadMessages(); }, 30000);
 window.onload=function(){
   document.getElementById('nm1').onclick=function(){show('pg-feed');loadFeed();};
   document.getElementById('nm2').onclick=function(){show('pg-matches');loadMatches();};
-  document.getElementById('nm3').onclick=function(){show('pg-messages');loadMessages();};
+  document.getElementById('nm3').onclick=function(){show('pg-messages');loadMessages();updateMsgBadge(0);};
   document.getElementById('nm4').onclick=function(){show('pg-profile');loadProfile();};
   // Check if we're returning from Google OAuth redirect
   var hash = window.location.hash;
