@@ -935,13 +935,7 @@ async function loadProfile(){
       var spEl=document.getElementById('sp'); if(spEl) spEl.textContent=u.stats.projects||0;
       var smEl=document.getElementById('sm'); if(smEl) smEl.textContent=u.stats.matches||0;
     }
-    // Load invest/collab counts
-    var mr = await api('/matches/my-matches','GET');
-    if(mr.ok && mr.data.matches){
-      var received = mr.data.matches.filter(function(m){ return m.direction==='received'; });
-      document.getElementById('sp-invest').textContent = received.filter(function(m){ return m.match_type==='invest'; }).length;
-      document.getElementById('sp-collab').textContent = received.filter(function(m){ return m.match_type==='collab'; }).length;
-    }
+
   }
   var r2=await api('/projects/mine');
   var el=document.getElementById('myprojs');
