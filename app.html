@@ -1297,7 +1297,14 @@ var BACKEND = 'https://workmatch-backend.onrender.com';
 function triggerGoogleSignIn() {
   var errEl = document.getElementById('lerr') || document.getElementById('serr');
   if(errEl) errEl.textContent = '';
-  
+
+  // Wait for Google library to load
+  if(typeof google === 'undefined' || !google.accounts) {
+    if(errEl){ errEl.style.color='#7c6af7'; errEl.textContent='Loading Google... please wait'; }
+    setTimeout(triggerGoogleSignIn, 500);
+    return;
+  }
+
   // Initialize Google One Tap with your domain
   google.accounts.id.initialize({
     client_id: GOOGLE_CLIENT_ID,
@@ -1602,6 +1609,10 @@ async function showStatUsers(type){
 }
 // INIT
 window.onload=function(){
+  if(document.getElementById('profile-req-close')){
+    document.getElementById('profile-req-close').onclick=function(){document.getElementById('profile-req-mask').classList.remove('on');};
+    document.getElementById('profile-req-mask').onclick=function(e){if(e.target===this)this.classList.remove('on');};
+  }
   // Messages page nav
   if(document.getElementById('nm1')){
     document.getElementById('nm1').onclick=function(){show('pg-feed');loadFeed();};
@@ -1643,6 +1654,27 @@ window.onload=function(){
     <button class="nb" id="nm2"><div class="nb-ico">⚡</div><div class="nb-lbl">Matches</div></button>
     <button class="nb on" id="nm3"><div class="nb-ico">✉️</div><div class="nb-lbl" style="color:#7c6af7">Messages</div></button>
     <button class="nb" id="nm4"><div class="nb-ico">👤</div><div class="nb-lbl">Profile</div></button>
+  </div>
+</div>
+
+<!-- NOTIFICATIONS PAGE -->
+<div class="pg" id="pg-notifications" style="background:#07070d;flex-direction:column;">
+  <div style="display:flex;align-items:center;gap:12px;padding:48px 16px 12px;border-bottom:1px solid #1a1a1a;flex-shrink:0;">
+    <button onclick="show('pg-feed');" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;">←</button>
+    <div style="font-size:18px;font-weight:700;color:#fff;flex:1;">Notifications</div>
+    <button onclick="markAllRead()" style="background:none;border:none;color:#7c6af7;font-size:13px;font-weight:600;cursor:pointer;">Mark all read</button>
+  </div>
+  <div id="notif-list" style="flex:1;overflow-y:auto;padding:8px 0;font-family:-apple-system,sans-serif;"></div>
+</div>
+
+<!-- PROFILE REQUESTS SHEET -->
+<div class="cmask" id="profile-req-mask">
+  <div class="cmodal" style="max-height:75vh;display:flex;flex-direction:column;">
+    <button class="cmx" id="profile-req-close">✕</button>
+    <div style="clear:both;margin-bottom:12px;">
+      <div style="font-size:16px;font-weight:700;color:#fff;" id="profile-req-title">Requests</div>
+    </div>
+    <div id="profile-req-list" style="flex:1;overflow-y:scroll;min-height:0;max-height:400px;"></div>
   </div>
 </div>
 </body>
