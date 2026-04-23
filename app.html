@@ -721,23 +721,7 @@ function buildSlide(p){
   var w=0;var pt=setInterval(function(){w+=0.2;var el=document.getElementById('pf-'+p.id);if(!el){clearInterval(pt);return;}if(w>=100){clearInterval(pt);return;}el.style.width=w+'%';},100);
 
   // Top
-  var tp=document.createElement('div');tp.className='s-top';
-  tp.innerHTML='<div class="s-logo">WE-NEED-<b style="color:#7c6af7">U</b></div>';
-  var pb=document.createElement('button');pb.className='s-postbtn';pb.textContent='+ Post idea';
-  pb.onclick=function(){show('pg-post');};
-  var bellWrap=document.createElement('div');
-  bellWrap.style.cssText='position:relative;display:flex;align-items:center;';
-  var bellBtn=document.createElement('button');
-  bellBtn.style.cssText='background:none;border:none;cursor:pointer;font-size:22px;padding:4px;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.9));';
-  bellBtn.textContent='🔔';
-  bellBtn.onclick=function(){show('pg-notifications');loadNotifications();};
-  var bellBadge=document.createElement('div');
-  bellBadge.id='bell-badge-'+p.id;
-  bellBadge.className='bell-badge';
-  bellBadge.style.cssText='display:none;position:absolute;top:0;right:0;background:#e24b4a;color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;align-items:center;justify-content:center;';
-  bellWrap.appendChild(bellBtn);bellWrap.appendChild(bellBadge);
-  tp.appendChild(bellWrap);
-  tp.appendChild(pb);s.appendChild(tp);
+  var tp=document.createElement('div');
 
   // Right actions
   var ra=document.createElement('div');ra.className='s-right';
