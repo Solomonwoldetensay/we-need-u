@@ -1590,6 +1590,11 @@ async function showStatUsers(type){
   document.getElementById('stat-users-list').innerHTML = '<div class="req-empty">Loading...</div>';
   document.getElementById('stat-users-sheet').classList.add('on');
 
+  if(type === 'views'){
+    document.getElementById('stat-users-list').innerHTML='<div class="req-empty" style="padding:20px;text-align:center;color:#aaa;font-size:16px;">'+document.getElementById('pd-views').textContent+' total views</div>';
+    return;
+  }
+
   if(type === 'likes'){
     var r = await api('/projects/'+currentProjId+'/likes');
     var users = r.ok ? (r.data.likes||[]) : [];
@@ -1605,76 +1610,44 @@ async function showStatUsers(type){
     return;
   }
 
-  if(type === 'views'){
-    document.getElementById('stat-users-list').innerHTML='<div class="req-empty" style="padding:20px;text-align:center;color:#555;">'+document.getElementById('pd-views').textContent+' views total</div>';
+  // invest or collab — use matches endpoint (works for everyone)
+  var r = await api('/matches/my-matches','GET');
+  if(!r.ok){ document.getElementById('stat-users-list').innerHTML='<div class="req-empty">Failed to load</div>'; return; }
+  // Filter matches for this specific project and type
+  var filtered = (r.data.matches||[]).filter(function(m){
+    return m.match_type === type && m.project_id === currentProjId;
+  });
+  // Also check if current user is project creator — if so show all requesters
+  if(!filtered.length){
+    // Try as project owner
+    var r2 = await api('/projects/'+currentProjId+'/requests');
+    if(r2.ok && r2.data.requests){
+      var reqs = r2.data.requests.filter(function(req){ return req.match_type===type; });
+      if(reqs.length){
+        document.getElementById('stat-users-list').innerHTML = reqs.map(function(req){
+          var q = clr(req.requester_id);
+          var statusColor = req.status==='accepted'?'#4ade80':req.status==='denied'?'#666':'#f5c97a';
+          var statusText = req.status==='accepted'?'✅ Connected':req.status==='denied'?'❌':'⏳ Pending';
+          return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #1e1e1e;">'+
+            '<div style="width:38px;height:38px;border-radius:50%;background:'+q.bg+';color:'+q.c+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;">'+ini(req.requester_name)+'</div>'+
+            '<div style="flex:1;"><div style="font-size:13px;font-weight:600;color:#fff;">'+(req.requester_name||'User')+'</div>'+
+            '<div style="font-size:11px;color:#666;">'+(req.requester_location||'')+'</div></div>'+
+            '<div style="font-size:11px;font-weight:700;color:'+statusColor+';">'+statusText+'</div></div>';
+        }).join('');
+        return;
+      }
+    }
+    document.getElementById('stat-users-list').innerHTML='<div class="req-empty">No '+(type==='invest'?'investors':'collaborators')+' yet</div>';
     return;
   }
-
-  // invest or collab - show from requests
-  var r = await api('/projects/'+currentProjId+'/requests?status=all');
-  var requests = r.ok ? (r.data.requests||[]) : [];
-  var filtered = requests.filter(function(req){ return req.match_type === type; });
-  if(!filtered.length){ document.getElementById('stat-users-list').innerHTML='<div class="req-empty">No '+(type==='invest'?'investors':'collaborators')+' yet</div>'; return; }
-  document.getElementById('stat-users-list').innerHTML = filtered.map(function(req){
-    var q = clr(req.requester_id);
-    var statusColor = req.status==='accepted'?'#4ade80':req.status==='denied'?'#666':'#f5c97a';
-    var statusText = req.status==='accepted'?'✅ Connected':req.status==='denied'?'❌':'⏳ Pending';
+  document.getElementById('stat-users-list').innerHTML = filtered.map(function(m){
+    var q = clr(m.other_user_id);
+    var statusColor = m.status==='accepted'?'#4ade80':m.status==='denied'?'#666':'#f5c97a';
+    var statusText = m.status==='accepted'?'✅ Connected':m.status==='denied'?'❌':'⏳ Pending';
     return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #1e1e1e;">'+
-      '<div style="width:38px;height:38px;border-radius:50%;background:'+q.bg+';color:'+q.c+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;">'+ini(req.requester_name)+'</div>'+
-      '<div style="flex:1;"><div style="font-size:13px;font-weight:600;color:#fff;">'+(req.requester_name||'User')+'</div>'+
-      '<div style="font-size:11px;color:#666;">'+(req.requester_location||'')+'</div></div>'+
+      '<div style="width:38px;height:38px;border-radius:50%;background:'+q.bg+';color:'+q.c+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;">'+ini(m.other_user_name)+'</div>'+
+      '<div style="flex:1;"><div style="font-size:13px;font-weight:600;color:#fff;">'+(m.other_user_name||'User')+'</div>'+
+      '<div style="font-size:11px;color:#666;">'+m.project_title+'</div></div>'+
       '<div style="font-size:11px;font-weight:700;color:'+statusColor+';">'+statusText+'</div></div>';
   }).join('');
 }
-// INIT
-window.onload=function(){
-  document.getElementById('stat-users-close').onclick=function(){document.getElementById('stat-users-sheet').classList.remove('on');};
-  document.getElementById('stat-users-sheet').onclick=function(e){if(e.target===this)this.classList.remove('on');};
-  document.getElementById('nm1').onclick=function(){show('pg-feed');loadFeed();};
-  document.getElementById('nm2').onclick=function(){show('pg-matches');loadMatches();};
-  document.getElementById('nm3').onclick=function(){show('pg-messages');loadMessages();updateMsgBadge(0);};
-  document.getElementById('nm4').onclick=function(){show('pg-profile');loadProfile();};
-  // Check if we're returning from Google OAuth redirect
-  var hash = window.location.hash;
-  if(hash && hash.indexOf('access_token') > -1) {
-    // Extract the access token from URL hash
-    var params = new URLSearchParams(hash.substring(1));
-    var accessToken = params.get('access_token');
-    if(accessToken) {
-      // Clear the hash from URL
-      history.replaceState(null, null, window.location.pathname);
-      // Exchange token for our JWT
-      exchangeGoogleToken(accessToken);
-      return;
-    }
-  }
-  if(token&&user)enterApp();
-};
-</script>
-
-<!-- MESSAGES PAGE -->
-<div class="pg" id="pg-messages" style="background:#07070d;flex-direction:column;">
-  <div style="display:flex;align-items:center;gap:12px;padding:48px 16px 12px;border-bottom:1px solid #1a1a1a;flex-shrink:0;">
-    <div style="font-size:18px;font-weight:700;color:#fff;flex:1;">Messages</div>
-  </div>
-  <div id="messages-list" style="flex:1;overflow-y:auto;font-family:-apple-system,sans-serif;"></div>
-  <div class="bnav">
-    <button class="nb" id="nm1"><div class="nb-ico">🔥</div><div class="nb-lbl">Feed</div></button>
-    <button class="nb" id="nm2"><div class="nb-ico">⚡</div><div class="nb-lbl">Matches</div></button>
-    <button class="nb on" id="nm3"><div class="nb-ico">✉️</div><div class="nb-lbl" style="color:#7c6af7">Messages</div></button>
-    <button class="nb" id="nm4"><div class="nb-ico">👤</div><div class="nb-lbl">Profile</div></button>
-  </div>
-</div>
-
-<!-- PROFILE REQUESTS SHEET -->
-<div class="cmask" id="profile-req-mask">
-  <div class="cmodal" style="max-height:75vh;display:flex;flex-direction:column;">
-    <button class="cmx" id="profile-req-close">✕</button>
-    <div style="clear:both;margin-bottom:12px;">
-      <div style="font-size:16px;font-weight:700;color:#fff;" id="profile-req-title">Requests</div>
-    </div>
-    <div id="profile-req-list" style="flex:1;overflow-y:scroll;-webkit-overflow-scrolling:touch;min-height:0;max-height:400px;"></div>
-  </div>
-</div>
-</body>
-</html>
