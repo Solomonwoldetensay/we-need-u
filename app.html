@@ -376,14 +376,6 @@ textarea.fi{min-height:75px;resize:vertical;}
       <div class="pname" id="pname">Solomon</div>
       <div class="ploc" id="ploc">Moorhead, MN</div>
       <div class="pstats">
-        <div onclick="showProfileRequests('invest')" style="cursor:pointer;">
-          <div class="psv" id="sp-invest">0</div>
-          <div class="psl">💰 Invest</div>
-        </div>
-        <div onclick="showProfileRequests('collab')" style="cursor:pointer;">
-          <div class="psv" id="sp-collab">0</div>
-          <div class="psl">⚡ Collab</div>
-        </div>
         <div><div class="psv" id="sp">0</div><div class="psl">Projects</div></div>
         <div><div class="psv" id="sm">0</div><div class="psl">Matches</div></div>
       </div>
@@ -464,10 +456,10 @@ textarea.fi{min-height:75px;resize:vertical;}
     <div class="pd-mode" id="pd-mode"></div>
     <div class="pd-desc" id="pd-desc"></div>
     <div class="pd-stats-row">
-      <div class="pd-stat invest"><div class="pd-stat-val" id="pd-invest">0</div><div class="pd-stat-lbl">💰 Invests</div></div>
-      <div class="pd-stat collab"><div class="pd-stat-val" id="pd-collab">0</div><div class="pd-stat-lbl">⚡ Collabs</div></div>
-      <div class="pd-stat likes" id="pd-likes-btn"><div class="pd-stat-val" id="pd-likes">0</div><div class="pd-stat-lbl">❤️ Likes</div></div>
-      <div class="pd-stat views"><div class="pd-stat-val" id="pd-views">0</div><div class="pd-stat-lbl">👁 Views</div></div>
+      <div class="pd-stat invest" onclick="showStatUsers('invest')" style="cursor:pointer;"><div class="pd-stat-val" id="pd-invest">0</div><div class="pd-stat-lbl">💰 Invests</div></div>
+      <div class="pd-stat collab" onclick="showStatUsers('collab')" style="cursor:pointer;"><div class="pd-stat-val" id="pd-collab">0</div><div class="pd-stat-lbl">⚡ Collabs</div></div>
+      <div class="pd-stat likes" id="pd-likes-btn" onclick="showStatUsers('likes')" style="cursor:pointer;"><div class="pd-stat-val" id="pd-likes">0</div><div class="pd-stat-lbl">❤️ Likes</div></div>
+      <div class="pd-stat views" onclick="showStatUsers('views')" style="cursor:pointer;"><div class="pd-stat-val" id="pd-views">0</div><div class="pd-stat-lbl">👁 Views</div></div>
     </div>
     <div class="pd-comments-title">💬 Comments</div>
     <div id="pd-comments-list"><div style="font-size:12px;color:#555;text-align:center;padding:1rem;">No comments yet</div></div>
@@ -482,6 +474,17 @@ textarea.fi{min-height:75px;resize:vertical;}
       <div class="req-list" id="likes-list"><div class="req-empty">No likes yet</div></div>
     </div>
   </div>
+
+<!-- STAT USERS SHEET -->
+<div class="likes-sheet" id="stat-users-sheet">
+  <div class="req-inner">
+    <div class="req-top">
+      <div class="req-top-title" id="stat-users-title">Users</div>
+      <button class="req-close" id="stat-users-close">✕</button>
+    </div>
+    <div class="req-list" id="stat-users-list"><div class="req-empty">Loading...</div></div>
+  </div>
+</div>
   <!-- REQUESTS SHEET -->
   <div class="req-sheet" id="req-sheet">
     <div class="req-inner">
@@ -1586,8 +1589,53 @@ async function showProfileRequests(type){
   }).join('');
   document.getElementById('profile-req-list').innerHTML = html;
 }
+
+async function showStatUsers(type){
+  var titles = {invest:'💰 Investors', collab:'⚡ Collaborators', likes:'❤️ Liked by', views:'👁 Views'};
+  document.getElementById('stat-users-title').textContent = titles[type] || type;
+  document.getElementById('stat-users-list').innerHTML = '<div class="req-empty">Loading...</div>';
+  document.getElementById('stat-users-sheet').classList.add('on');
+
+  if(type === 'likes'){
+    var r = await api('/projects/'+currentProjId+'/likes');
+    var users = r.ok ? (r.data.likes||[]) : [];
+    if(!users.length){ document.getElementById('stat-users-list').innerHTML='<div class="req-empty">No likes yet</div>'; return; }
+    document.getElementById('stat-users-list').innerHTML = users.map(function(u){
+      var q = clr(u.id);
+      return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #1e1e1e;">'+
+        '<div style="width:38px;height:38px;border-radius:50%;background:'+q.bg+';color:'+q.c+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;">'+ini(u.full_name)+'</div>'+
+        '<div><div style="font-size:13px;font-weight:600;color:#fff;">'+u.full_name+'</div>'+
+        '<div style="font-size:11px;color:#666;">'+(u.location||'')+'</div></div>'+
+        '<div style="margin-left:auto;font-size:18px;">❤️</div></div>';
+    }).join('');
+    return;
+  }
+
+  if(type === 'views'){
+    document.getElementById('stat-users-list').innerHTML='<div class="req-empty" style="padding:20px;text-align:center;color:#555;">'+document.getElementById('pd-views').textContent+' views total</div>';
+    return;
+  }
+
+  // invest or collab - show from requests
+  var r = await api('/projects/'+currentProjId+'/requests?status=all');
+  var requests = r.ok ? (r.data.requests||[]) : [];
+  var filtered = requests.filter(function(req){ return req.match_type === type; });
+  if(!filtered.length){ document.getElementById('stat-users-list').innerHTML='<div class="req-empty">No '+(type==='invest'?'investors':'collaborators')+' yet</div>'; return; }
+  document.getElementById('stat-users-list').innerHTML = filtered.map(function(req){
+    var q = clr(req.requester_id);
+    var statusColor = req.status==='accepted'?'#4ade80':req.status==='denied'?'#666':'#f5c97a';
+    var statusText = req.status==='accepted'?'✅ Connected':req.status==='denied'?'❌':'⏳ Pending';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #1e1e1e;">'+
+      '<div style="width:38px;height:38px;border-radius:50%;background:'+q.bg+';color:'+q.c+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;">'+ini(req.requester_name)+'</div>'+
+      '<div style="flex:1;"><div style="font-size:13px;font-weight:600;color:#fff;">'+(req.requester_name||'User')+'</div>'+
+      '<div style="font-size:11px;color:#666;">'+(req.requester_location||'')+'</div></div>'+
+      '<div style="font-size:11px;font-weight:700;color:'+statusColor+';">'+statusText+'</div></div>';
+  }).join('');
+}
 // INIT
 window.onload=function(){
+  document.getElementById('stat-users-close').onclick=function(){document.getElementById('stat-users-sheet').classList.remove('on');};
+  document.getElementById('stat-users-sheet').onclick=function(e){if(e.target===this)this.classList.remove('on');};
   document.getElementById('nm1').onclick=function(){show('pg-feed');loadFeed();};
   document.getElementById('nm2').onclick=function(){show('pg-matches');loadMatches();};
   document.getElementById('nm3').onclick=function(){show('pg-messages');loadMessages();updateMsgBadge(0);};
