@@ -1009,6 +1009,7 @@ function showAvatarToast(msg){
 var currentProjId=null,pdVid=null;
 function openPostDetail(p){
   currentProjId=p.id;
+  currentProjectId=p.id;
   var q=clr(p.id);
   var mc=p.mode==='collab'?'#7c6af7':p.mode==='invest'?'#e8a020':'#d4537e';
   var ml=p.mode==='collab'?'⚡ Seeking Collaborators':p.mode==='invest'?'💰 Seeking Investors':'⚡💰 Collab + Invest';
@@ -1614,6 +1615,7 @@ async function showStatUsers(type){
   var r = await api('/matches/my-matches','GET');
   if(!r.ok){ document.getElementById('stat-users-list').innerHTML='<div class="req-empty">Failed to load</div>'; return; }
   // Filter matches for this specific project and type
+  // Filter by match type AND project
   var filtered = (r.data.matches||[]).filter(function(m){
     return m.match_type === type && m.project_id === currentProjId;
   });
