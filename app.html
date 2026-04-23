@@ -1521,10 +1521,12 @@ async function loadMessages(){
   updateMsgBadge(0);
 }
 
+var msgBadgeCount = 0;
 function updateMsgBadge(count){
+  msgBadgeCount = count;
   document.querySelectorAll('.msg-badge').forEach(function(b){
     if(count>0){b.style.display='flex';b.textContent=count>9?'9+':count;}
-    else{b.style.display='none';}
+    else{b.style.display='none';b.textContent='';}
   });
 }
 
@@ -1534,7 +1536,10 @@ async function checkUnreadMessages(){
     var r = await api('/matches/my-matches','GET');
     if(!r.ok) return;
     var unread = (r.data.matches||[]).filter(function(m){ return m.status==='accepted' && m.last_message; }).length;
-    updateMsgBadge(unread);
+    // Don't show badge if Messages page is currently open
+    var msgPageOpen = document.getElementById('pg-messages') && document.getElementById('pg-messages').classList.contains('on');
+    if(msgPageOpen) updateMsgBadge(0);
+    else updateMsgBadge(unread);
   } catch(e){}
 }
 setInterval(function(){ if(token) checkUnreadMessages(); }, 30000);
