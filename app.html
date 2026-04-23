@@ -1480,7 +1480,7 @@ setInterval(function(){ if(token) safeCheckUnread(); },30000);
 
 // ── MESSAGES PAGE ──────────────────────────
 async function loadMessages(){
-  msgLastSeenAt = new Date(); // Record when user opened messages
+  localStorage.setItem('wm_msg_seen_at', new Date().toISOString()); // Save seen time
   updateMsgBadge(0);
   var list = document.getElementById('messages-list');
   if(!list) return;
@@ -1531,19 +1531,21 @@ function updateMsgBadge(count){
   });
 }
 
-var msgLastSeenAt = null;
 async function checkUnreadMessages(){
   if(!token) return;
   // Don't show badge if Messages page is open
   var msgPageOpen = document.getElementById('pg-messages') && document.getElementById('pg-messages').classList.contains('on');
   if(msgPageOpen){ updateMsgBadge(0); return; }
-  // Only show badge if user hasn't seen messages yet
-  if(msgLastSeenAt) return; // User already opened messages, don't re-show
   try {
     var r = await api('/matches/my-matches','GET');
     if(!r.ok) return;
+    // Get last time user opened messages (saved in localStorage)
+    var lastSeen = localStorage.getItem('wm_msg_seen_at');
     var unread = (r.data.matches||[]).filter(function(m){
-      return m.status==='accepted' && m.last_message;
+      if(m.status!=='accepted' || !m.last_message) return false;
+      if(!lastSeen) return true;
+      if(!m.last_message_at) return false;
+      return new Date(m.last_message_at) > new Date(lastSeen);
     }).length;
     updateMsgBadge(unread);
   } catch(e){}
