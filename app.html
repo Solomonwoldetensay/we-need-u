@@ -34,7 +34,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;display:flex;justif
 .feed-body::-webkit-scrollbar{display:none;}
 .slide{height:calc(100vh - 70px);height:calc(100dvh - 70px);scroll-snap-align:start;position:relative;overflow:hidden;background:#000;flex-shrink:0;}
 .s-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.93) 0%,transparent 50%,rgba(0,0,0,0.3) 100%);pointer-events:none;z-index:1;}
-
+.s-top{position:absolute;top:0;left:0;right:0;padding:40px 14px 8px;display:flex;justify-content:space-between;align-items:center;z-index:2;}
+.s-logo{font-size:17px;font-weight:900;color:#fff;}
+.s-logo b{color:#7c6af7;}
+.s-postbtn{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;font-size:11px;padding:6px 12px;border-radius:20px;cursor:pointer;-webkit-appearance:none;}
 .s-right{position:absolute;right:12px;bottom:130px;display:flex;flex-direction:column;gap:16px;align-items:center;z-index:2;}
 .s-rbtn{display:flex;flex-direction:column;align-items:center;gap:4px;border:none;background:none;cursor:pointer;}
 .s-rico{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:22px;}
@@ -281,11 +284,18 @@ textarea.fi{min-height:75px;resize:vertical;}
 
 <!-- FEED -->
 <div class="pg feed-pg" id="pg-feed">
+  <div id="feed-topbar" style="position:absolute;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:44px 14px 10px;background:linear-gradient(to bottom,rgba(0,0,0,0.75) 0%,transparent 100%);pointer-events:none;">
+    <div style="display:flex;align-items:center;gap:8px;pointer-events:auto;">
+      <div id="feed-avatar" style="width:34px;height:34px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,0.5);background:#333;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff;flex-shrink:0;"></div>
+      <div style="font-size:18px;font-weight:900;color:#fff;">WE-NEED-<b style="color:#fff;">U</b></div>
+    </div>
+    <button onclick="show('pg-post')" style="background:rgba(124,106,247,0.85);border:none;color:#fff;font-size:11px;font-weight:600;padding:7px 14px;border-radius:20px;cursor:pointer;pointer-events:auto;">+ Post idea</button>
+  </div>
   <div class="feed-body" id="feed-body"></div>
   <div class="bnav">
     <button class="nb on" id="n1"><div class="nb-ico">🔥</div><div class="nb-lbl" style="color:#7c6af7">Feed</div></button>
     <button class="nb" id="n2"><div class="nb-ico">⚡</div><div class="nb-lbl">Matches</div></button>
-    <button class="nb" id="n3"><div class="nb-ico">＋</div><div class="nb-lbl">Post</div></button>
+    <button class="nb" id="n3" style="position:relative"><div class="nb-ico">✉️</div><div class="nb-lbl">Messages</div><div id="msg-badge-1" class="msg-badge" style="display:none;position:absolute;top:4px;right:6px;background:#e24b4a;color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;align-items:center;justify-content:center;"></div></button>
     <button class="nb" id="n4"><div class="nb-ico">👤</div><div class="nb-lbl">Profile</div></button>
   </div>
 </div>
@@ -308,7 +318,7 @@ textarea.fi{min-height:75px;resize:vertical;}
   <div class="bnav">
     <button class="nb" id="n5"><div class="nb-ico">🔥</div><div class="nb-lbl">Feed</div></button>
     <button class="nb on" id="n6"><div class="nb-ico">⚡</div><div class="nb-lbl" style="color:#7c6af7">Matches</div></button>
-    <button class="nb" id="n7"><div class="nb-ico">＋</div><div class="nb-lbl">Post</div></button>
+    <button class="nb" id="n7" style="position:relative"><div class="nb-ico">✉️</div><div class="nb-lbl">Messages</div><div id="msg-badge-2" class="msg-badge" style="display:none;position:absolute;top:4px;right:6px;background:#e24b4a;color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;align-items:center;justify-content:center;"></div></button>
     <button class="nb" id="n8"><div class="nb-ico">👤</div><div class="nb-lbl">Profile</div></button>
   </div>
 </div>
@@ -349,7 +359,7 @@ textarea.fi{min-height:75px;resize:vertical;}
   <div class="bnav">
     <button class="nb" id="n9"><div class="nb-ico">🔥</div><div class="nb-lbl">Feed</div></button>
     <button class="nb" id="n10"><div class="nb-ico">⚡</div><div class="nb-lbl">Matches</div></button>
-    <button class="nb on" id="n11"><div class="nb-ico">＋</div><div class="nb-lbl" style="color:#7c6af7">Post</div></button>
+    <button class="nb" id="n11" style="position:relative"><div class="nb-ico">✉️</div><div class="nb-lbl">Messages</div><div id="msg-badge-3" class="msg-badge" style="display:none;position:absolute;top:4px;right:6px;background:#e24b4a;color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;align-items:center;justify-content:center;"></div></button>
     <button class="nb" id="n12"><div class="nb-ico">👤</div><div class="nb-lbl">Profile</div></button>
   </div>
 </div>
@@ -379,7 +389,7 @@ textarea.fi{min-height:75px;resize:vertical;}
   <div class="bnav">
     <button class="nb" id="n13"><div class="nb-ico">🔥</div><div class="nb-lbl">Feed</div></button>
     <button class="nb" id="n14"><div class="nb-ico">⚡</div><div class="nb-lbl">Matches</div></button>
-    <button class="nb" id="n15"><div class="nb-ico">＋</div><div class="nb-lbl">Post</div></button>
+    <button class="nb" id="n15" style="position:relative"><div class="nb-ico">✉️</div><div class="nb-lbl">Messages</div><div id="msg-badge-4" class="msg-badge" style="display:none;position:absolute;top:4px;right:6px;background:#e24b4a;color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;align-items:center;justify-content:center;"></div></button>
     <button class="nb on" id="n16"><div class="nb-ico">👤</div><div class="nb-lbl" style="color:#7c6af7">Profile</div></button>
   </div>
 </div>
@@ -542,6 +552,18 @@ function enterApp(){
   loadFeed();
   loadProfile();
   if(typeof checkUnreadCount==='function') setTimeout(checkUnreadCount,1000);
+  setTimeout(checkUnreadMessages,2000);
+  var favEl=document.getElementById('feed-avatar');
+  if(favEl&&user){
+    if(user.avatar_url){
+      var img=document.createElement('img');img.src=user.avatar_url;
+      img.style.cssText='width:100%;height:100%;object-fit:cover;';
+      img.onerror=function(){favEl.textContent=(user.full_name||'?').charAt(0).toUpperCase();};
+      favEl.innerHTML='';favEl.appendChild(img);
+    } else {
+      favEl.textContent=(user.full_name||'?').charAt(0).toUpperCase();
+    }
+  }
 }
 
 // LOGIN
@@ -615,19 +637,19 @@ function goPost(){show('pg-post');}
 function goProf(){show('pg-profile');loadProfile();}
 document.getElementById('n1').onclick=goFeed;
 document.getElementById('n2').onclick=goMatch;
-document.getElementById('n3').onclick=goPost;
+document.getElementById('n3').onclick=function(){show('pg-messages');loadMessages();};
 document.getElementById('n4').onclick=goProf;
 document.getElementById('n5').onclick=goFeed;
 document.getElementById('n6').onclick=goMatch;
-document.getElementById('n7').onclick=goPost;
+document.getElementById('n7').onclick=function(){show('pg-messages');loadMessages();};
 document.getElementById('n8').onclick=goProf;
 document.getElementById('n9').onclick=goFeed;
 document.getElementById('n10').onclick=goMatch;
-document.getElementById('n11').onclick=goPost;
+document.getElementById('n11').onclick=function(){show('pg-messages');loadMessages();};
 document.getElementById('n12').onclick=goProf;
 document.getElementById('n13').onclick=goFeed;
 document.getElementById('n14').onclick=goMatch;
-document.getElementById('n15').onclick=goPost;
+document.getElementById('n15').onclick=function(){show('pg-messages');loadMessages();};
 document.getElementById('n16').onclick=goProf;
 document.getElementById('cbk').onclick=function(){show('pg-matches');};
 document.getElementById('logbtn').onclick=function(){
@@ -699,8 +721,9 @@ function buildSlide(p){
 
 
   // Right actions
-  // Right actions
   var ra=document.createElement('div');ra.className='s-right';
+  // Profile avatar at top of right sidebar
+    var ra=document.createElement('div');ra.className='s-right';
   var raAv=document.createElement('div');raAv.style.cssText='width:46px;height:46px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,0.6);background:'+q.bg+';color:'+q.c+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;margin-bottom:4px;';
   if(p.creator_avatar){var raI=document.createElement('img');raI.src=p.creator_avatar;raI.style.cssText='width:100%;height:100%;object-fit:cover;';raI.onerror=function(){this.parentElement.textContent=ini(p.creator_name);};raAv.appendChild(raI);}else{raAv.textContent=ini(p.creator_name);}
   ra.appendChild(raAv);
@@ -1455,6 +1478,67 @@ async function safeCheckUnread(){
 }
 setInterval(function(){ if(token) safeCheckUnread(); },30000);
 
+
+// ── MESSAGES PAGE ──────────────────────────
+async function loadMessages(){
+  var list = document.getElementById('messages-list');
+  if(!list) return;
+  list.innerHTML = '<div style="text-align:center;padding:40px;color:#555;font-size:14px;">Loading...</div>';
+  var r = await api('/matches/my-matches', 'GET');
+  if(!r.ok){ list.innerHTML = '<div style="text-align:center;padding:40px;color:#555;">Failed to load</div>'; return; }
+  var accepted = (r.data.matches||[]).filter(function(m){ return m.status === 'accepted'; });
+  if(accepted.length === 0){
+    list.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#555;font-size:14px;">No messages yet<br><br>Accept a match to start chatting! 💬</div>';
+    return;
+  }
+  list.innerHTML = '';
+  accepted.forEach(function(m){
+    var q = clr(m.other_user_id);
+    var d = document.createElement('div');
+    d.style.cssText = 'display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #111;cursor:pointer;';
+    d.onclick = function(){ openChat(m.conversation_id, m.other_user_name); };
+    // Avatar
+    var av = document.createElement('div');
+    av.style.cssText = 'width:46px;height:46px;border-radius:50%;overflow:hidden;background:'+q.bg+';color:'+q.c+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;';
+    if(m.other_user_avatar){
+      var img = document.createElement('img');
+      img.src = m.other_user_avatar;
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+      img.onerror = function(){ av.textContent = ini(m.other_user_name); };
+      av.appendChild(img);
+    } else {
+      av.textContent = ini(m.other_user_name);
+    }
+    d.appendChild(av);
+    // Info
+    var info = document.createElement('div');
+    info.style.cssText = 'flex:1;min-width:0;';
+    info.innerHTML = '<div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:3px;">'+( m.other_user_name||'User')+'</div>'+
+      '<div style="font-size:12px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(m.last_message||m.project_title||'Connected')+'</div>';
+    d.appendChild(info);
+    list.appendChild(d);
+  });
+  updateMsgBadge(0);
+}
+
+function updateMsgBadge(count){
+  document.querySelectorAll('.msg-badge').forEach(function(b){
+    if(count>0){b.style.display='flex';b.textContent=count>9?'9+':count;}
+    else{b.style.display='none';}
+  });
+}
+
+async function checkUnreadMessages(){
+  if(!token) return;
+  try {
+    var r = await api('/matches/my-matches','GET');
+    if(!r.ok) return;
+    var unread = (r.data.matches||[]).filter(function(m){ return m.status==='accepted' && m.last_message; }).length;
+    updateMsgBadge(unread);
+  } catch(e){}
+}
+setInterval(function(){ if(token) checkUnreadMessages(); }, 30000);
+
 // INIT
 window.onload=function(){
   // Check if we're returning from Google OAuth redirect
@@ -1474,5 +1558,13 @@ window.onload=function(){
   if(token&&user)enterApp();
 };
 </script>
+
+<!-- MESSAGES PAGE -->
+<div class="pg" id="pg-messages" style="background:#07070d;flex-direction:column;">
+  <div style="display:flex;align-items:center;gap:12px;padding:48px 16px 12px;border-bottom:1px solid #1a1a1a;flex-shrink:0;">
+    <div style="font-size:18px;font-weight:700;color:#fff;flex:1;">Messages</div>
+  </div>
+  <div id="messages-list" style="flex:1;overflow-y:auto;font-family:-apple-system,sans-serif;"></div>
+</div>
 </body>
 </html>
