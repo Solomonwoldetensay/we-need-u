@@ -728,7 +728,6 @@ function buildSlide(p){
   if(p.creator_avatar){var raI=document.createElement('img');raI.src=p.creator_avatar;raI.style.cssText='width:100%;height:100%;object-fit:cover;';raI.onerror=function(){this.parentElement.textContent=ini(p.creator_name);};raAv.appendChild(raI);}else{raAv.textContent=ini(p.creator_name);}
   ra.appendChild(raAv);
   ra.innerHTML+=
-    avatarHtml+
     '<button class="s-rbtn" id="lb-'+p.id+'"><div class="s-rico" id="li-'+p.id+'">🤍</div><div class="s-rlbl">Like</div></button>'+
     '<button class="s-rbtn" id="sb-'+p.id+'"><div class="s-rico" id="si-'+p.id+'">🔖</div><div class="s-rlbl">Save</div></button>'+
     '<button class="s-rbtn" id="cmb-'+p.id+'"><div class="s-rico">💬</div><div class="s-rlbl" id="cc-'+p.id+'">'+(p.comment_count||0)+'</div></button>'+
