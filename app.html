@@ -652,10 +652,7 @@ document.getElementById('n14').onclick=goMatch;
 document.getElementById('n15').onclick=function(){show('pg-messages');loadMessages();};
 document.getElementById('n16').onclick=goProf;
 document.getElementById('cbk').onclick=function(){show('pg-matches');};
-document.getElementById('nm1').onclick=function(){show('pg-feed');loadFeed();};
-document.getElementById('nm2').onclick=function(){show('pg-matches');loadMatches();};
-document.getElementById('nm3').onclick=function(){show('pg-messages');loadMessages();};
-document.getElementById('nm4').onclick=function(){show('pg-profile');loadProfile();};
+
 document.getElementById('logbtn').onclick=function(){
   token=null;user=null;localStorage.removeItem('wm_token');localStorage.removeItem('wm_user');show('pg-login');
 };
@@ -1544,6 +1541,10 @@ setInterval(function(){ if(token) checkUnreadMessages(); }, 30000);
 
 // INIT
 window.onload=function(){
+  document.getElementById('nm1').onclick=function(){show('pg-feed');loadFeed();};
+  document.getElementById('nm2').onclick=function(){show('pg-matches');loadMatches();};
+  document.getElementById('nm3').onclick=function(){show('pg-messages');loadMessages();};
+  document.getElementById('nm4').onclick=function(){show('pg-profile');loadProfile();};
   // Check if we're returning from Google OAuth redirect
   var hash = window.location.hash;
   if(hash && hash.indexOf('access_token') > -1) {
