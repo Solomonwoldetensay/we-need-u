@@ -284,41 +284,41 @@ textarea.fi{min-height:75px;resize:vertical;}
 
 <!-- FEED -->
 <div class="pg feed-pg" id="pg-feed">
-  <div style="position:absolute;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:48px 14px 10px;background:linear-gradient(to bottom,rgba(0,0,0,0.7) 0%,transparent 100%);pointer-events:none;">
-    <div style="font-size:20px;font-weight:900;color:#fff;pointer-events:auto;">WE-NEED-<b style="color:#fff">U</b></div>
-    <button onclick="show('pg-post')" style="background:rgba(124,106,247,0.9);border:none;color:#fff;font-size:12px;font-weight:600;padding:8px 14px;border-radius:20px;cursor:pointer;pointer-events:auto;">+ Post idea</button>
+  <div id="feed-topbar" style="position:absolute;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:44px 14px 10px;background:linear-gradient(to bottom,rgba(0,0,0,0.75) 0%,transparent 100%);pointer-events:none;">
+    <div style="display:flex;align-items:center;gap:8px;pointer-events:auto;">
+      <div id="feed-avatar" style="width:34px;height:34px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,0.5);background:#333;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff;flex-shrink:0;"></div>
+      <div style="font-size:18px;font-weight:900;color:#fff;">WE-NEED-<b style="color:#fff;">U</b></div>
+    </div>
+    <button onclick="show('pg-post')" style="background:rgba(124,106,247,0.85);border:none;color:#fff;font-size:11px;font-weight:600;padding:7px 14px;border-radius:20px;cursor:pointer;pointer-events:auto;">+ Post idea</button>
   </div>
   <div class="feed-body" id="feed-body"></div>
   <div class="bnav">
     <button class="nb on" id="n1"><div class="nb-ico">🔥</div><div class="nb-lbl" style="color:#7c6af7">Feed</div></button>
     <button class="nb" id="n2"><div class="nb-ico">⚡</div><div class="nb-lbl">Matches</div></button>
-    <button class="nb" id="n3" style="position:relative"><div class="nb-ico" style="font-size:22px;">✉️</div><div class="nb-lbl" style="color:#fff;">Messages</div><div id="msg-badge-1" class="msg-badge" style="display:none;position:absolute;top:4px;right:8px;background:#e24b4a;color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;align-items:center;justify-content:center;"></div></button>
+    <button class="nb" id="n3" style="position:relative"><div class="nb-ico">✉️</div><div class="nb-lbl">Messages</div><div id="msg-badge-1" class="msg-badge" style="display:none;position:absolute;top:4px;right:6px;background:#e24b4a;color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;align-items:center;justify-content:center;"></div></button>
     <button class="nb" id="n4"><div class="nb-ico">👤</div><div class="nb-lbl">Profile</div></button>
   </div>
 </div>
 
 <!-- MATCHES -->
-<div class="pg" id="pg-matches" style="background:#0d0d0d;">
+<div class="pg" id="pg-matches">
   <div class="inner-pg">
-    <div class="pg-top" style="padding-bottom:0;background:#111;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-        <button onclick="show('pg-feed');loadFeed();" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:0;">←</button>
-        <div class="pg-title" style="margin-bottom:0;">Messages & Matches</div>
-      </div>
+    <div class="pg-top" style="padding-bottom:0;">
+      <div class="pg-title" style="margin-bottom:12px;">Your Matches</div>
       <div class="match-tabs">
         <div class="mtab invest-tab active" id="tab-invest" onclick="switchTab('invest')">💰 Invest</div>
         <div class="mtab collab-tab" id="tab-collab" onclick="switchTab('collab')">⚡ Collab</div>
       </div>
     </div>
     <div class="match-panels">
-      <div class="match-panel active" id="panel-invest"><div class="m-empty"><div class="m-empty-ico">💰</div><div style="color:#888;font-size:14px;">No invest matches yet</div></div></div>
-      <div class="match-panel" id="panel-collab"><div class="m-empty"><div class="m-empty-ico">⚡</div><div style="color:#888;font-size:14px;">No collab matches yet</div></div></div>
+      <div class="match-panel active" id="panel-invest"><div class="m-empty"><div class="m-empty-ico">💰</div><div>No invest matches yet</div></div></div>
+      <div class="match-panel" id="panel-collab"><div class="m-empty"><div class="m-empty-ico">⚡</div><div>No collab matches yet</div></div></div>
     </div>
   </div>
   <div class="bnav">
     <button class="nb" id="n5"><div class="nb-ico">🔥</div><div class="nb-lbl">Feed</div></button>
     <button class="nb on" id="n6"><div class="nb-ico">⚡</div><div class="nb-lbl" style="color:#7c6af7">Matches</div></button>
-    <button class="nb" id="n7" style="position:relative"><div class="nb-ico" style="font-size:22px;">✉️</div><div class="nb-lbl" style="color:#fff;">Messages</div><div id="msg-badge-2" class="msg-badge" style="display:none;position:absolute;top:4px;right:8px;background:#e24b4a;color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;align-items:center;justify-content:center;"></div></button>
+    <button class="nb" id="n7" style="position:relative"><div class="nb-ico">✉️</div><div class="nb-lbl">Messages</div><div id="msg-badge-2" class="msg-badge" style="display:none;position:absolute;top:4px;right:6px;background:#e24b4a;color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;align-items:center;justify-content:center;"></div></button>
     <button class="nb" id="n8"><div class="nb-ico">👤</div><div class="nb-lbl">Profile</div></button>
   </div>
 </div>
@@ -359,7 +359,7 @@ textarea.fi{min-height:75px;resize:vertical;}
   <div class="bnav">
     <button class="nb" id="n9"><div class="nb-ico">🔥</div><div class="nb-lbl">Feed</div></button>
     <button class="nb" id="n10"><div class="nb-ico">⚡</div><div class="nb-lbl">Matches</div></button>
-    <button class="nb on" id="n11"><div class="nb-ico">＋</div><div class="nb-lbl" style="color:#7c6af7">Post</div></button>
+    <button class="nb" id="n11" style="position:relative"><div class="nb-ico">✉️</div><div class="nb-lbl">Messages</div><div id="msg-badge-3" class="msg-badge" style="display:none;position:absolute;top:4px;right:6px;background:#e24b4a;color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;align-items:center;justify-content:center;"></div></button>
     <button class="nb" id="n12"><div class="nb-ico">👤</div><div class="nb-lbl">Profile</div></button>
   </div>
 </div>
@@ -389,7 +389,7 @@ textarea.fi{min-height:75px;resize:vertical;}
   <div class="bnav">
     <button class="nb" id="n13"><div class="nb-ico">🔥</div><div class="nb-lbl">Feed</div></button>
     <button class="nb" id="n14"><div class="nb-ico">⚡</div><div class="nb-lbl">Matches</div></button>
-    <button class="nb" id="n15" style="position:relative"><div class="nb-ico" style="font-size:22px;">✉️</div><div class="nb-lbl" style="color:#fff;">Messages</div><div id="msg-badge-3" class="msg-badge" style="display:none;position:absolute;top:4px;right:8px;background:#e24b4a;color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;align-items:center;justify-content:center;"></div></button>
+    <button class="nb" id="n15" style="position:relative"><div class="nb-ico">✉️</div><div class="nb-lbl">Messages</div><div id="msg-badge-4" class="msg-badge" style="display:none;position:absolute;top:4px;right:6px;background:#e24b4a;color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;align-items:center;justify-content:center;"></div></button>
     <button class="nb on" id="n16"><div class="nb-ico">👤</div><div class="nb-lbl" style="color:#7c6af7">Profile</div></button>
   </div>
 </div>
@@ -552,7 +552,21 @@ function enterApp(){
   loadFeed();
   loadProfile();
   if(typeof checkUnreadCount==='function') setTimeout(checkUnreadCount,1000);
-  setTimeout(checkUnreadMessages, 2000);
+  setTimeout(checkUnreadMessages,2000);
+  // Set feed top bar avatar
+  var favEl=document.getElementById('feed-avatar');
+  if(favEl&&user){
+    if(user.avatar_url){
+      var img=document.createElement('img');
+      img.src=user.avatar_url;
+      img.style.cssText='width:100%;height:100%;object-fit:cover;';
+      img.onerror=function(){favEl.textContent=(user.full_name||'?').charAt(0).toUpperCase();};
+      favEl.innerHTML='';
+      favEl.appendChild(img);
+    } else {
+      favEl.textContent=(user.full_name||'?').charAt(0).toUpperCase();
+    }
+  }
 }
 
 // LOGIN
@@ -729,10 +743,13 @@ function buildSlide(p){
 
   // Right actions
   var ra=document.createElement('div');ra.className='s-right';
+  // Profile avatar at top of right sidebar
+    var ra=document.createElement('div');ra.className='s-right';
   var raAv=document.createElement('div');raAv.style.cssText='width:46px;height:46px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,0.6);background:'+q.bg+';color:'+q.c+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;margin-bottom:4px;';
   if(p.creator_avatar){var raI=document.createElement('img');raI.src=p.creator_avatar;raI.style.cssText='width:100%;height:100%;object-fit:cover;';raI.onerror=function(){this.parentElement.textContent=ini(p.creator_name);};raAv.appendChild(raI);}else{raAv.textContent=ini(p.creator_name);}
   ra.appendChild(raAv);
   ra.innerHTML+=
+    avatarHtml+
     '<button class="s-rbtn" id="lb-'+p.id+'"><div class="s-rico" id="li-'+p.id+'">🤍</div><div class="s-rlbl">Like</div></button>'+
     '<button class="s-rbtn" id="sb-'+p.id+'"><div class="s-rico" id="si-'+p.id+'">🔖</div><div class="s-rlbl">Save</div></button>'+
     '<button class="s-rbtn" id="cmb-'+p.id+'"><div class="s-rico">💬</div><div class="s-rlbl" id="cc-'+p.id+'">'+(p.comment_count||0)+'</div></button>'+
@@ -845,8 +862,8 @@ async function loadMatches(){
   pc.innerHTML='<div class="m-empty"><div class="m-empty-ico">⏳</div><div>Loading...</div></div>';
   var r=await api('/matches/my-matches');
   if(!r.ok||!r.data.matches||!r.data.matches.length){
-    pi.innerHTML='<div class="m-empty"><div class="m-empty-ico">💰</div><div style="color:#888;font-size:14px;">No invest matches yet</div></div>';
-    pc.innerHTML='<div class="m-empty"><div class="m-empty-ico">⚡</div><div style="color:#888;font-size:14px;">No collab matches yet</div></div>';
+    pi.innerHTML='<div class="m-empty"><div class="m-empty-ico">💰</div><div>No invest matches yet</div></div>';
+    pc.innerHTML='<div class="m-empty"><div class="m-empty-ico">⚡</div><div>No collab matches yet</div></div>';
     return;
   }
   function buildMatchCard(m){
@@ -1409,40 +1426,6 @@ async function exchangeGoogleToken(accessToken) {
 }
 
 
-
-// ── MESSAGE BADGE ──────────────────────────
-async function checkUnreadMessages(){
-  if(!token) return;
-  var r = await api('/matches/my-matches','GET');
-  if(!r.ok) return;
-  var matches = r.data.matches || [];
-  // Count accepted matches with unread messages
-  var unread = matches.filter(function(m){
-    return m.status === 'accepted' && m.last_message && m.conversation_id;
-  }).length;
-  updateMsgBadge(unread);
-}
-
-function updateMsgBadge(count){
-  document.querySelectorAll('.msg-badge').forEach(function(b){
-    if(count > 0){
-      b.style.display = 'flex';
-      b.textContent = count > 9 ? '9+' : count;
-    } else {
-      b.style.display = 'none';
-    }
-  });
-}
-
-// Clear badge when user opens messages
-var origLoadMatches = loadMatches;
-async function loadMatchesWithBadge(){
-  updateMsgBadge(0);
-  return origLoadMatches();
-}
-
-setInterval(function(){ if(token) checkUnreadMessages(); }, 15000);
-
 // ── NOTIFICATIONS ──────────────────────────
 async function loadNotifications() {
   var list=document.getElementById('notif-list');
@@ -1503,6 +1486,23 @@ async function checkUnreadCount(){
 }
 
 setInterval(function(){ if(typeof checkUnreadCount==='function') checkUnreadCount(); },30000);
+
+
+// ── MESSAGE BADGE ──────────────────────────
+function updateMsgBadge(count){
+  document.querySelectorAll('.msg-badge').forEach(function(b){
+    if(count>0){b.style.display='flex';b.textContent=count>9?'9+':count;}
+    else{b.style.display='none';}
+  });
+}
+async function checkUnreadMessages(){
+  if(!token) return;
+  var r=await api('/matches/my-matches','GET');
+  if(!r.ok) return;
+  var unread=(r.data.matches||[]).filter(function(m){return m.status==='accepted'&&m.last_message;}).length;
+  updateMsgBadge(unread);
+}
+setInterval(function(){if(token)checkUnreadMessages();},15000);
 
 // INIT
 window.onload=function(){
