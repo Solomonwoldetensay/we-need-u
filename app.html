@@ -1435,19 +1435,22 @@ async function loadNotifications() {
     return;
   }
   var icons={invest:'💰',collab:'⚡',accepted:'✅',comment:'💬',like:'❤️',message:'📩'};
-  list.innerHTML=notifs.map(function(n){
-    var time=timeAgoN(n.created_at);
-    var icon=icons[n.type]||'🔔';
-    return '<div style="display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-bottom:1px solid #111;background:'+(n.is_read?'transparent':'rgba(124,106,247,0.06)')+';" onclick="markRead(\"'+n.id+'\")">'+
-      '<div style="font-size:24px;flex-shrink:0;">'+icon+'</div>'+
-      '<div style="flex:1;">'+
-        '<div style="font-size:14px;font-weight:'+(n.is_read?400:600)+';color:#fff;margin-bottom:3px;">'+n.title+'</div>'+
-        '<div style="font-size:13px;color:#888;line-height:1.4;">'+n.body+'</div>'+
-        '<div style="font-size:11px;color:#555;margin-top:4px;">'+time+'</div>'+
-      '</div>'+
-      (!n.is_read?'<div style="width:8px;height:8px;border-radius:50%;background:#7c6af7;flex-shrink:0;margin-top:6px;"></div>':'')+
-    '</div>';
-  }).join('');
+  list.innerHTML='';
+  notifs.forEach(function(n){
+    var div=document.createElement('div');
+    div.style.cssText='display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-bottom:1px solid #111;background:'+(n.is_read?'transparent':'rgba(124,106,247,0.06)')+';cursor:pointer;';
+    div.onclick=function(){markRead(n.id);this.style.background='transparent';};
+    var s=Math.floor((Date.now()-new Date(n.created_at))/1000);
+    var t=s<60?'Just now':s<3600?Math.floor(s/60)+'m ago':s<86400?Math.floor(s/3600)+'h ago':Math.floor(s/86400)+'d ago';
+    var icons={invest:'💰',collab:'⚡',accepted:'✅',comment:'💬',like:'❤️',message:'📩'};
+    div.innerHTML='<div style="font-size:22px;flex-shrink:0;">'+(icons[n.type]||'🔔')+'</div>'+
+      '<div style="flex:1;"><div style="font-size:13px;font-weight:'+(n.is_read?400:600)+';color:#fff;">'+n.title+'</div>'+
+      '<div style="font-size:12px;color:#888;">'+n.body+'</div>'+
+      '<div style="font-size:11px;color:#555;margin-top:3px;">'+t+'</div></div>'+
+      (!n.is_read?'<div style="width:8px;height:8px;border-radius:50%;background:#7c6af7;margin-top:4px;flex-shrink:0;"></div>':'');
+    list.appendChild(div);
+  });
+  updateNotifBadge(0);
   updateNotifBadge(0);
 }
 
