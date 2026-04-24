@@ -1657,10 +1657,10 @@ window.onload=function(){
   </div>
   <div id="messages-list" style="flex:1;overflow-y:auto;font-family:-apple-system,sans-serif;"></div>
   <div class="bnav">
-    <button class="nb" id="nm1"><div class="nb-ico">🔥</div><div class="nb-lbl">Feed</div></button>
-    <button class="nb" id="nm2"><div class="nb-ico">⚡</div><div class="nb-lbl">Matches</div></button>
-    <button class="nb on" id="nm3"><div class="nb-ico">✉️</div><div class="nb-lbl" style="color:#7c6af7">Messages</div></button>
-    <button class="nb" id="nm4"><div class="nb-ico">👤</div><div class="nb-lbl">Profile</div></button>
+    <button class="nb" id="nm1" onclick="show('pg-feed');loadFeed();"><div class="nb-ico">🔥</div><div class="nb-lbl">Feed</div></button>
+    <button class="nb" id="nm2" onclick="show('pg-matches');loadMatches();"><div class="nb-ico">⚡</div><div class="nb-lbl">Matches</div></button>
+    <button class="nb on" id="nm3" onclick="show('pg-messages');loadMessages();updateMsgBadge(0);"><div class="nb-ico">✉️</div><div class="nb-lbl" style="color:#7c6af7">Messages</div></button>
+    <button class="nb" id="nm4" onclick="show('pg-profile');loadProfile();"><div class="nb-ico">👤</div><div class="nb-lbl">Profile</div></button>
   </div>
 </div>
 
