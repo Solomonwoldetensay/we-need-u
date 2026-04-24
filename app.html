@@ -463,7 +463,7 @@ textarea.fi{min-height:75px;resize:vertical;}
     <div class="pd-stats-row">
       <div class="pd-stat invest" onclick="showStatUsers('invest')" style="cursor:pointer;"><div class="pd-stat-val" id="pd-invest">0</div><div class="pd-stat-lbl">💰 Invests</div></div>
       <div class="pd-stat collab" onclick="showStatUsers('collab')" style="cursor:pointer;"><div class="pd-stat-val" id="pd-collab">0</div><div class="pd-stat-lbl">⚡ Collabs</div></div>
-      <div class="pd-stat likes" onclick="showStatUsers('likes')" style="cursor:pointer;"><div class="pd-stat-val" id="pd-likes">0</div><div class="pd-stat-lbl">❤️ Likes</div></div>
+      <div class="pd-stat likes" id="pd-likes-btn" onclick="showStatUsers('likes')" style="cursor:pointer;"><div class="pd-stat-val" id="pd-likes">0</div><div class="pd-stat-lbl">❤️ Likes</div></div>
       <div class="pd-stat views" onclick="showStatUsers('views')" style="cursor:pointer;"><div class="pd-stat-val" id="pd-views">0</div><div class="pd-stat-lbl">👁 Views</div></div>
     </div>
     <div class="pd-comments-title">💬 Comments</div>
@@ -1084,7 +1084,7 @@ document.getElementById('pd-back').onclick=function(){
 document.getElementById('pd-requests-btn').onclick=function(){openRequests();};
 document.getElementById('req-close').onclick=function(){document.getElementById('req-sheet').classList.remove('on');};
 document.getElementById('likes-close').onclick=function(){document.getElementById('likes-sheet').classList.remove('on');};
-document.getElementById('pd-likes-btn').onclick=async function(){
+var pdLikesBtn=document.getElementById('pd-likes-btn'); if(pdLikesBtn) pdLikesBtn.onclick=async function(){
   document.getElementById('likes-sheet').classList.add('on');
   var list=document.getElementById('likes-list');
   list.innerHTML='<div class="req-empty">Loading...</div>';
@@ -1643,7 +1643,25 @@ window.onload=function(){
       return;
     }
   }
-  if(token&&user)enterApp();
+  if(token&&user){
+    // Check if token is still valid before entering app
+    fetch('https://workmatch-backend.onrender.com/api/auth/me', {
+      headers: {'Authorization': 'Bearer ' + token}
+    }).then(function(r){
+      if(r.ok){
+        enterApp();
+      } else {
+        // Token expired - clear and show login
+        token=null; user=null;
+        localStorage.removeItem('wm_token');
+        localStorage.removeItem('wm_user');
+        show('pg-login');
+      }
+    }).catch(function(){
+      // Network error (Render sleeping) - still try to enter app
+      enterApp();
+    });
+  }
 };
 </script>
 
