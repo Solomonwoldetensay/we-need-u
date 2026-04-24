@@ -239,6 +239,10 @@ textarea.fi{min-height:75px;resize:vertical;}
   <div class="card">
     <div class="ctitle">Welcome back 👋</div>
     <div class="errtxt" id="lerr"></div>
+    <div id="g-signin2" 
+      data-onsuccess="handleGoogleSignIn"
+      style="margin-bottom:8px;">
+    </div>
     <button class="gbtn" id="google-login-btn" onclick="triggerGoogleSignIn()">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -248,7 +252,7 @@ textarea.fi{min-height:75px;resize:vertical;}
       </svg>
       Continue with Google
     </button>
-    <div id="g-btn-container" style="width:100%;margin-bottom:8px" data-client_id="855168386507-5tjaea79rg95ghmjb57eirpggeoapj9b.apps.googleusercontent.com"></div>
+    <div id="g-btn-container" style="width:100%;margin-bottom:8px;"></div>
     <div class="auth-divider"><span>or sign in with email</span></div>
     <input class="inp" type="email" placeholder="Email address" id="lemail" autocomplete="email"/>
     <input class="inp" type="password" placeholder="Password" id="lpw" autocomplete="current-password"/>
@@ -1306,31 +1310,30 @@ function triggerGoogleSignIn() {
     return;
   }
 
-  // Initialize Google One Tap with your domain
+  // Initialize and show Google One Tap prompt
   google.accounts.id.initialize({
     client_id: GOOGLE_CLIENT_ID,
     callback: handleGoogleSignIn,
     auto_select: false,
     cancel_on_tap_outside: true,
   });
-  
-  // Render button in a container
-  var container = document.getElementById('g-btn-container');
-  if(container) {
-    container.innerHTML = '';
-    google.accounts.id.renderButton(container, {
-      theme: 'filled_black',
-      size: 'large', 
-      width: 280,
-      text: 'continue_with',
-      shape: 'rectangular',
-    });
-    // Auto click the rendered button
-    setTimeout(function() {
-      var btn = container.querySelector('div[role=button]');
-      if(btn) btn.click();
-    }, 300);
-  }
+  // Show the One Tap UI
+  google.accounts.id.prompt(function(notification){
+    if(notification.isNotDisplayed() || notification.isSkippedMoment()){
+      // Fallback to renderButton
+      var container = document.getElementById('g-btn-container');
+      if(container){
+        container.innerHTML='';
+        google.accounts.id.renderButton(container,{
+          theme:'filled_black',size:'large',width:280,text:'continue_with'
+        });
+        setTimeout(function(){
+          var btn=container.querySelector('div[role=button]');
+          if(btn)btn.click();
+        },300);
+      }
+    }
+  });
 }
 
 // Called when app gets focus back after Google redirect
