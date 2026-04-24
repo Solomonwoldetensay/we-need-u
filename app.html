@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
 <title>WE-NEED-U</title>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-<meta name="google-signin-client_id" content="855168386507-5tjaea79rg95ghmjb57eirpggeoapj9b.apps.googleusercontent.com"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;background:#000;margin:0;padding:0;}
@@ -40,9 +39,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;display:flex;justif
 .s-logo b{color:#7c6af7;}
 .s-postbtn{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;font-size:11px;padding:6px 12px;border-radius:20px;cursor:pointer;-webkit-appearance:none;}
 .s-right{position:absolute;right:12px;bottom:130px;display:flex;flex-direction:column;gap:16px;align-items:center;z-index:2;}
-.s-rbtn{display:flex;flex-direction:column;align-items:center;gap:5px;border:none;background:none;cursor:pointer;}
-.s-rico{width:52px;height:52px;border-radius:50%;background:rgba(0,0,0,0.5);border:2px solid rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 2px 12px rgba(0,0,0,0.6);}
-.s-rlbl{font-size:11px;color:#fff;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,0.9);}
+.s-rbtn{display:flex;flex-direction:column;align-items:center;gap:4px;border:none;background:none;cursor:pointer;}
+.s-rico{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:22px;}
+.s-rlbl{font-size:9px;color:rgba(255,255,255,0.8);font-weight:500;}
 .s-info{position:absolute;bottom:68px;left:14px;right:68px;z-index:2;}
 .s-handle{font-size:14px;font-weight:700;color:#fff;margin-bottom:2px;}
 .s-loc{font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:5px;}
@@ -239,10 +238,6 @@ textarea.fi{min-height:75px;resize:vertical;}
   <div class="card">
     <div class="ctitle">Welcome back 👋</div>
     <div class="errtxt" id="lerr"></div>
-    <div id="g-signin2" 
-      data-onsuccess="handleGoogleSignIn"
-      style="margin-bottom:8px;">
-    </div>
     <button class="gbtn" id="google-login-btn" onclick="triggerGoogleSignIn()">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -252,7 +247,7 @@ textarea.fi{min-height:75px;resize:vertical;}
       </svg>
       Continue with Google
     </button>
-    <div id="g-btn-container" style="width:100%;margin-bottom:8px;"></div>
+    <div id="g-btn-container" style="width:100%;margin-bottom:8px"></div>
     <div class="auth-divider"><span>or sign in with email</span></div>
     <input class="inp" type="email" placeholder="Email address" id="lemail" autocomplete="email"/>
     <input class="inp" type="password" placeholder="Password" id="lpw" autocomplete="current-password"/>
@@ -479,17 +474,6 @@ textarea.fi{min-height:75px;resize:vertical;}
       <div class="req-list" id="likes-list"><div class="req-empty">No likes yet</div></div>
     </div>
   </div>
-
-<!-- STAT USERS SHEET -->
-<div class="likes-sheet" id="stat-users-sheet">
-  <div class="req-inner">
-    <div class="req-top">
-      <div class="req-top-title" id="stat-users-title">Users</div>
-      <button class="req-close" id="stat-users-close">✕</button>
-    </div>
-    <div class="req-list" id="stat-users-list"></div>
-  </div>
-</div>
   <!-- REQUESTS SHEET -->
   <div class="req-sheet" id="req-sheet">
     <div class="req-inner">
@@ -668,7 +652,10 @@ document.getElementById('n14').onclick=goMatch;
 document.getElementById('n15').onclick=function(){show('pg-messages');loadMessages();};
 document.getElementById('n16').onclick=goProf;
 document.getElementById('cbk').onclick=function(){show('pg-matches');};
-// nm handlers set via inline onclick in HTML
+document.getElementById('nm1').onclick=function(){show('pg-feed');loadFeed();};
+document.getElementById('nm2').onclick=function(){show('pg-matches');loadMatches();};
+document.getElementById('nm3').onclick=function(){show('pg-messages');loadMessages();};
+document.getElementById('nm4').onclick=function(){show('pg-profile');loadProfile();};
 document.getElementById('logbtn').onclick=function(){
   token=null;user=null;localStorage.removeItem('wm_token');localStorage.removeItem('wm_user');show('pg-login');
 };
@@ -1084,7 +1071,7 @@ document.getElementById('pd-back').onclick=function(){
 document.getElementById('pd-requests-btn').onclick=function(){openRequests();};
 document.getElementById('req-close').onclick=function(){document.getElementById('req-sheet').classList.remove('on');};
 document.getElementById('likes-close').onclick=function(){document.getElementById('likes-sheet').classList.remove('on');};
-var pdLikesBtn=document.getElementById('pd-likes-btn'); if(pdLikesBtn) pdLikesBtn.onclick=async function(){
+document.getElementById('pd-likes-btn').onclick=async function(){
   document.getElementById('likes-sheet').classList.add('on');
   var list=document.getElementById('likes-list');
   list.innerHTML='<div class="req-empty">Loading...</div>';
@@ -1299,38 +1286,32 @@ var BACKEND = 'https://workmatch-backend.onrender.com';
 function triggerGoogleSignIn() {
   var errEl = document.getElementById('lerr') || document.getElementById('serr');
   if(errEl) errEl.textContent = '';
-
-  // Wait for Google library to load
-  if(typeof google === 'undefined' || !google.accounts) {
-    if(errEl){ errEl.style.color='#7c6af7'; errEl.textContent='Loading Google... please wait'; }
-    setTimeout(triggerGoogleSignIn, 500);
-    return;
-  }
-
-  // Initialize and show Google One Tap prompt
+  
+  // Initialize Google One Tap with your domain
   google.accounts.id.initialize({
     client_id: GOOGLE_CLIENT_ID,
     callback: handleGoogleSignIn,
     auto_select: false,
     cancel_on_tap_outside: true,
   });
-  // Show the One Tap UI
-  google.accounts.id.prompt(function(notification){
-    if(notification.isNotDisplayed() || notification.isSkippedMoment()){
-      // Fallback to renderButton
-      var container = document.getElementById('g-btn-container');
-      if(container){
-        container.innerHTML='';
-        google.accounts.id.renderButton(container,{
-          theme:'filled_black',size:'large',width:280,text:'continue_with'
-        });
-        setTimeout(function(){
-          var btn=container.querySelector('div[role=button]');
-          if(btn)btn.click();
-        },300);
-      }
-    }
-  });
+  
+  // Render button in a container
+  var container = document.getElementById('g-btn-container');
+  if(container) {
+    container.innerHTML = '';
+    google.accounts.id.renderButton(container, {
+      theme: 'filled_black',
+      size: 'large', 
+      width: 280,
+      text: 'continue_with',
+      shape: 'rectangular',
+    });
+    // Auto click the rendered button
+    setTimeout(function() {
+      var btn = container.querySelector('div[role=button]');
+      if(btn) btn.click();
+    }, 300);
+  }
 }
 
 // Called when app gets focus back after Google redirect
@@ -1435,22 +1416,19 @@ async function loadNotifications() {
     return;
   }
   var icons={invest:'💰',collab:'⚡',accepted:'✅',comment:'💬',like:'❤️',message:'📩'};
-  list.innerHTML='';
-  notifs.forEach(function(n){
-    var div=document.createElement('div');
-    div.style.cssText='display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-bottom:1px solid #111;background:'+(n.is_read?'transparent':'rgba(124,106,247,0.06)')+';cursor:pointer;';
-    div.onclick=function(){markRead(n.id);this.style.background='transparent';};
-    var s=Math.floor((Date.now()-new Date(n.created_at))/1000);
-    var t=s<60?'Just now':s<3600?Math.floor(s/60)+'m ago':s<86400?Math.floor(s/3600)+'h ago':Math.floor(s/86400)+'d ago';
-    var icons={invest:'💰',collab:'⚡',accepted:'✅',comment:'💬',like:'❤️',message:'📩'};
-    div.innerHTML='<div style="font-size:22px;flex-shrink:0;">'+(icons[n.type]||'🔔')+'</div>'+
-      '<div style="flex:1;"><div style="font-size:13px;font-weight:'+(n.is_read?400:600)+';color:#fff;">'+n.title+'</div>'+
-      '<div style="font-size:12px;color:#888;">'+n.body+'</div>'+
-      '<div style="font-size:11px;color:#555;margin-top:3px;">'+t+'</div></div>'+
-      (!n.is_read?'<div style="width:8px;height:8px;border-radius:50%;background:#7c6af7;margin-top:4px;flex-shrink:0;"></div>':'');
-    list.appendChild(div);
-  });
-  updateNotifBadge(0);
+  list.innerHTML=notifs.map(function(n){
+    var time=timeAgoN(n.created_at);
+    var icon=icons[n.type]||'🔔';
+    return '<div style="display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-bottom:1px solid #111;background:'+(n.is_read?'transparent':'rgba(124,106,247,0.06)')+';" onclick="markRead(\"'+n.id+'\")">'+
+      '<div style="font-size:24px;flex-shrink:0;">'+icon+'</div>'+
+      '<div style="flex:1;">'+
+        '<div style="font-size:14px;font-weight:'+(n.is_read?400:600)+';color:#fff;margin-bottom:3px;">'+n.title+'</div>'+
+        '<div style="font-size:13px;color:#888;line-height:1.4;">'+n.body+'</div>'+
+        '<div style="font-size:11px;color:#555;margin-top:4px;">'+time+'</div>'+
+      '</div>'+
+      (!n.is_read?'<div style="width:8px;height:8px;border-radius:50%;background:#7c6af7;flex-shrink:0;margin-top:6px;"></div>':'')+
+    '</div>';
+  }).join('');
   updateNotifBadge(0);
 }
 
@@ -1565,70 +1543,26 @@ async function showStatUsers(type){
   document.getElementById('stat-users-title').textContent=titles[type]||type;
   document.getElementById('stat-users-list').innerHTML='<div class="req-empty">Loading...</div>';
   document.getElementById('stat-users-sheet').classList.add('on');
-  if(type==='views'){
-    document.getElementById('stat-users-list').innerHTML='<div class="req-empty" style="padding:20px;text-align:center;color:#aaa;font-size:16px;">'+document.getElementById('pd-views').textContent+' total views</div>';
-    return;
-  }
+  if(type==='views'){document.getElementById('stat-users-list').innerHTML='<div class="req-empty" style="text-align:center;color:#aaa;font-size:16px;">'+document.getElementById('pd-views').textContent+' total views</div>';return;}
   if(type==='likes'){
     var r=await api('/projects/'+currentProjId+'/likes');
     var users=r.ok?(r.data.likes||[]):[];
     if(!users.length){document.getElementById('stat-users-list').innerHTML='<div class="req-empty">No likes yet</div>';return;}
-    document.getElementById('stat-users-list').innerHTML=users.map(function(u){
-      var q=clr(u.id);
-      return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #1e1e1e;">'+
-        '<div style="width:38px;height:38px;border-radius:50%;background:'+q.bg+';color:'+q.c+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;">'+ini(u.full_name)+'</div>'+
-        '<div style="flex:1;"><div style="font-size:13px;font-weight:600;color:#fff;">'+u.full_name+'</div></div>'+
-        '<div style="margin-left:auto;">❤️</div></div>';
-    }).join('');
+    document.getElementById('stat-users-list').innerHTML=users.map(function(u){var q=clr(u.id);return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #1e1e1e;"><div style="width:38px;height:38px;border-radius:50%;background:'+q.bg+';color:'+q.c+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;">'+ini(u.full_name)+'</div><div style="flex:1;font-size:13px;font-weight:600;color:#fff;">'+u.full_name+'</div><div>❤️</div></div>';}).join('');
     return;
   }
   var r=await api('/projects/'+currentProjId+'/requests');
   if(r.ok&&r.data.requests&&r.data.requests.length){
     var reqs=r.data.requests.filter(function(req){return req.match_type===type;});
-    if(reqs.length){
-      document.getElementById('stat-users-list').innerHTML=reqs.map(function(req){
-        var q=clr(req.requester_id);
-        var sc=req.status==='accepted'?'#4ade80':req.status==='denied'?'#666':'#f5c97a';
-        var st=req.status==='accepted'?'✅':req.status==='denied'?'❌':'⏳';
-        return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #1e1e1e;">'+
-          '<div style="width:38px;height:38px;border-radius:50%;background:'+q.bg+';color:'+q.c+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;">'+ini(req.requester_name)+'</div>'+
-          '<div style="flex:1;"><div style="font-size:13px;font-weight:600;color:#fff;">'+(req.requester_name||'User')+'</div></div>'+
-          '<div style="font-size:13px;font-weight:700;color:'+sc+';">'+st+'</div></div>';
-      }).join('');
-      return;
-    }
+    if(reqs.length){document.getElementById('stat-users-list').innerHTML=reqs.map(function(req){var q=clr(req.requester_id);var sc=req.status==='accepted'?'#4ade80':req.status==='denied'?'#666':'#f5c97a';var st=req.status==='accepted'?'✅':req.status==='denied'?'❌':'⏳';return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #1e1e1e;"><div style="width:38px;height:38px;border-radius:50%;background:'+q.bg+';color:'+q.c+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;">'+ini(req.requester_name)+'</div><div style="flex:1;font-size:13px;font-weight:600;color:#fff;">'+(req.requester_name||'User')+'</div><div style="font-size:13px;font-weight:700;color:'+sc+';">'+st+'</div></div>';}).join('');return;}
   }
   var r2=await api('/matches/my-matches','GET');
   var filtered=(r2.ok?(r2.data.matches||[]):[]).filter(function(m){return m.match_type===type&&m.project_id===currentProjId;});
   if(!filtered.length){document.getElementById('stat-users-list').innerHTML='<div class="req-empty">No '+(type==='invest'?'investors':'collaborators')+' yet</div>';return;}
-  document.getElementById('stat-users-list').innerHTML=filtered.map(function(m){
-    var q=clr(m.other_user_id);
-    var sc=m.status==='accepted'?'#4ade80':m.status==='denied'?'#666':'#f5c97a';
-    var st=m.status==='accepted'?'✅':m.status==='denied'?'❌':'⏳';
-    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #1e1e1e;">'+
-      '<div style="width:38px;height:38px;border-radius:50%;background:'+q.bg+';color:'+q.c+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;">'+ini(m.other_user_name)+'</div>'+
-      '<div style="flex:1;"><div style="font-size:13px;font-weight:600;color:#fff;">'+(m.other_user_name||'User')+'</div></div>'+
-      '<div style="font-size:13px;font-weight:700;color:'+sc+';">'+st+'</div></div>';
-  }).join('');
+  document.getElementById('stat-users-list').innerHTML=filtered.map(function(m){var q=clr(m.other_user_id);var sc=m.status==='accepted'?'#4ade80':m.status==='denied'?'#666':'#f5c97a';var st=m.status==='accepted'?'✅':m.status==='denied'?'❌':'⏳';return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #1e1e1e;"><div style="width:38px;height:38px;border-radius:50%;background:'+q.bg+';color:'+q.c+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;">'+ini(m.other_user_name)+'</div><div style="flex:1;font-size:13px;font-weight:600;color:#fff;">'+(m.other_user_name||'User')+'</div><div style="font-size:13px;font-weight:700;color:'+sc+';">'+st+'</div></div>';}).join('');
 }
 // INIT
 window.onload=function(){
-  if(document.getElementById('profile-req-close')){
-    document.getElementById('profile-req-close').onclick=function(){document.getElementById('profile-req-mask').classList.remove('on');};
-    document.getElementById('profile-req-mask').onclick=function(e){if(e.target===this)this.classList.remove('on');};
-  }
-  // Messages page nav
-  if(document.getElementById('nm1')){
-    document.getElementById('nm1').onclick=function(){show('pg-feed');loadFeed();};
-    document.getElementById('nm2').onclick=function(){show('pg-matches');loadMatches();};
-    document.getElementById('nm3').onclick=function(){show('pg-messages');loadMessages();};
-    document.getElementById('nm4').onclick=function(){show('pg-profile');loadProfile();};
-  }
-  // Stat users sheet
-  if(document.getElementById('stat-users-close')){
-    document.getElementById('stat-users-close').onclick=function(){document.getElementById('stat-users-sheet').classList.remove('on');};
-    document.getElementById('stat-users-sheet').onclick=function(e){if(e.target===this)this.classList.remove('on');};
-  }
   // Check if we're returning from Google OAuth redirect
   var hash = window.location.hash;
   if(hash && hash.indexOf('access_token') > -1) {
@@ -1643,25 +1577,7 @@ window.onload=function(){
       return;
     }
   }
-  if(token&&user){
-    // Check if token is still valid before entering app
-    fetch('https://workmatch-backend.onrender.com/api/auth/me', {
-      headers: {'Authorization': 'Bearer ' + token}
-    }).then(function(r){
-      if(r.ok){
-        enterApp();
-      } else {
-        // Token expired - clear and show login
-        token=null; user=null;
-        localStorage.removeItem('wm_token');
-        localStorage.removeItem('wm_user');
-        show('pg-login');
-      }
-    }).catch(function(){
-      // Network error (Render sleeping) - still try to enter app
-      enterApp();
-    });
-  }
+  if(token&&user)enterApp();
 };
 </script>
 
@@ -1672,31 +1588,10 @@ window.onload=function(){
   </div>
   <div id="messages-list" style="flex:1;overflow-y:auto;font-family:-apple-system,sans-serif;"></div>
   <div class="bnav">
-    <button class="nb" id="nm1" onclick="show('pg-feed');loadFeed();"><div class="nb-ico">🔥</div><div class="nb-lbl">Feed</div></button>
-    <button class="nb" id="nm2" onclick="show('pg-matches');loadMatches();"><div class="nb-ico">⚡</div><div class="nb-lbl">Matches</div></button>
-    <button class="nb on" id="nm3" onclick="show('pg-messages');loadMessages();updateMsgBadge(0);"><div class="nb-ico">✉️</div><div class="nb-lbl" style="color:#7c6af7">Messages</div></button>
-    <button class="nb" id="nm4" onclick="show('pg-profile');loadProfile();"><div class="nb-ico">👤</div><div class="nb-lbl">Profile</div></button>
-  </div>
-</div>
-
-<!-- NOTIFICATIONS PAGE -->
-<div class="pg" id="pg-notifications" style="background:#07070d;flex-direction:column;">
-  <div style="display:flex;align-items:center;gap:12px;padding:48px 16px 12px;border-bottom:1px solid #1a1a1a;flex-shrink:0;">
-    <button onclick="show('pg-feed');" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;">←</button>
-    <div style="font-size:18px;font-weight:700;color:#fff;flex:1;">Notifications</div>
-    <button onclick="markAllRead()" style="background:none;border:none;color:#7c6af7;font-size:13px;font-weight:600;cursor:pointer;">Mark all read</button>
-  </div>
-  <div id="notif-list" style="flex:1;overflow-y:auto;padding:8px 0;font-family:-apple-system,sans-serif;"></div>
-</div>
-
-<!-- PROFILE REQUESTS SHEET -->
-<div class="cmask" id="profile-req-mask">
-  <div class="cmodal" style="max-height:75vh;display:flex;flex-direction:column;">
-    <button class="cmx" id="profile-req-close">✕</button>
-    <div style="clear:both;margin-bottom:12px;">
-      <div style="font-size:16px;font-weight:700;color:#fff;" id="profile-req-title">Requests</div>
-    </div>
-    <div id="profile-req-list" style="flex:1;overflow-y:scroll;min-height:0;max-height:400px;"></div>
+    <button class="nb" id="nm1"><div class="nb-ico">🔥</div><div class="nb-lbl">Feed</div></button>
+    <button class="nb" id="nm2"><div class="nb-ico">⚡</div><div class="nb-lbl">Matches</div></button>
+    <button class="nb on" id="nm3"><div class="nb-ico">✉️</div><div class="nb-lbl" style="color:#7c6af7">Messages</div></button>
+    <button class="nb" id="nm4"><div class="nb-ico">👤</div><div class="nb-lbl">Profile</div></button>
   </div>
 </div>
 </body>
