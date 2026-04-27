@@ -553,6 +553,10 @@ function unlockSound(){
 }
 
 var _scrollDebounce=null;
+function setFullVolume(vid){
+  vid.volume=1;
+  vid.muted=false;
+}
 function pickAndPlayBestSlide(){
   var feedPg=document.getElementById('pg-feed');
   if(!feedPg||!feedPg.classList.contains('on')){
@@ -568,12 +572,24 @@ function pickAndPlayBestSlide(){
     if(visible>bestScore){bestScore=visible;best=slide;}
   });
   // First mute+pause ALL
-  document.querySelectorAll('.slide video').forEach(function(v){v.pause();v.muted=true;});
+  document.querySelectorAll('.slide video').forEach(function(v){v.pause();v.muted=true;v.volume=1;});
   // Then play only the winner
   if(best){
     var vid=best.querySelector('video');
     if(vid){
-      vid.muted=!soundUnlocked;
+      if(soundUnlocked){
+        vid.muted=false;
+        vid.volume=1;
+        // Set volume again after playing starts — browser sometimes resets it
+        vid.onplaying=function(){
+          vid.volume=1;
+          vid.muted=false;
+          vid.onplaying=null;
+        };
+      } else {
+        vid.muted=true;
+        vid.volume=1;
+      }
       vid.play().catch(function(){vid.muted=true;vid.play().catch(function(){});});
     }
   }
@@ -760,12 +776,24 @@ function buildSlide(p){
         document.querySelectorAll('.slide video').forEach(function(v){
           if(v!==vid){v.pause();v.muted=true;}
         });
-        vid.muted=false;vid.volume=1;
+        vid.muted=false;
+        vid.volume=1;
         vid.play().catch(function(){});
+        // Force volume again after browser starts playing
+        vid.onplaying=function(){
+          vid.volume=1;
+          vid.muted=false;
+          vid.onplaying=null;
+        };
         // Hide all sound hints
         document.querySelectorAll('.sound-hint').forEach(function(h){h.style.display='none';});
       } else {
-        if(vid.paused)vid.play();else vid.pause();
+        if(vid.paused){
+          vid.volume=1;
+          vid.play().catch(function(){});
+        } else {
+          vid.pause();
+        }
       }
     };
     s.appendChild(vid);
