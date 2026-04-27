@@ -758,10 +758,23 @@ function buildSlide(p){
   s.appendChild(info);
 
   var acts=document.createElement('div');acts.className='s-acts';
-  var ib=document.createElement('button');ib.className='s-btn btn-i';ib.textContent='💰 Invest';
-  ib.onclick=function(){if(ib.classList.contains('btn-sent'))return;ib.classList.add('btn-sent');ib.textContent='💰 Sent!';showToast(p.id,'💰 Investment sent!','rgba(232,160,32,0.95)');api('/matches/swipe','POST',{project_id:p.id,action:'invest'});};
-  var cb=document.createElement('button');cb.className='s-btn btn-c';cb.textContent='⚡ Collab';
-  cb.onclick=function(){if(cb.classList.contains('btn-sent'))return;cb.classList.add('btn-sent');cb.textContent='⚡ Sent!';showToast(p.id,'⚡ Collab request sent!','rgba(124,106,247,0.95)');api('/matches/swipe','POST',{project_id:p.id,action:'collab'});};
+  var ib=null,cb=null;
+
+  // Only show Invest button if project accepts investors
+  if(p.mode==='invest'||p.mode==='both'){
+    ib=document.createElement('button');ib.className='s-btn btn-i';ib.textContent='💰 Invest';
+    ib.onclick=function(){if(ib.classList.contains('btn-sent'))return;ib.classList.add('btn-sent');ib.textContent='💰 Sent!';showToast(p.id,'💰 Investment sent!','rgba(232,160,32,0.95)');api('/matches/swipe','POST',{project_id:p.id,action:'invest'});};
+    acts.appendChild(ib);
+  }
+
+  // Only show Collab button if project accepts collaborators
+  if(p.mode==='collab'||p.mode==='both'){
+    cb=document.createElement('button');cb.className='s-btn btn-c';cb.textContent='⚡ Collab';
+    cb.onclick=function(){if(cb.classList.contains('btn-sent'))return;cb.classList.add('btn-sent');cb.textContent='⚡ Sent!';showToast(p.id,'⚡ Collab request sent!','rgba(124,106,247,0.95)');api('/matches/swipe','POST',{project_id:p.id,action:'collab'});};
+    acts.appendChild(cb);
+  }
+
+  // Profile button always shows
   var profb=document.createElement('button');profb.className='s-btn btn-p';profb.textContent='👤';
   profb.onclick=function(){
     var qc=clr(p.id);
@@ -773,23 +786,34 @@ function buildSlide(p){
     document.getElementById('cmproj').innerHTML='<div class="cmpt">'+p.title+'</div><div class="cmpd">'+(p.description||'')+'</div>';
     document.getElementById('cmask').classList.add('on');
   };
-  acts.appendChild(ib);acts.appendChild(cb);acts.appendChild(profb);s.appendChild(acts);
+  acts.appendChild(profb);
+  s.appendChild(acts);
 
-  var si=document.createElement('div');si.className='swipe-invest';si.textContent='💰 Invest';s.appendChild(si);
-  var sc=document.createElement('div');sc.className='swipe-collab';sc.textContent='⚡ Collab';s.appendChild(sc);
+  // Swipe overlays — only show relevant ones
+  var si=null,sc2=null;
+  if(p.mode==='invest'||p.mode==='both'){
+    si=document.createElement('div');si.className='swipe-invest';si.textContent='💰 Invest';s.appendChild(si);
+  }
+  if(p.mode==='collab'||p.mode==='both'){
+    sc2=document.createElement('div');sc2.className='swipe-collab';sc2.textContent='⚡ Collab';s.appendChild(sc2);
+  }
 
   var txStart=0,txCur=0,swiping=false;
   s.addEventListener('touchstart',function(e){if(e.touches.length!==1)return;txStart=e.touches[0].clientX;txCur=txStart;swiping=true;},{passive:true});
   s.addEventListener('touchmove',function(e){
     if(!swiping||e.touches.length!==1)return;txCur=e.touches[0].clientX;
     var dx=txCur-txStart;
-    if(Math.abs(dx)>20){if(dx<0){si.style.opacity=Math.min(1,Math.abs(dx)/80);sc.style.opacity=0;}else{sc.style.opacity=Math.min(1,dx/80);si.style.opacity=0;}}
+    if(Math.abs(dx)>20){
+      if(dx<0&&si){si.style.opacity=Math.min(1,Math.abs(dx)/80);if(sc2)sc2.style.opacity=0;}
+      else if(dx>0&&sc2){sc2.style.opacity=Math.min(1,dx/80);if(si)si.style.opacity=0;}
+    }
   },{passive:true});
   s.addEventListener('touchend',function(){
-    if(!swiping)return;swiping=false;var dx=txCur-txStart;si.style.opacity=0;sc.style.opacity=0;
+    if(!swiping)return;swiping=false;var dx=txCur-txStart;
+    if(si)si.style.opacity=0;if(sc2)sc2.style.opacity=0;
     if(Math.abs(dx)<60)return;
-    if(dx<-60){if(!ib.classList.contains('btn-sent')){ib.classList.add('btn-sent');ib.textContent='💰 Sent!';showToast(p.id,'💰 Investment request sent!','rgba(232,160,32,0.95)');api('/matches/swipe','POST',{project_id:p.id,action:'invest'});}}
-    else if(dx>60){if(!cb.classList.contains('btn-sent')){cb.classList.add('btn-sent');cb.textContent='⚡ Sent!';showToast(p.id,'⚡ Collab request sent!','rgba(124,106,247,0.95)');api('/matches/swipe','POST',{project_id:p.id,action:'collab'});}}
+    if(dx<-60&&ib&&!ib.classList.contains('btn-sent')){ib.classList.add('btn-sent');ib.textContent='💰 Sent!';showToast(p.id,'💰 Investment request sent!','rgba(232,160,32,0.95)');api('/matches/swipe','POST',{project_id:p.id,action:'invest'});}
+    else if(dx>60&&cb&&!cb.classList.contains('btn-sent')){cb.classList.add('btn-sent');cb.textContent='⚡ Sent!';showToast(p.id,'⚡ Collab request sent!','rgba(124,106,247,0.95)');api('/matches/swipe','POST',{project_id:p.id,action:'collab'});}
   },{passive:true});
 
   var t=document.createElement('div');t.className='toast';t.id='t-'+p.id;s.appendChild(t);
