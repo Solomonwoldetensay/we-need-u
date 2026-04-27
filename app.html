@@ -973,10 +973,15 @@ async function loadMatches(){
 // ── CHAT ──────────────────────────
 async function openChat(cid,name){
   convId=cid;
+  // Mark as read immediately and update badge
+  readConversations[cid]=true;
+  checkUnreadMessages();
   document.getElementById('cwho').textContent=name;
   document.getElementById('cav').textContent=ini(name);
   document.getElementById('msgs').innerHTML='';
   show('pg-chat');
+  // Also mark messages as read on the server
+  api('/messages/'+cid+'/read','PUT');
   var r=await api('/messages/'+cid);
   if(r.ok&&r.data.messages){
     var area=document.getElementById('msgs');
@@ -1367,32 +1372,99 @@ async function showStatUsers(type){
 }
 
 // ── MESSAGES PAGE ──────────────────────────
+// Track which conversations have been opened this session
+var readConversations={};
+
 async function loadMessages(){
   var list=document.getElementById('messages-list');
   if(!list)return;
   list.innerHTML='<div style="text-align:center;padding:40px;color:#555;font-size:14px;">Loading...</div>';
   var r=await api('/matches/my-matches','GET');
   if(!r.ok){list.innerHTML='<div style="text-align:center;padding:40px;color:#555;">Failed to load</div>';return;}
-  var accepted=(r.data.matches||[]).filter(function(m){return m.status==='accepted';});
+
+  var allMatches=r.data.matches||[];
+
+  // Newly accepted matches (show as notification even if no message yet)
+  var accepted=allMatches.filter(function(m){return m.status==='accepted';});
+
   if(accepted.length===0){
-    list.innerHTML='<div style="text-align:center;padding:60px 20px;color:#555;font-size:14px;">No messages yet<br><br>Accept a match to start chatting! 💬</div>';return;
+    list.innerHTML='<div style="text-align:center;padding:60px 20px;color:#555;font-size:14px;">No messages yet<br><br>When someone accepts your match request it will appear here 💬</div>';
+    updateMsgBadge(0);
+    return;
   }
+
   list.innerHTML='';
+  var unreadCount=0;
+
   accepted.forEach(function(m){
-    var q=clr(m.other_user_id);var d=document.createElement('div');
-    d.style.cssText='display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #111;cursor:pointer;';
-    d.onclick=function(){openChat(m.conversation_id,m.other_user_name);};
+    var q=clr(m.other_user_id);
+    var d=document.createElement('div');
+    var hasUnread=m.last_message&&!readConversations[m.conversation_id];
+    if(hasUnread)unreadCount++;
+
+    d.style.cssText='display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #111;cursor:pointer;background:'+(hasUnread?'rgba(124,106,247,0.06)':'transparent')+';position:relative;';
+
+    // Avatar
     var av=document.createElement('div');
-    av.style.cssText='width:46px;height:46px;border-radius:50%;overflow:hidden;background:'+q.bg+';color:'+q.c+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;';
-    if(m.other_user_avatar){var img=document.createElement('img');img.src=m.other_user_avatar;img.style.cssText='width:100%;height:100%;object-fit:cover;';img.onerror=function(){av.textContent=ini(m.other_user_name);};av.appendChild(img);}
-    else{av.textContent=ini(m.other_user_name);}
+    av.style.cssText='width:46px;height:46px;border-radius:50%;overflow:hidden;background:'+q.bg+';color:'+q.c+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;position:relative;';
+    if(m.other_user_avatar){
+      var img=document.createElement('img');img.src=m.other_user_avatar;
+      img.style.cssText='width:100%;height:100%;object-fit:cover;';
+      img.onerror=function(){av.textContent=ini(m.other_user_name);};
+      av.appendChild(img);
+    }else{av.textContent=ini(m.other_user_name);}
+
+    // Unread dot on avatar
+    if(hasUnread){
+      var dot=document.createElement('div');
+      dot.style.cssText='position:absolute;bottom:1px;right:1px;width:12px;height:12px;border-radius:50%;background:#7c6af7;border:2px solid #07070d;';
+      av.appendChild(dot);
+    }
     d.appendChild(av);
+
+    // Info
     var info=document.createElement('div');info.style.cssText='flex:1;min-width:0;';
-    info.innerHTML='<div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:3px;">'+(m.other_user_name||'User')+'</div>'+
-      '<div style="font-size:12px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(m.last_message||m.project_title||'Connected')+'</div>';
-    d.appendChild(info);list.appendChild(d);
+    var matchTypeBadge=m.match_type==='invest'
+      ?'<span style="font-size:9px;background:rgba(232,160,32,0.15);color:#f5c97a;padding:2px 6px;border-radius:8px;margin-left:6px;">💰 Investor</span>'
+      :'<span style="font-size:9px;background:rgba(124,106,247,0.15);color:#a99cf9;padding:2px 6px;border-radius:8px;margin-left:6px;">⚡ Collab</span>';
+    var lastMsg=m.last_message||'✅ Match accepted — say hello!';
+    info.innerHTML=
+      '<div style="font-size:14px;font-weight:'+(hasUnread?700:600)+';color:#fff;margin-bottom:3px;">'+(m.other_user_name||'User')+matchTypeBadge+'</div>'+
+      '<div style="font-size:12px;color:'+(hasUnread?'#ccc':'#666')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+lastMsg+'</div>';
+    d.appendChild(info);
+
+    // Time
+    if(m.last_message_at){
+      var t=document.createElement('div');
+      t.style.cssText='font-size:10px;color:#555;flex-shrink:0;';
+      t.textContent=timeAgo(m.last_message_at);
+      d.appendChild(t);
+    }
+
+    d.onclick=function(){
+      // Mark as read locally
+      readConversations[m.conversation_id]=true;
+      d.style.background='transparent';
+      var dotEl=av.querySelector('div');if(dotEl)dotEl.remove();
+      info.querySelector('div').style.fontWeight=600;
+      // Recount badge
+      var remaining=accepted.filter(function(x){return x.last_message&&!readConversations[x.conversation_id];}).length;
+      updateMsgBadge(remaining);
+      openChat(m.conversation_id,m.other_user_name);
+    };
+
+    list.appendChild(d);
   });
-  updateMsgBadge(0);
+
+  updateMsgBadge(unreadCount);
+}
+
+function timeAgo(dateStr){
+  var s=Math.floor((Date.now()-new Date(dateStr))/1000);
+  if(s<60)return 'now';
+  if(s<3600)return Math.floor(s/60)+'m';
+  if(s<86400)return Math.floor(s/3600)+'h';
+  return Math.floor(s/86400)+'d';
 }
 
 function updateMsgBadge(count){
@@ -1407,7 +1479,14 @@ async function checkUnreadMessages(){
   try{
     var r=await api('/matches/my-matches','GET');
     if(!r.ok)return;
-    var unread=(r.data.matches||[]).filter(function(m){return m.status==='accepted'&&m.last_message;}).length;
+    var matches=r.data.matches||[];
+    var unread=matches.filter(function(m){
+      if(m.status!=='accepted')return false;
+      if(!m.last_message)return false;
+      // If we've opened this conversation this session, it's read
+      if(readConversations[m.conversation_id])return false;
+      return true;
+    }).length;
     updateMsgBadge(unread);
   }catch(e){}
 }
