@@ -974,7 +974,7 @@ async function loadMatches(){
 async function openChat(cid,name){
   convId=cid;
   // Mark as read immediately and update badge
-  readConversations[cid]=true;
+  markConversationRead(cid);
   checkUnreadMessages();
   document.getElementById('cwho').textContent=name;
   document.getElementById('cav').textContent=ini(name);
@@ -1372,8 +1372,24 @@ async function showStatUsers(type){
 }
 
 // ── MESSAGES PAGE ──────────────────────────
-// Track which conversations have been opened this session
-var readConversations={};
+// Track read conversations — persisted in localStorage so badge never comes back
+var readConversations=(function(){
+  try{return JSON.parse(localStorage.getItem('wnu_read')||'{}');}catch(e){return {};}
+})();
+
+function markConversationRead(cid){
+  readConversations[cid]=Date.now();
+  try{localStorage.setItem('wnu_read',JSON.stringify(readConversations));}catch(e){}
+}
+
+function isConversationUnread(m){
+  // No message ever sent — not unread
+  if(!m.last_message||!m.last_message_at)return false;
+  // If we have a read timestamp and it's after the last message — read
+  var readAt=readConversations[m.conversation_id];
+  if(readAt&&readAt>=new Date(m.last_message_at).getTime())return false;
+  return true;
+}
 
 async function loadMessages(){
   var list=document.getElementById('messages-list');
@@ -1399,7 +1415,7 @@ async function loadMessages(){
   accepted.forEach(function(m){
     var q=clr(m.other_user_id);
     var d=document.createElement('div');
-    var hasUnread=m.last_message&&!readConversations[m.conversation_id];
+    var hasUnread=isConversationUnread(m);
     if(hasUnread)unreadCount++;
 
     d.style.cssText='display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #111;cursor:pointer;background:'+(hasUnread?'rgba(124,106,247,0.06)':'transparent')+';position:relative;';
@@ -1442,13 +1458,11 @@ async function loadMessages(){
     }
 
     d.onclick=function(){
-      // Mark as read locally
-      readConversations[m.conversation_id]=true;
+      markConversationRead(m.conversation_id);
       d.style.background='transparent';
       var dotEl=av.querySelector('div');if(dotEl)dotEl.remove();
       info.querySelector('div').style.fontWeight=600;
-      // Recount badge
-      var remaining=accepted.filter(function(x){return x.last_message&&!readConversations[x.conversation_id];}).length;
+      var remaining=accepted.filter(function(x){return isConversationUnread(x);}).length;
       updateMsgBadge(remaining);
       openChat(m.conversation_id,m.other_user_name);
     };
@@ -1479,13 +1493,8 @@ async function checkUnreadMessages(){
   try{
     var r=await api('/matches/my-matches','GET');
     if(!r.ok)return;
-    var matches=r.data.matches||[];
-    var unread=matches.filter(function(m){
-      if(m.status!=='accepted')return false;
-      if(!m.last_message)return false;
-      // If we've opened this conversation this session, it's read
-      if(readConversations[m.conversation_id])return false;
-      return true;
+    var unread=(r.data.matches||[]).filter(function(m){
+      return m.status==='accepted'&&isConversationUnread(m);
     }).length;
     updateMsgBadge(unread);
   }catch(e){}
