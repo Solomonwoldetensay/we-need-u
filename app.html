@@ -540,15 +540,18 @@ function unlockSound(){
 }
 
 function setupFeedObserver(){
-  var observer=new IntersectionObserver(function(entries){
+  if(window._feedObserver)window._feedObserver.disconnect();
+  window._feedObserver=new IntersectionObserver(function(entries){
     entries.forEach(function(entry){
       var vid=entry.target.querySelector('video');
       if(!vid)return;
+      var feedPg=document.getElementById('pg-feed');
+      if(!feedPg||!feedPg.classList.contains('on')){vid.pause();return;}
       if(entry.isIntersecting){vid.muted=!soundUnlocked;vid.play().catch(function(){});}
       else{vid.pause();}
     });
   },{threshold:0.7});
-  document.querySelectorAll('.slide').forEach(function(slide){observer.observe(slide);});
+  document.querySelectorAll('.slide').forEach(function(slide){window._feedObserver.observe(slide);});
 }
 
 var CLR=[{bg:'#160f2e',c:'#a99cf9'},{bg:'#0a1a10',c:'#1db975'},{bg:'#1e1408',c:'#e8a020'},{bg:'#1e0818',c:'#d4537e'},{bg:'#101810',c:'#639922'},{bg:'#0e1a1e',c:'#22d3ee'}];
@@ -988,6 +991,8 @@ function showAvatarToast(msg){
 
 // ── POST DETAIL ──────────────────────────
 function openPostDetail(p){
+  // Pause ALL feed videos before opening detail
+  document.querySelectorAll('.feed-body video').forEach(function(v){v.pause();});
   currentProjId=p.id;
   var q=clr(p.id);
   var mc=p.mode==='collab'?'#7c6af7':p.mode==='invest'?'#e8a020':'#d4537e';
@@ -1052,6 +1057,15 @@ document.getElementById('pd-back').onclick=function(){
   document.getElementById('req-sheet').classList.remove('on');
   document.getElementById('likes-sheet').classList.remove('on');
   document.getElementById('stat-users-sheet').classList.remove('on');
+  // Resume the currently visible feed slide video
+  document.querySelectorAll('.slide').forEach(function(slide){
+    var rect=slide.getBoundingClientRect();
+    var vid=slide.querySelector('video');
+    if(vid&&rect.top>=0&&rect.top<window.innerHeight*0.6){
+      vid.muted=!soundUnlocked;
+      vid.play().catch(function(){});
+    }
+  });
 };
 document.getElementById('pd-requests-btn').onclick=function(){openRequests();};
 document.getElementById('req-close').onclick=function(){document.getElementById('req-sheet').classList.remove('on');};
