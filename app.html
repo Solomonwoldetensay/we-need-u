@@ -534,23 +534,63 @@ var pdVid=null;
 var soundUnlocked=false;
 
 function unlockSound(){
-  document.querySelectorAll('video').forEach(function(v){
-    v.muted=false;v.volume=1;v.play().catch(function(){});
+  // Only unmute the currently visible slide's video
+  var best=null,bestScore=-1;
+  document.querySelectorAll('.slide').forEach(function(slide){
+    var rect=slide.getBoundingClientRect();
+    var visTop=Math.max(rect.top,0);
+    var visBot=Math.min(rect.bottom,window.innerHeight);
+    var visible=Math.max(0,visBot-visTop);
+    if(visible>bestScore){bestScore=visible;best=slide;}
   });
+  document.querySelectorAll('.slide video').forEach(function(v){
+    v.pause();v.muted=true;
+  });
+  if(best){
+    var vid=best.querySelector('video');
+    if(vid){vid.muted=false;vid.volume=1;vid.play().catch(function(){});}
+  }
+}
+
+var _scrollDebounce=null;
+function pickAndPlayBestSlide(){
+  var feedPg=document.getElementById('pg-feed');
+  if(!feedPg||!feedPg.classList.contains('on')){
+    document.querySelectorAll('.slide video').forEach(function(v){v.pause();});
+    return;
+  }
+  var best=null,bestScore=-1;
+  document.querySelectorAll('.slide').forEach(function(slide){
+    var rect=slide.getBoundingClientRect();
+    var visTop=Math.max(rect.top,0);
+    var visBot=Math.min(rect.bottom,window.innerHeight);
+    var visible=Math.max(0,visBot-visTop);
+    if(visible>bestScore){bestScore=visible;best=slide;}
+  });
+  // First mute+pause ALL
+  document.querySelectorAll('.slide video').forEach(function(v){v.pause();v.muted=true;});
+  // Then play only the winner
+  if(best){
+    var vid=best.querySelector('video');
+    if(vid){
+      vid.muted=!soundUnlocked;
+      vid.play().catch(function(){vid.muted=true;vid.play().catch(function(){});});
+    }
+  }
 }
 
 function setupFeedObserver(){
   if(window._feedObserver)window._feedObserver.disconnect();
-  window._feedObserver=new IntersectionObserver(function(entries){
-    entries.forEach(function(entry){
-      var vid=entry.target.querySelector('video');
-      if(!vid)return;
-      var feedPg=document.getElementById('pg-feed');
-      if(!feedPg||!feedPg.classList.contains('on')){vid.pause();return;}
-      if(entry.isIntersecting){vid.muted=!soundUnlocked;vid.play().catch(function(){});}
-      else{vid.pause();}
-    });
-  },{threshold:0.7});
+  var feedBody=document.getElementById('feed-body');
+  feedBody.addEventListener('scroll',function(){
+    document.querySelectorAll('.slide video').forEach(function(v){v.muted=true;});
+    clearTimeout(_scrollDebounce);
+    _scrollDebounce=setTimeout(pickAndPlayBestSlide,150);
+  },{passive:true});
+  window._feedObserver=new IntersectionObserver(function(){
+    clearTimeout(_scrollDebounce);
+    _scrollDebounce=setTimeout(pickAndPlayBestSlide,150);
+  },{threshold:0.8});
   document.querySelectorAll('.slide').forEach(function(slide){window._feedObserver.observe(slide);});
 }
 
@@ -694,6 +734,14 @@ async function loadFeed(){
   }
   r.data.projects.forEach(function(p){fb.appendChild(buildSlide(p));});
   setupFeedObserver();
+  // Manually trigger first slide to play after DOM settles
+  setTimeout(function(){
+    var firstSlide=fb.querySelector('.slide');
+    if(firstSlide){
+      var vid=firstSlide.querySelector('video');
+      if(vid){vid.muted=true;vid.play().catch(function(){});}
+    }
+  },400);
 }
 
 function buildSlide(p){
@@ -707,11 +755,27 @@ function buildSlide(p){
     vid.muted=true;
     vid.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
     vid.onclick=function(){
-      if(!soundUnlocked){soundUnlocked=true;unlockSound();}
-      else{if(vid.paused)vid.play();else vid.pause();}
+      if(!soundUnlocked){
+        soundUnlocked=true;
+        document.querySelectorAll('.slide video').forEach(function(v){
+          if(v!==vid){v.pause();v.muted=true;}
+        });
+        vid.muted=false;vid.volume=1;
+        vid.play().catch(function(){});
+        // Hide all sound hints
+        document.querySelectorAll('.sound-hint').forEach(function(h){h.style.display='none';});
+      } else {
+        if(vid.paused)vid.play();else vid.pause();
+      }
     };
     s.appendChild(vid);
-    setTimeout(function(){vid.play().catch(function(){});},300);
+    // "Tap for sound" hint — only shown until user unlocks sound
+    var soundHint=document.createElement('div');
+    soundHint.className='sound-hint';
+    soundHint.style.cssText='position:absolute;bottom:140px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.6);color:#fff;font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px;z-index:5;pointer-events:none;display:'+(soundUnlocked?'none':'flex')+';align-items:center;gap:6px;white-space:nowrap;';
+    soundHint.innerHTML='🔊 Tap video for sound';
+    s.appendChild(soundHint);
+    // Don't autoplay — let the observer decide who plays
   }else{
     var ph=document.createElement('div');
     ph.style.cssText='position:absolute;inset:0;background:linear-gradient(160deg,'+q.bg+' 0%,#000 100%);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;';
