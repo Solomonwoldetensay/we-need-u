@@ -816,33 +816,24 @@ function buildSlide(p){
     var vid=document.createElement('video');
     vid.src=p.video_url;vid.setAttribute('playsinline','');vid.setAttribute('loop','');
     vid.muted=true;
-    vid.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
-    vid.onclick=function(){
+    vid.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;';
+    // Handle video tap on the slide itself — but only if not tapping info
+    s.addEventListener('click',function(e){
+      if(e.target.closest('.s-info')||e.target.closest('.s-acts')||e.target.closest('.s-right')||e.target.closest('.sound-hint'))return;
       if(!soundUnlocked){
         soundUnlocked=true;
         document.querySelectorAll('.slide video').forEach(function(v){
           if(v!==vid){v.pause();v.muted=true;}
         });
-        vid.muted=false;
-        vid.volume=1;
+        vid.muted=false;vid.volume=1;
         vid.play().catch(function(){});
-        // Force volume again after browser starts playing
-        vid.onplaying=function(){
-          vid.volume=1;
-          vid.muted=false;
-          vid.onplaying=null;
-        };
-        // Hide all sound hints
+        vid.onplaying=function(){vid.volume=1;vid.muted=false;vid.onplaying=null;};
         document.querySelectorAll('.sound-hint').forEach(function(h){h.style.display='none';});
       } else {
-        if(vid.paused){
-          vid.volume=1;
-          vid.play().catch(function(){});
-        } else {
-          vid.pause();
-        }
+        if(vid.paused){vid.volume=1;vid.play().catch(function(){});}
+        else{vid.pause();}
       }
-    };
+    });
     s.appendChild(vid);
     // "Tap for sound" hint — only shown until user unlocks sound
     var soundHint=document.createElement('div');
