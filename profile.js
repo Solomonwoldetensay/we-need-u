@@ -41,9 +41,11 @@ async function loadProfile(){
 
 // ── OTHER USER PROFILE ──────────────────────────
 async function openUserProfile(creatorId, creatorName, creatorAvatar, creatorLocation){
-  document.querySelectorAll('.feed-body video').forEach(function(v){v.pause();});
-  var mask=document.getElementById('user-profile-mask');
-  mask.classList.add('on');
+  try{
+    document.querySelectorAll('.feed-body video').forEach(function(v){v.pause();});
+    var mask=document.getElementById('user-profile-mask');
+    if(!mask){alert('Profile modal not found');return;}
+    mask.classList.add('on');
 
   var avEl=document.getElementById('up-avatar');
   var q=clr(creatorId);
@@ -62,15 +64,43 @@ async function openUserProfile(creatorId, creatorName, creatorAvatar, creatorLoc
   document.getElementById('up-projects').innerHTML='<div style="text-align:center;padding:2rem;color:#555;font-size:13px;">Loading projects...</div>';
 
   // Fetch without auth to bypass swipe filter
+  // Also try multiple pages in case there are many projects
   var projects=[];
   try{
-    var resp=await fetch('https://workmatch-backend.onrender.com/api/projects?limit=50');
+    // Pass no auth token so swipe filter is bypassed
+    var resp=await fetch('https://workmatch-backend.onrender.com/api/projects?limit=50&page=1');
     var data=await resp.json();
-    var allProjects=data.projects||[];
-    projects=allProjects.filter(function(p){return p.creator_id===creatorId;});
+    var allProjects=data.projects||data.data||[];
+    projects=allProjects.filter(function(p){
+      return p.creator_id===creatorId||p.creator_id==creatorId;
+    });
+
+    // If not found in first page, try page 2
+    if(!projects.length&&data.pagination&&data.pagination.has_more){
+      var resp2=await fetch('https://workmatch-backend.onrender.com/api/projects?limit=50&page=2');
+      var data2=await resp2.json();
+      var more=(data2.projects||[]).filter(function(p){return p.creator_id===creatorId;});
+      projects=projects.concat(more);
+    }
   }catch(e){
-    var r2=await api('/projects?limit=50');
-    if(r2.ok&&r2.data.projects){projects=r2.data.projects.filter(function(p){return p.creator_id===creatorId;});}
+    console.log('fetch error:',e);
+  }
+
+  // If still empty, try with auth (shows their projects at least)
+  if(!projects.length){
+    try{
+      var r2=await api('/projects?limit=50');
+      if(r2.ok&&r2.data.projects){
+        projects=r2.data.projects.filter(function(p){return p.creator_id===creatorId;});
+      }
+    }catch(e2){}
+  }
+
+  // Last resort — fetch their specific projects via /projects/mine equivalent
+  // by checking if this is the logged-in user
+  if(!projects.length&&user&&user.id===creatorId){
+    var r3=await api('/projects/mine');
+    if(r3.ok&&r3.data.projects)projects=r3.data.projects;
   }
 
   document.getElementById('up-stats').textContent=projects.length+' project'+(projects.length!==1?'s':'');
@@ -99,9 +129,11 @@ async function openUserProfile(creatorId, creatorName, creatorAvatar, creatorLoc
   });
   document.getElementById('up-projects').innerHTML='';
   document.getElementById('up-projects').appendChild(grid);
+  }catch(err){
+    console.error('openUserProfile error:',err);
+    document.getElementById('up-projects').innerHTML='<div style="text-align:center;padding:2rem;color:#e24b4a;font-size:13px;">Error: '+err.message+'</div>';
+  }
 }
-
-// ── MATCHES ──────────────────────────
 function switchTab(tab){
   document.getElementById('tab-invest').classList.toggle('active',tab==='invest');
   document.getElementById('tab-collab').classList.toggle('active',tab==='collab');

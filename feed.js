@@ -162,7 +162,15 @@ function buildSlide(p){
   }
   // 👤 Profile button — RELIABLE way to open user profile
   var profb=document.createElement('button');profb.className='s-btn btn-p';profb.textContent='👤';
-  profb.onclick=function(e){e.stopPropagation();openUserProfile(p.creator_id,p.creator_name,p.creator_avatar,p.creator_location);};
+  profb.onclick=function(e){
+    e.stopPropagation();
+    e.preventDefault();
+    try{
+      openUserProfile(p.creator_id,p.creator_name,p.creator_avatar,p.creator_location);
+    }catch(err){
+      alert('Error opening profile: '+err.message);
+    }
+  };
   acts.appendChild(profb);
   s.appendChild(acts);
 
