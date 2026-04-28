@@ -59,17 +59,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;display:flex;justif
 .s-logo{font-size:17px;font-weight:900;color:#fff;}
 .s-logo b{color:#7c6af7;}
 .s-postbtn{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;font-size:11px;padding:6px 12px;border-radius:20px;cursor:pointer;-webkit-appearance:none;}
-.s-right{position:absolute;right:12px;bottom:130px;display:flex;flex-direction:column;gap:16px;align-items:center;z-index:2;}
+.s-right{position:absolute;right:12px;bottom:130px;display:flex;flex-direction:column;gap:16px;align-items:center;z-index:20;}
 .s-rbtn{display:flex;flex-direction:column;align-items:center;gap:4px;border:none;background:none;cursor:pointer;}
 .s-rico{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:22px;}
 .s-rlbl{font-size:9px;color:rgba(255,255,255,0.8);font-weight:500;}
-.s-info{position:absolute;bottom:68px;left:14px;right:68px;z-index:10;}
+.s-info{position:absolute;bottom:68px;left:14px;right:68px;z-index:20;}
 .s-handle{font-size:14px;font-weight:700;color:#fff;margin-bottom:2px;}
 .s-loc{font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:5px;}
 .s-mode{display:inline-block;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:10px;padding:3px 10px;border-radius:20px;margin-bottom:5px;}
 .s-title{font-size:16px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:4px;}
 .s-desc{font-size:12px;color:rgba(255,255,255,0.8);line-height:1.4;}
-.s-acts{position:absolute;bottom:0;left:0;right:0;display:flex;gap:8px;padding:8px 12px 10px;z-index:2;}
+.s-acts{position:absolute;bottom:0;left:0;right:0;display:flex;gap:8px;padding:8px 12px 10px;z-index:20;}
 .s-btn{flex:1;padding:12px 4px;border-radius:13px;border:none;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;-webkit-appearance:none;}
 .s-btn:active{opacity:0.7;}
 .btn-c{background:#7c6af7;color:#fff;flex:2;}
@@ -817,14 +817,14 @@ function buildSlide(p){
     vid.src=p.video_url;vid.setAttribute('playsinline','');vid.setAttribute('loop','');
     vid.muted=true;
     vid.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;';
-    // Handle video tap on the slide itself — but only if not tapping info
-    s.addEventListener('click',function(e){
-      if(e.target.closest('.s-info')||e.target.closest('.s-acts')||e.target.closest('.s-right')||e.target.closest('.sound-hint'))return;
+    s.appendChild(vid);
+    // Transparent tap overlay ONLY for video sound — sits behind s-info and s-acts
+    var tapOverlay=document.createElement('div');
+    tapOverlay.style.cssText='position:absolute;inset:0;z-index:3;';
+    tapOverlay.onclick=function(){
       if(!soundUnlocked){
         soundUnlocked=true;
-        document.querySelectorAll('.slide video').forEach(function(v){
-          if(v!==vid){v.pause();v.muted=true;}
-        });
+        document.querySelectorAll('.slide video').forEach(function(v){if(v!==vid){v.pause();v.muted=true;}});
         vid.muted=false;vid.volume=1;
         vid.play().catch(function(){});
         vid.onplaying=function(){vid.volume=1;vid.muted=false;vid.onplaying=null;};
@@ -833,16 +833,14 @@ function buildSlide(p){
         if(vid.paused){vid.volume=1;vid.play().catch(function(){});}
         else{vid.pause();}
       }
-    });
-    s.appendChild(vid);
-    // "Tap for sound" hint — only shown until user unlocks sound
+    };
+    s.appendChild(tapOverlay);
+    // Sound hint
     var soundHint=document.createElement('div');
     soundHint.className='sound-hint';
-    soundHint.style.cssText='position:absolute;bottom:140px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.6);color:#fff;font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px;z-index:5;pointer-events:none;display:'+(soundUnlocked?'none':'flex')+';align-items:center;gap:6px;white-space:nowrap;';
+    soundHint.style.cssText='position:absolute;bottom:140px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.6);color:#fff;font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px;z-index:4;pointer-events:none;display:'+(soundUnlocked?'none':'flex')+';align-items:center;gap:6px;white-space:nowrap;';
     soundHint.innerHTML='🔊 Tap video for sound';
-    s.appendChild(soundHint);
-    // Don't autoplay — let the observer decide who plays
-  }else{
+    s.appendChild(soundHint);else{
     var ph=document.createElement('div');
     ph.style.cssText='position:absolute;inset:0;background:linear-gradient(160deg,'+q.bg+' 0%,#000 100%);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;';
     var av=document.createElement('div');
