@@ -919,17 +919,11 @@ function buildSlide(p){
     acts.appendChild(cb);
   }
 
-  // Profile button always shows
+  // Profile button — opens user profile with their videos
   var profb=document.createElement('button');profb.className='s-btn btn-p';profb.textContent='👤';
-  profb.onclick=function(){
-    var qc=clr(p.id);
-    var cmavEl=document.getElementById('cmav');
-    if(p.creator_avatar){var cI=document.createElement('img');cI.src=p.creator_avatar;cI.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%;';cmavEl.innerHTML='';cmavEl.style.cssText='background:transparent;padding:0;overflow:hidden;';cmavEl.appendChild(cI);}
-    else{cmavEl.textContent=ini(p.creator_name);cmavEl.style.background=qc.bg;cmavEl.style.color=qc.c;}
-    document.getElementById('cmname').textContent=p.creator_name||'Entrepreneur';
-    document.getElementById('cmloc').textContent=p.creator_location||'';
-    document.getElementById('cmproj').innerHTML='<div class="cmpt">'+p.title+'</div><div class="cmpd">'+(p.description||'')+'</div>';
-    document.getElementById('cmask').classList.add('on');
+  profb.onclick=function(e){
+    e.stopPropagation();
+    openUserProfile(p.creator_id,p.creator_name,p.creator_avatar,p.creator_location);
   };
   acts.appendChild(profb);
   s.appendChild(acts);
