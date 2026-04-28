@@ -14,34 +14,12 @@
 <meta name="theme-color" content="#07070d"/>
 <meta name="description" content="Post your idea. Find who you need. Connect with investors and collaborators."/>
 
-<!-- ── Icons for iOS home screen — inline SVG as data URI so no external request needed ── -->
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Crect width='180' height='180' rx='40' fill='%237c6af7'/%3E%3Ctext x='90' y='115' font-size='72' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'%3EU%3C/text%3E%3C/svg%3E"/>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Crect width='192' height='192' rx='40' fill='%237c6af7'/%3E%3Ctext x='96' y='125' font-size='80' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'%3EU%3C/text%3E%3C/svg%3E"/>
+<!-- ── Apple Touch Icon — must be absolute path ── -->
+<link rel="apple-touch-icon" sizes="180x180" href="/we-need-u/icon.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="/we-need-u/icon.png"/>
 
-<!-- ── PWA Manifest — inline to avoid path issues on GitHub Pages ── -->
-<script>
-(function(){
-  var manifest={
-    name:'WE-NEED-U',
-    short_name:'WE-NEED-U',
-    description:'Post your idea. Find who you need.',
-    start_url:window.location.href,
-    display:'standalone',
-    orientation:'portrait',
-    background_color:'#07070d',
-    theme_color:'#7c6af7',
-    icons:[
-      {src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Crect width='192' height='192' rx='40' fill='%237c6af7'/%3E%3Ctext x='96' y='125' font-size='80' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'%3EU%3C/text%3E%3C/svg%3E",sizes:'192x192',type:'image/svg+xml'},
-      {src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512'%3E%3Crect width='512' height='512' rx='100' fill='%237c6af7'/%3E%3Ctext x='256' y='340' font-size='220' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'%3EU%3C/text%3E%3C/svg%3E",sizes:'512x512',type:'image/svg+xml'}
-    ]
-  };
-  var blob=new Blob([JSON.stringify(manifest)],{type:'application/json'});
-  var url=URL.createObjectURL(blob);
-  var link=document.createElement('link');
-  link.rel='manifest';link.href=url;
-  document.head.appendChild(link);
-})();
-</script>
+<!-- ── PWA Manifest ── -->
+<link rel="manifest" href="/we-need-u/manifest.json"/>
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
@@ -1708,6 +1686,11 @@ if(window.navigator.standalone||window.matchMedia('(display-mode: standalone)').
   document.getElementById('install-banner').style.display='none';
   document.getElementById('ios-install-banner').style.display='none';
 }
+// ── SERVICE WORKER (makes Add to Home Screen appear on iOS) ──
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/we-need-u/sw.js',{scope:'/we-need-u/'}).catch(function(e){console.log('SW error:',e);});
+}
+
 window.onload=function(){
   var hash=window.location.hash;
   if(hash&&hash.indexOf('access_token')>-1){
