@@ -967,20 +967,16 @@ async function openChat(cid,name){
   var r=await api('/messages/'+cid);
   if(r.ok&&r.data.messages){
     if(r.data.messages.length===0){
-      // No messages yet — show match accepted greeting
+      // No messages yet — show match accepted greeting with suggestion pills
       var greeting=document.createElement('div');
-      greeting.style.cssText='display:flex;flex-direction:column;gap:8px;padding:16px 0;';
+      greeting.style.cssText='display:flex;flex-direction:column;align-items:center;padding:30px 16px;gap:10px;';
       greeting.innerHTML=
-        // System message in center
-        '<div style="text-align:center;padding:12px 16px;margin-bottom:4px;">'+
-          '<div style="font-size:28px;margin-bottom:6px;">🎉</div>'+
-          '<div style="display:inline-block;background:rgba(255,255,255,0.06);border-radius:12px;padding:8px 16px;font-size:12px;color:#888;">You matched with '+name+'</div>'+
-        '</div>'+
-        // Quick reply bubbles that look like real messages from "them"
-        '<div class="msg them"><div class="mbub" onclick="quickSay(\'👋 Hey! Excited to connect with you!\')" style="cursor:pointer;">👋 Say hello</div></div>'+
-        '<div class="msg them"><div class="mbub" onclick="quickSay(\'Would love to learn more about your idea!\')" style="cursor:pointer;">💡 Tell me more about your idea</div></div>'+
-        '<div class="msg them"><div class="mbub" onclick="quickSay(\'When would you be free for a quick call?\')" style="cursor:pointer;">📞 Let\'s schedule a call</div></div>'+
-        '<div style="text-align:center;font-size:10px;color:#444;margin-top:4px;">Tap a suggestion or type your own</div>';
+        '<div style="font-size:32px;margin-bottom:4px;">🎉</div>'+
+        '<div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:2px;">You\'re connected with '+name+'!</div>'+
+        '<div style="font-size:12px;color:#555;margin-bottom:16px;">Say hello to get the conversation started</div>'+
+        '<button onclick="quickSay(\'👋 Hey! Excited to connect with you!\')" style="background:#1a1a2e;border:1px solid #2a2a3e;color:#ccc;padding:10px 18px;border-radius:20px;font-size:13px;cursor:pointer;width:100%;text-align:left;">👋 Hey! Excited to connect with you!</button>'+
+        '<button onclick="quickSay(\'Would love to learn more about your idea!\')" style="background:#1a1a2e;border:1px solid #2a2a3e;color:#ccc;padding:10px 18px;border-radius:20px;font-size:13px;cursor:pointer;width:100%;text-align:left;">💡 Would love to learn more about your idea!</button>'+
+        '<button onclick="quickSay(\'When would you be free for a quick call?\')" style="background:#1a1a2e;border:1px solid #2a2a3e;color:#ccc;padding:10px 18px;border-radius:20px;font-size:13px;cursor:pointer;width:100%;text-align:left;">📞 When would you be free for a quick call?</button>';
       area.appendChild(greeting);
     } else {
       r.data.messages.forEach(function(m){
@@ -1395,10 +1391,8 @@ function markConversationRead(cid, lastMsgAt){
 }
 
 function isConversationUnread(m){
-  // Newly accepted match with no messages — show as unread until opened
-  if(!m.last_message&&!m.last_message_at){
-    return !readConversations[m.conversation_id];
-  }
+  // No message ever — never show badge
+  if(!m.last_message||!m.last_message_at)return false;
   // Get when we last read this conversation
   var readAt=readConversations[m.conversation_id];
   // Never opened — unread
