@@ -2,17 +2,60 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<meta http-equiv="refresh" content="0; url=app.html"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
 <title>WE-NEED-U</title>
+
+<!-- PWA tags on index so iOS sees them immediately -->
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="WE-NEED-U"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#07070d"/>
+<link rel="apple-touch-icon" sizes="180x180" href="./icon.png"/>
+<link rel="manifest" href="./manifest.json"/>
+
 <style>
-* { margin: 0; padding: 0; }
-body { background: #07070d; display: flex; align-items: center; justify-content: center; height: 100vh; }
-h1 { font-family: -apple-system, sans-serif; color: #7c6af7; font-size: 24px; }
+*{margin:0;padding:0;}
+body{background:#07070d;display:flex;align-items:center;justify-content:center;height:100vh;font-family:-apple-system,sans-serif;flex-direction:column;gap:12px;}
+.logo{font-size:28px;font-weight:900;color:#fff;}
+.logo b{color:#7c6af7;}
+.sub{font-size:12px;color:#555;}
 </style>
 </head>
 <body>
-<h1>WE-NEED-U</h1>
-<script>window.location.href = 'app.html';</script>
+<div class="logo">WE-NEED-<b>U</b></div>
+<div class="sub">Loading...</div>
+<script>
+// Register SW first, THEN redirect — gives iOS time to see the SW
+function goToApp(){
+  window.location.replace('./app.html');
+}
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js',{scope:'./'})
+    .then(function(reg){
+      // Wait for SW to be active then redirect
+      if(reg.active){
+        goToApp();
+      } else {
+        var sw=reg.installing||reg.waiting;
+        if(sw){
+          sw.addEventListener('statechange',function(){
+            if(sw.state==='activated')goToApp();
+          });
+          // Fallback — redirect after 2 seconds no matter what
+          setTimeout(goToApp,2000);
+        } else {
+          goToApp();
+        }
+      }
+    })
+    .catch(function(){
+      // SW failed — just redirect anyway
+      goToApp();
+    });
+} else {
+  goToApp();
+}
+</script>
 </body>
 </html>

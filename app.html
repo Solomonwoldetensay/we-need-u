@@ -15,11 +15,11 @@
 <meta name="description" content="Post your idea. Find who you need. Connect with investors and collaborators."/>
 
 <!-- ── Apple Touch Icon — must be absolute path ── -->
-<link rel="apple-touch-icon" sizes="180x180" href="/we-need-u/icon.png"/>
-<link rel="icon" type="image/png" sizes="192x192" href="/we-need-u/icon.png"/>
+<link rel="apple-touch-icon" sizes="180x180" href="./icon.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="./icon.png"/>
 
 <!-- ── PWA Manifest ── -->
-<link rel="manifest" href="/we-need-u/manifest.json"/>
+<link rel="manifest" href="./manifest.json"/>
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
@@ -1688,7 +1688,7 @@ if(window.navigator.standalone||window.matchMedia('(display-mode: standalone)').
 }
 // ── SERVICE WORKER (makes Add to Home Screen appear on iOS) ──
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/we-need-u/sw.js',{scope:'/we-need-u/'}).catch(function(e){console.log('SW error:',e);});
+  navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(function(e){console.log('SW error:',e);});
 }
 
 window.onload=function(){
