@@ -533,30 +533,7 @@ var currentProjId=null;
 var pdVid=null;
 var soundUnlocked=false;
 
-function unlockSound(){
-  // Only unmute the currently visible slide's video
-  var best=null,bestScore=-1;
-  document.querySelectorAll('.slide').forEach(function(slide){
-    var rect=slide.getBoundingClientRect();
-    var visTop=Math.max(rect.top,0);
-    var visBot=Math.min(rect.bottom,window.innerHeight);
-    var visible=Math.max(0,visBot-visTop);
-    if(visible>bestScore){bestScore=visible;best=slide;}
-  });
-  document.querySelectorAll('.slide video').forEach(function(v){
-    v.pause();v.muted=true;
-  });
-  if(best){
-    var vid=best.querySelector('video');
-    if(vid){vid.muted=false;vid.volume=1;vid.play().catch(function(){});}
-  }
-}
-
 var _scrollDebounce=null;
-function setFullVolume(vid){
-  vid.volume=1;
-  vid.muted=false;
-}
 function pickAndPlayBestSlide(){
   var feedPg=document.getElementById('pg-feed');
   if(!feedPg||!feedPg.classList.contains('on')){
@@ -597,12 +574,15 @@ function pickAndPlayBestSlide(){
 
 function setupFeedObserver(){
   if(window._feedObserver)window._feedObserver.disconnect();
+  // Remove old scroll listener before adding new one
   var feedBody=document.getElementById('feed-body');
-  feedBody.addEventListener('scroll',function(){
+  if(window._feedScrollHandler)feedBody.removeEventListener('scroll',window._feedScrollHandler);
+  window._feedScrollHandler=function(){
     document.querySelectorAll('.slide video').forEach(function(v){v.muted=true;});
     clearTimeout(_scrollDebounce);
     _scrollDebounce=setTimeout(pickAndPlayBestSlide,150);
-  },{passive:true});
+  };
+  feedBody.addEventListener('scroll',window._feedScrollHandler,{passive:true});
   window._feedObserver=new IntersectionObserver(function(){
     clearTimeout(_scrollDebounce);
     _scrollDebounce=setTimeout(pickAndPlayBestSlide,150);
@@ -642,7 +622,8 @@ function enterApp(){
   show('pg-feed');
   loadFeed();
   loadProfile();
-  setTimeout(checkUnreadMessages,2000);
+  // Delay unread check so localStorage read state is respected
+  setTimeout(checkUnreadMessages,3000);
   var favEl=document.getElementById('feed-avatar');
   if(favEl&&user){
     if(user.avatar_url){
@@ -973,26 +954,50 @@ async function loadMatches(){
 // ── CHAT ──────────────────────────
 async function openChat(cid,name){
   convId=cid;
-  // Mark as read immediately and update badge
-  markConversationRead(cid);
+  // Mark as read — use far future time so any existing message is considered read
+  markConversationRead(cid, new Date(Date.now()+86400000).toISOString());
   checkUnreadMessages();
   document.getElementById('cwho').textContent=name;
   document.getElementById('cav').textContent=ini(name);
-  document.getElementById('msgs').innerHTML='';
+  var area=document.getElementById('msgs');
+  area.innerHTML='';
   show('pg-chat');
   // Also mark messages as read on the server
   api('/messages/'+cid+'/read','PUT');
   var r=await api('/messages/'+cid);
   if(r.ok&&r.data.messages){
-    var area=document.getElementById('msgs');
-    r.data.messages.forEach(function(m){
-      var d=document.createElement('div');
-      d.className='msg '+(m.sender_id===user.id?'me':'them');
-      d.innerHTML='<div class="mbub">'+m.content+'</div>';
-      area.appendChild(d);
-    });
+    if(r.data.messages.length===0){
+      // No messages yet — show match accepted greeting
+      var greeting=document.createElement('div');
+      greeting.style.cssText='text-align:center;padding:20px 16px;';
+      greeting.innerHTML=
+        '<div style="font-size:36px;margin-bottom:8px;">🎉</div>'+
+        '<div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;">You\'re connected with '+name+'!</div>'+
+        '<div style="font-size:12px;color:#666;margin-bottom:16px;">Your match request was accepted. Say hello!</div>'+
+        '<button onclick="quickSay(\'👋 Hey! Excited to connect with you!\')" style="background:rgba(124,106,247,0.15);border:1px solid rgba(124,106,247,0.3);color:#a99cf9;padding:8px 16px;border-radius:20px;font-size:12px;cursor:pointer;margin:4px;">👋 Say hello</button>'+
+        '<button onclick="quickSay(\'Would love to learn more about your idea!\')" style="background:rgba(124,106,247,0.15);border:1px solid rgba(124,106,247,0.3);color:#a99cf9;padding:8px 16px;border-radius:20px;font-size:12px;cursor:pointer;margin:4px;">💡 Learn more</button>'+
+        '<button onclick="quickSay(\'When would you be free for a quick call?\')" style="background:rgba(124,106,247,0.15);border:1px solid rgba(124,106,247,0.3);color:#a99cf9;padding:8px 16px;border-radius:20px;font-size:12px;cursor:pointer;margin:4px;">📞 Schedule call</button>';
+      area.appendChild(greeting);
+    } else {
+      r.data.messages.forEach(function(m){
+        var d=document.createElement('div');
+        d.className='msg '+(m.sender_id===user.id?'me':'them');
+        d.innerHTML='<div class="mbub">'+m.content+'</div>';
+        area.appendChild(d);
+      });
+    }
     area.scrollTop=area.scrollHeight;
   }
+  // Auto-focus keyboard
+  setTimeout(function(){
+    var cbox=document.getElementById('cbox');
+    if(cbox)cbox.focus();
+  },300);
+}
+
+function quickSay(text){
+  var cbox=document.getElementById('cbox');
+  if(cbox){cbox.value=text;cbox.focus();}
 }
 
 document.getElementById('csend').onclick=sendMsg;
@@ -1377,18 +1382,26 @@ var readConversations=(function(){
   try{return JSON.parse(localStorage.getItem('wnu_read')||'{}');}catch(e){return {};}
 })();
 
-function markConversationRead(cid){
-  readConversations[cid]=Date.now();
+function markConversationRead(cid, lastMsgAt){
+  // Store the server's last_message_at timestamp (or Date.now() as fallback)
+  // This avoids device clock vs server clock mismatch
+  var ts=lastMsgAt?new Date(lastMsgAt).getTime():Date.now();
+  readConversations[cid]=ts;
   try{localStorage.setItem('wnu_read',JSON.stringify(readConversations));}catch(e){}
 }
 
 function isConversationUnread(m){
-  // No message ever sent — not unread
-  if(!m.last_message||!m.last_message_at)return false;
-  // If we have a read timestamp and it's after the last message — read
+  // Newly accepted match with no messages — show as unread until opened
+  if(!m.last_message&&!m.last_message_at){
+    return !readConversations[m.conversation_id];
+  }
+  // Get when we last read this conversation
   var readAt=readConversations[m.conversation_id];
-  if(readAt&&readAt>=new Date(m.last_message_at).getTime())return false;
-  return true;
+  // Never opened — unread
+  if(!readAt)return true;
+  // Compare: if last message came AFTER we last read it — unread
+  var lastMsgTime=new Date(m.last_message_at).getTime();
+  return lastMsgTime>readAt;
 }
 
 async function loadMessages(){
@@ -1443,7 +1456,9 @@ async function loadMessages(){
     var matchTypeBadge=m.match_type==='invest'
       ?'<span style="font-size:9px;background:rgba(232,160,32,0.15);color:#f5c97a;padding:2px 6px;border-radius:8px;margin-left:6px;">💰 Investor</span>'
       :'<span style="font-size:9px;background:rgba(124,106,247,0.15);color:#a99cf9;padding:2px 6px;border-radius:8px;margin-left:6px;">⚡ Collab</span>';
-    var lastMsg=m.last_message||'✅ Match accepted — say hello!';
+    var lastMsg=m.last_message
+      ?m.last_message
+      :'🎉 Match accepted! Tap to say hello';
     info.innerHTML=
       '<div style="font-size:14px;font-weight:'+(hasUnread?700:600)+';color:#fff;margin-bottom:3px;">'+(m.other_user_name||'User')+matchTypeBadge+'</div>'+
       '<div style="font-size:12px;color:'+(hasUnread?'#ccc':'#666')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+lastMsg+'</div>';
@@ -1458,7 +1473,7 @@ async function loadMessages(){
     }
 
     d.onclick=function(){
-      markConversationRead(m.conversation_id);
+      markConversationRead(m.conversation_id, m.last_message_at);
       d.style.background='transparent';
       var dotEl=av.querySelector('div');if(dotEl)dotEl.remove();
       info.querySelector('div').style.fontWeight=600;
