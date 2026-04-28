@@ -888,16 +888,23 @@ function buildSlide(p){
 
   var info=document.createElement('div');info.className='s-info';
   var avatarRow=document.createElement('div');
-  avatarRow.style.cssText='display:flex;align-items:center;margin-bottom:4px;cursor:pointer;';
-  avatarRow.onclick=function(){openUserProfile(p.creator_id,p.creator_name,p.creator_avatar,p.creator_location);};
+  avatarRow.style.cssText='display:flex;align-items:center;margin-bottom:4px;cursor:pointer;z-index:5;position:relative;';
+  avatarRow.onclick=function(e){e.stopPropagation();openUserProfile(p.creator_id,p.creator_name,p.creator_avatar,p.creator_location);};
   var avatarEl=document.createElement('div');
   avatarEl.style.cssText='width:36px;height:36px;border-radius:50%;overflow:hidden;flex-shrink:0;margin-right:8px;border:2px solid rgba(255,255,255,0.5);background:'+q.bg+';color:'+q.c+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;';
   if(p.creator_avatar){var avImg=document.createElement('img');avImg.src=p.creator_avatar;avImg.style.cssText='width:100%;height:100%;object-fit:cover;';avImg.onerror=function(){this.parentElement.textContent=ini(p.creator_name);};avatarEl.appendChild(avImg);}
   else{avatarEl.textContent=ini(p.creator_name);}
   var nameCol=document.createElement('div');
   nameCol.innerHTML='<div class="s-handle">@'+(p.creator_name||'user').toLowerCase().replace(/\s+/g,'_')+'</div><div class="s-loc">'+(p.creator_location||'Entrepreneur')+'</div>';
-  avatarRow.appendChild(avatarEl);avatarRow.appendChild(nameCol);info.appendChild(avatarRow);
-  info.innerHTML+='<div class="s-mode">'+mode+'</div><div class="s-title">'+p.title+'</div><div class="s-desc">'+((p.description||'').substring(0,110))+(p.description&&p.description.length>110?'...':'')+'</div>';
+  avatarRow.appendChild(avatarEl);avatarRow.appendChild(nameCol);
+  // FIX: use appendChild for rest instead of innerHTML+= which destroys onclick
+  var modeDiv=document.createElement('div');modeDiv.className='s-mode';modeDiv.textContent=mode;
+  var titleDiv=document.createElement('div');titleDiv.className='s-title';titleDiv.textContent=p.title;
+  var descDiv=document.createElement('div');descDiv.className='s-desc';descDiv.textContent=(p.description||'').substring(0,110)+(p.description&&p.description.length>110?'...':'');
+  info.appendChild(avatarRow);
+  info.appendChild(modeDiv);
+  info.appendChild(titleDiv);
+  info.appendChild(descDiv);
   s.appendChild(info);
 
   var acts=document.createElement('div');acts.className='s-acts';
