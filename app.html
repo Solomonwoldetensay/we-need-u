@@ -897,6 +897,14 @@ function buildSlide(p){
   var nameCol=document.createElement('div');
   nameCol.innerHTML='<div class="s-handle">@'+(p.creator_name||'user').toLowerCase().replace(/\s+/g,'_')+'</div><div class="s-loc">'+(p.creator_location||'Entrepreneur')+'</div>';
   avatarRow.appendChild(avatarEl);avatarRow.appendChild(nameCol);
+  // Use both onclick and touchend for reliable mobile tapping
+  var profileTapped=false;
+  avatarRow.addEventListener('touchend',function(e){
+    e.stopPropagation();e.preventDefault();
+    if(profileTapped)return;profileTapped=true;
+    setTimeout(function(){profileTapped=false;},500);
+    openUserProfile(p.creator_id,p.creator_name,p.creator_avatar,p.creator_location);
+  },{passive:false});
   // FIX: use appendChild for rest instead of innerHTML+= which destroys onclick
   var modeDiv=document.createElement('div');modeDiv.className='s-mode';modeDiv.textContent=mode;
   var titleDiv=document.createElement('div');titleDiv.className='s-title';titleDiv.textContent=p.title;
@@ -948,8 +956,14 @@ function buildSlide(p){
     sc2=document.createElement('div');sc2.className='swipe-collab';sc2.textContent='⚡ Collab';s.appendChild(sc2);
   }
 
-  var txStart=0,txCur=0,swiping=false;
-  s.addEventListener('touchstart',function(e){if(e.touches.length!==1)return;txStart=e.touches[0].clientX;txCur=txStart;swiping=true;},{passive:true});
+  var txStart=0,txCur=0,swiping=false,swipeTarget=null;
+  s.addEventListener('touchstart',function(e){
+    if(e.touches.length!==1)return;
+    swipeTarget=e.target;
+    // Don't swipe if touching the info area (avatar, name, buttons)
+    if(e.target.closest('.s-info')||e.target.closest('.s-acts')||e.target.closest('.s-right')){return;}
+    txStart=e.touches[0].clientX;txCur=txStart;swiping=true;
+  },{passive:true});
   s.addEventListener('touchmove',function(e){
     if(!swiping||e.touches.length!==1)return;txCur=e.touches[0].clientX;
     var dx=txCur-txStart;
@@ -1636,15 +1650,17 @@ async function openUserProfile(creatorId, creatorName, creatorAvatar, creatorLoc
   document.getElementById('up-stats').textContent='Loading...';
   document.getElementById('up-projects').innerHTML='<div style="text-align:center;padding:2rem;color:#555;font-size:13px;">Loading projects...</div>';
 
-  // Fetch their projects
-  var r=await api('/projects?limit=20');
-  if(!r.ok||!r.data.projects){
-    document.getElementById('up-projects').innerHTML='<div style="text-align:center;padding:2rem;color:#555;font-size:13px;">No projects found</div>';
-    return;
+  // Fetch their projects — use creator_id filter and bypass swipe exclusion
+  // We fetch without auth token to avoid swipe exclusion filter
+  var r=await fetch('https://workmatch-backend.onrender.com/api/projects?limit=50&page=1').then(function(res){return res.json();}).catch(function(){return null;});
+  if(!r||!r.projects){
+    // fallback to api helper
+    var r2=await api('/projects?limit=50');
+    r={projects:r2.ok?r2.data.projects:[]};
   }
 
   // Filter to only this creator's projects
-  var projects=r.data.projects.filter(function(p){return p.creator_id===creatorId;});
+  var projects=(r.projects||[]).filter(function(p){return p.creator_id===creatorId;});
 
   document.getElementById('up-stats').textContent=projects.length+' project'+(projects.length!==1?'s':'');
 
