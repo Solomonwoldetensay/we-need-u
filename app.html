@@ -1416,8 +1416,6 @@ async function loadMessages(){
   if(!r.ok){list.innerHTML='<div style="text-align:center;padding:40px;color:#555;">Failed to load</div>';return;}
 
   var allMatches=r.data.matches||[];
-
-  // Newly accepted matches (show as notification even if no message yet)
   var accepted=allMatches.filter(function(m){return m.status==='accepted';});
 
   if(accepted.length===0){
@@ -1426,16 +1424,44 @@ async function loadMessages(){
     return;
   }
 
+  // ── Deduplicate by conversation_id ─────────────
+  // If same person has collab+invest, keep the one with most recent activity
+  var seen={};
+  var deduped=[];
+  accepted.forEach(function(m){
+    var key=m.conversation_id||m.other_user_id;
+    if(!seen[key]){
+      seen[key]=true;
+      deduped.push(m);
+    } else {
+      // Keep whichever has more recent last_message_at
+      var idx=deduped.findIndex(function(x){return (x.conversation_id||x.other_user_id)===key;});
+      if(idx>-1){
+        var existing=deduped[idx];
+        var existingTime=existing.last_message_at?new Date(existing.last_message_at).getTime():0;
+        var newTime=m.last_message_at?new Date(m.last_message_at).getTime():0;
+        if(newTime>existingTime)deduped[idx]=m;
+      }
+    }
+  });
+
+  // ── Sort: most recent message at top ────────────
+  deduped.sort(function(a,b){
+    var at=a.last_message_at?new Date(a.last_message_at).getTime():new Date(a.created_at||0).getTime();
+    var bt=b.last_message_at?new Date(b.last_message_at).getTime():new Date(b.created_at||0).getTime();
+    return bt-at; // descending — most recent first
+  });
+
   list.innerHTML='';
   var unreadCount=0;
 
-  accepted.forEach(function(m){
+  deduped.forEach(function(m){
     var q=clr(m.other_user_id);
     var d=document.createElement('div');
     var hasUnread=isConversationUnread(m);
     if(hasUnread)unreadCount++;
 
-    d.style.cssText='display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #111;cursor:pointer;background:'+(hasUnread?'rgba(124,106,247,0.06)':'transparent')+';position:relative;';
+    d.style.cssText='display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #1a1a1a;cursor:pointer;background:'+(hasUnread?'rgba(124,106,247,0.06)':'transparent')+';position:relative;';
 
     // Avatar
     var av=document.createElement('div');
@@ -1447,7 +1473,7 @@ async function loadMessages(){
       av.appendChild(img);
     }else{av.textContent=ini(m.other_user_name);}
 
-    // Unread dot on avatar
+    // Unread dot
     if(hasUnread){
       var dot=document.createElement('div');
       dot.style.cssText='position:absolute;bottom:1px;right:1px;width:12px;height:12px;border-radius:50%;background:#7c6af7;border:2px solid #07070d;';
@@ -1457,31 +1483,27 @@ async function loadMessages(){
 
     // Info
     var info=document.createElement('div');info.style.cssText='flex:1;min-width:0;';
-    var matchTypeBadge=m.match_type==='invest'
-      ?'<span style="font-size:9px;background:rgba(232,160,32,0.15);color:#f5c97a;padding:2px 6px;border-radius:8px;margin-left:6px;">💰 Investor</span>'
-      :'<span style="font-size:9px;background:rgba(124,106,247,0.15);color:#a99cf9;padding:2px 6px;border-radius:8px;margin-left:6px;">⚡ Collab</span>';
-    var lastMsg=m.last_message
-      ?m.last_message
-      :'🎉 Match accepted! Tap to say hello';
+    var lastMsg=m.last_message?m.last_message:'🎉 Match accepted! Tap to say hello';
     info.innerHTML=
-      '<div style="font-size:14px;font-weight:'+(hasUnread?700:600)+';color:#fff;margin-bottom:3px;">'+(m.other_user_name||'User')+matchTypeBadge+'</div>'+
+      '<div style="font-size:14px;font-weight:'+(hasUnread?700:600)+';color:#fff;margin-bottom:3px;">'+(m.other_user_name||'User')+'</div>'+
       '<div style="font-size:12px;color:'+(hasUnread?'#ccc':'#666')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+lastMsg+'</div>';
     d.appendChild(info);
 
     // Time
-    if(m.last_message_at){
+    var timeStr=m.last_message_at||m.created_at;
+    if(timeStr){
       var t=document.createElement('div');
       t.style.cssText='font-size:10px;color:#555;flex-shrink:0;';
-      t.textContent=timeAgo(m.last_message_at);
+      t.textContent=timeAgo(timeStr);
       d.appendChild(t);
     }
 
     d.onclick=function(){
-      markConversationRead(m.conversation_id, m.last_message_at);
+      markConversationRead(m.conversation_id,m.last_message_at);
       d.style.background='transparent';
-      var dotEl=av.querySelector('div');if(dotEl)dotEl.remove();
+      var dotEl=av.querySelector('div[style*="border-radius:50%"]');if(dotEl)dotEl.remove();
       info.querySelector('div').style.fontWeight=600;
-      var remaining=accepted.filter(function(x){return isConversationUnread(x);}).length;
+      var remaining=deduped.filter(function(x){return isConversationUnread(x);}).length;
       updateMsgBadge(remaining);
       openChat(m.conversation_id,m.other_user_name);
     };
