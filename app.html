@@ -969,14 +969,18 @@ async function openChat(cid,name){
     if(r.data.messages.length===0){
       // No messages yet — show match accepted greeting
       var greeting=document.createElement('div');
-      greeting.style.cssText='text-align:center;padding:20px 16px;';
+      greeting.style.cssText='display:flex;flex-direction:column;gap:8px;padding:16px 0;';
       greeting.innerHTML=
-        '<div style="font-size:36px;margin-bottom:8px;">🎉</div>'+
-        '<div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;">You\'re connected with '+name+'!</div>'+
-        '<div style="font-size:12px;color:#666;margin-bottom:16px;">Your match request was accepted. Say hello!</div>'+
-        '<button onclick="quickSay(\'👋 Hey! Excited to connect with you!\')" style="background:rgba(124,106,247,0.15);border:1px solid rgba(124,106,247,0.3);color:#a99cf9;padding:8px 16px;border-radius:20px;font-size:12px;cursor:pointer;margin:4px;">👋 Say hello</button>'+
-        '<button onclick="quickSay(\'Would love to learn more about your idea!\')" style="background:rgba(124,106,247,0.15);border:1px solid rgba(124,106,247,0.3);color:#a99cf9;padding:8px 16px;border-radius:20px;font-size:12px;cursor:pointer;margin:4px;">💡 Learn more</button>'+
-        '<button onclick="quickSay(\'When would you be free for a quick call?\')" style="background:rgba(124,106,247,0.15);border:1px solid rgba(124,106,247,0.3);color:#a99cf9;padding:8px 16px;border-radius:20px;font-size:12px;cursor:pointer;margin:4px;">📞 Schedule call</button>';
+        // System message in center
+        '<div style="text-align:center;padding:12px 16px;margin-bottom:4px;">'+
+          '<div style="font-size:28px;margin-bottom:6px;">🎉</div>'+
+          '<div style="display:inline-block;background:rgba(255,255,255,0.06);border-radius:12px;padding:8px 16px;font-size:12px;color:#888;">You matched with '+name+'</div>'+
+        '</div>'+
+        // Quick reply bubbles that look like real messages from "them"
+        '<div class="msg them"><div class="mbub" onclick="quickSay(\'👋 Hey! Excited to connect with you!\')" style="cursor:pointer;">👋 Say hello</div></div>'+
+        '<div class="msg them"><div class="mbub" onclick="quickSay(\'Would love to learn more about your idea!\')" style="cursor:pointer;">💡 Tell me more about your idea</div></div>'+
+        '<div class="msg them"><div class="mbub" onclick="quickSay(\'When would you be free for a quick call?\')" style="cursor:pointer;">📞 Let\'s schedule a call</div></div>'+
+        '<div style="text-align:center;font-size:10px;color:#444;margin-top:4px;">Tap a suggestion or type your own</div>';
       area.appendChild(greeting);
     } else {
       r.data.messages.forEach(function(m){
