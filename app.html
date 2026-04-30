@@ -62,12 +62,21 @@
 
 <!-- FEED -->
 <div class="pg feed-pg" id="pg-feed">
-  <div id="feed-topbar" style="position:absolute;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:44px 14px 10px;background:linear-gradient(to bottom,rgba(0,0,0,0.75) 0%,transparent 100%);pointer-events:none;">
-    <div style="display:flex;align-items:center;gap:8px;pointer-events:auto;">
-      <div id="feed-avatar" style="width:34px;height:34px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,0.5);background:#333;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff;flex-shrink:0;"></div>
-      <div style="font-size:18px;font-weight:900;color:#fff;">WE-NEED-<b style="color:#fff;">U</b></div>
+  <div id="feed-topbar" style="position:absolute;top:0;left:0;right:0;z-index:10;background:linear-gradient(to bottom,rgba(0,0,0,0.85) 0%,transparent 100%);pointer-events:none;">
+    <!-- Top row: avatar + post button -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:44px 14px 8px;pointer-events:auto;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div id="feed-avatar" style="width:34px;height:34px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,0.5);background:#333;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff;flex-shrink:0;"></div>
+        <div style="font-size:18px;font-weight:900;color:#fff;">WE-NEED-<b style="color:#fff;">U</b></div>
+      </div>
+      <button onclick="show('pg-post')" style="background:rgba(124,106,247,0.85);border:none;color:#fff;font-size:11px;font-weight:600;padding:7px 14px;border-radius:20px;cursor:pointer;">+ Post idea</button>
     </div>
-    <button onclick="show('pg-post')" style="background:rgba(124,106,247,0.85);border:none;color:#fff;font-size:11px;font-weight:600;padding:7px 14px;border-radius:20px;cursor:pointer;pointer-events:auto;">+ Post idea</button>
+    <!-- Filter pills row -->
+    <div style="display:flex;gap:8px;padding:0 14px 10px;pointer-events:auto;">
+      <button id="filter-all" onclick="setFeedFilter('all')" style="background:rgba(255,255,255,0.95);border:none;color:#07070d;font-size:11px;font-weight:700;padding:5px 14px;border-radius:20px;cursor:pointer;">All</button>
+      <button id="filter-collab" onclick="setFeedFilter('collab')" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:#fff;font-size:11px;font-weight:600;padding:5px 14px;border-radius:20px;cursor:pointer;">⚡ Collab</button>
+      <button id="filter-invest" onclick="setFeedFilter('invest')" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:#fff;font-size:11px;font-weight:600;padding:5px 14px;border-radius:20px;cursor:pointer;">💰 Invest</button>
+    </div>
   </div>
   <div class="feed-body" id="feed-body"></div>
   <div class="bnav">
