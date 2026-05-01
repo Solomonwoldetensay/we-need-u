@@ -68,8 +68,6 @@ document.getElementById('user-profile-mask').onclick=function(e){if(e.target===t
 
 // ── GOOGLE SIGN IN ──────────────────────────
 var GOOGLE_CLIENT_ID='855168386507-5tjaea79rg95ghmjb57eirpggeoapj9b.apps.googleusercontent.com';
-var BACKEND='https://workmatch-backend.onrender.com';
-
 function triggerGoogleSignIn(){
   var errEl=document.getElementById('lerr')||document.getElementById('serr');
   if(errEl)errEl.textContent='';

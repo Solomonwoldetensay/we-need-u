@@ -29,6 +29,8 @@ self.addEventListener('activate',function(e){
 self.addEventListener('fetch',function(e){
   // Only handle GET requests
   if(e.request.method!=='GET')return;
+  var url=new URL(e.request.url);
+  if(url.origin!==self.location.origin||url.pathname.endsWith('/env.js'))return;
   e.respondWith(
     caches.match(e.request).then(function(r){
       return r||fetch(e.request).catch(function(){

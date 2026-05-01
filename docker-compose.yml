@@ -1,0 +1,7 @@
+services:
+  we-need-u:
+    build: .
+    ports:
+      - "${APP_PORT:-8080}:80"
+    environment:
+      BACKEND_URL: "${BACKEND_URL:-https://workmatch-backend.onrender.com}"

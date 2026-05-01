@@ -1,5 +1,6 @@
 // ── GLOBALS ──────────────────────────
-var API='https://workmatch-backend.onrender.com/api';
+var BACKEND=((window.WNU_CONFIG&&window.WNU_CONFIG.BACKEND_URL)||'https://workmatch-backend.onrender.com').replace(/\/$/,'');
+var API=BACKEND+'/api';
 var token=localStorage.getItem('wm_token')||null;
 var user=JSON.parse(localStorage.getItem('wm_user')||'null');
 var postMode=null;

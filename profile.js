@@ -68,7 +68,7 @@ async function openUserProfile(creatorId, creatorName, creatorAvatar, creatorLoc
   var projects=[];
   try{
     // Pass no auth token so swipe filter is bypassed
-    var resp=await fetch('https://workmatch-backend.onrender.com/api/projects?limit=50&page=1');
+    var resp=await fetch(API+'/projects?limit=50&page=1');
     var data=await resp.json();
     var allProjects=data.projects||data.data||[];
     projects=allProjects.filter(function(p){
@@ -77,7 +77,7 @@ async function openUserProfile(creatorId, creatorName, creatorAvatar, creatorLoc
 
     // If not found in first page, try page 2
     if(!projects.length&&data.pagination&&data.pagination.has_more){
-      var resp2=await fetch('https://workmatch-backend.onrender.com/api/projects?limit=50&page=2');
+      var resp2=await fetch(API+'/projects?limit=50&page=2');
       var data2=await resp2.json();
       var more=(data2.projects||[]).filter(function(p){return p.creator_id===creatorId;});
       projects=projects.concat(more);
