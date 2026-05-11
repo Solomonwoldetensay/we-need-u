@@ -5,20 +5,23 @@ document.getElementById('lbtn').onclick=async function(){
   var err=document.getElementById('lerr');
   if(!em||!pw){err.textContent='Enter email and password.';return;}
   err.textContent='';this.textContent='Signing in...';this.disabled=true;
-  var slowTimer=setTimeout(function(){err.style.color='#7c6af7';err.textContent='Starting up server... please wait 30 seconds ☕';},5000);
+  var slowTimer=setTimeout(function(){err.style.color='#7c6af7';err.textContent='Starting up server... please wait 30 seconds \u2615';},5000);
+  // Node.js backend route: POST /api/auth/login
   var r=await api('/auth/login','POST',{email:em,password:pw});
   clearTimeout(slowTimer);err.style.color='#e24b4a';this.textContent='Sign In';this.disabled=false;
   if(r.ok){
     token=r.data.token;
-    // FIX: Python backend returns {token, user} with user.name not user.full_name
     user=r.data.user;
-    // Normalize — make sure both name and full_name work
-    if(user&&!user.name&&user.full_name)user.name=user.full_name;
+    // Node.js backend returns user.full_name
     if(user&&!user.full_name&&user.name)user.full_name=user.name;
+    if(user&&!user.name&&user.full_name)user.name=user.full_name;
     localStorage.setItem('wm_token',token);
     localStorage.setItem('wm_user',JSON.stringify(user));
     enterApp();
-  }else{err.textContent=r.data.detail||r.data.message||'Login failed.';}
+  }else{
+    // Node.js backend returns r.data.message (not r.data.detail)
+    err.textContent=r.data.message||'Login failed.';
+  }
 };
 
 // ── SIGNUP ──────────────────────────
@@ -31,27 +34,28 @@ document.getElementById('sbtn').onclick=async function(){
   if(!name||!em||!pw){err.textContent='Fill in all fields.';return;}
   if(pw.length<6){err.textContent='Password needs 6+ characters.';return;}
   err.textContent='';this.textContent='Creating...';this.disabled=true;
-  var slowTimer=setTimeout(function(){err.style.color='#7c6af7';err.textContent='Starting up server... please wait 30 seconds ☕';},5000);
-  // FIX: Python backend expects {name, email, password} not {full_name, email, password}
-  var r=await api('/auth/signup','POST',{name:name,email:em,password:pw,location:loc});
+  var slowTimer=setTimeout(function(){err.style.color='#7c6af7';err.textContent='Starting up server... please wait 30 seconds \u2615';},5000);
+  // FIX: Node.js backend route is /auth/register NOT /auth/signup
+  // FIX: Node.js backend expects full_name NOT name
+  var r=await api('/auth/register','POST',{full_name:name,email:em,password:pw,location:loc});
   clearTimeout(slowTimer);err.style.color='#e24b4a';this.textContent='Create Account';this.disabled=false;
   if(r.ok){
     token=r.data.token;
     user=r.data.user;
     // Normalize name fields
-    if(user&&!user.name&&user.full_name)user.name=user.full_name;
     if(user&&!user.full_name&&user.name)user.full_name=user.name;
+    if(user&&!user.name&&user.full_name)user.name=user.full_name;
     localStorage.setItem('wm_token',token);
     localStorage.setItem('wm_user',JSON.stringify(user));
     enterApp();
-  }else if(r.data.detail&&r.data.detail.indexOf('already exists')>-1){
-    // Account exists — try logging in instead
+  }else if(r.data.message&&r.data.message.indexOf('already exists')>-1){
+    // Account exists - try logging in instead
     err.style.color='#7c6af7';err.textContent='Account found! Signing you in...';
     var lr=await api('/auth/login','POST',{email:em,password:pw});
     if(lr.ok){
       token=lr.data.token;user=lr.data.user;
-      if(user&&!user.name&&user.full_name)user.name=user.full_name;
       if(user&&!user.full_name&&user.name)user.full_name=user.name;
+      if(user&&!user.name&&user.full_name)user.name=user.full_name;
       localStorage.setItem('wm_token',token);
       localStorage.setItem('wm_user',JSON.stringify(user));
       enterApp();
@@ -60,7 +64,10 @@ document.getElementById('sbtn').onclick=async function(){
       err.textContent='Account exists. Please sign in instead.';
       setTimeout(function(){show('pg-login');document.getElementById('lemail').value=em;},1500);
     }
-  }else{err.textContent=r.data.detail||r.data.message||'Signup failed.';}
+  }else{
+    // Node.js returns r.data.message not r.data.detail
+    err.textContent=r.data.message||'Signup failed.';
+  }
 };
 
 // Switch between login and signup screens
@@ -68,7 +75,6 @@ document.getElementById('gosu').onclick=function(){show('pg-signup');};
 document.getElementById('goli').onclick=function(){show('pg-login');};
 
 // ── NAV WIRING ──────────────────────────
-// Connect all bottom nav buttons to navigation functions
 document.getElementById('n1').onclick=goFeed;document.getElementById('n2').onclick=goMatch;document.getElementById('n3').onclick=goMessages;document.getElementById('n4').onclick=goProf;
 document.getElementById('n5').onclick=goFeed;document.getElementById('n6').onclick=goMatch;document.getElementById('n7').onclick=goMessages;document.getElementById('n8').onclick=goProf;
 document.getElementById('n9').onclick=goFeed;document.getElementById('n10').onclick=goMatch;document.getElementById('n11').onclick=goMessages;document.getElementById('n12').onclick=goProf;
@@ -78,7 +84,7 @@ document.getElementById('nm1').onclick=goFeed;document.getElementById('nm2').onc
 // Back button in chat goes to matches
 document.getElementById('cbk').onclick=function(){show('pg-matches');};
 
-// Sign out — clears token and user data
+// Sign out - clears token and user data
 document.getElementById('logbtn').onclick=function(){
   token=null;user=null;
   localStorage.removeItem('wm_token');
@@ -94,7 +100,7 @@ document.getElementById('cmask').onclick=function(e){if(e.target===this)this.cla
 document.getElementById('csend').onclick=sendMsg;
 document.getElementById('cbox').onkeydown=function(e){if(e.key==='Enter')sendMsg();};
 
-// Avatar upload — triggers file picker
+// Avatar upload
 document.getElementById('pav-wrap').onclick=function(){document.getElementById('avatar-file').click();};
 document.getElementById('avatar-file').onchange=async function(){
   var f=this.files[0];if(!f)return;
@@ -102,16 +108,15 @@ document.getElementById('avatar-file').onchange=async function(){
   pavEl.innerHTML='<div style="font-size:11px;color:#aaa;">...</div>';
   var reader=new FileReader();
   reader.onload=async function(e){
-    // FIX: PUT to /auth/profile to update avatar
+    // Node.js backend: PUT /api/auth/profile
     var r=await api('/auth/profile','PUT',{avatar_base64:e.target.result});
     if(r.ok&&r.data.user&&r.data.user.avatar_url){
       user.avatar_url=r.data.user.avatar_url;
       pavEl.innerHTML='<img src="'+user.avatar_url+'" alt="avatar"/>';
-      showAvatarToast('✅ Profile photo updated!');
+      showAvatarToast('\u2705 Profile photo updated!');
     }else{
-      // FIX: use user.name not user.full_name
-      pavEl.textContent=ini(user.name||user.full_name);
-      showAvatarToast('❌ Upload failed, try again');
+      pavEl.textContent=ini(user.full_name||user.name);
+      showAvatarToast('\u274c Upload failed, try again');
     }
   };
   reader.readAsDataURL(f);
@@ -159,15 +164,13 @@ function resetGoogleBtns(){
 function loginSuccess(data){
   token=data.token;
   user=data.user;
-  // Normalize name fields
-  if(user&&!user.name&&user.full_name)user.name=user.full_name;
   if(user&&!user.full_name&&user.name)user.full_name=user.name;
+  if(user&&!user.name&&user.full_name)user.name=user.full_name;
   localStorage.setItem('wm_token',token);
   localStorage.setItem('wm_user',JSON.stringify(user));
   enterApp();
 }
 
-// Handles Google Sign In response
 async function handleGoogleSignIn(googleResponse){
   var errEl=document.getElementById('lerr')||document.getElementById('serr');
   var lbtn=document.getElementById('google-login-btn');
@@ -175,7 +178,7 @@ async function handleGoogleSignIn(googleResponse){
   var r=await api('/auth/google','POST',{id_token:googleResponse.credential});
   resetGoogleBtns();
   if(r.ok)loginSuccess(r.data);
-  else if(errEl)errEl.textContent=r.data.detail||r.data.message||'Google sign in failed.';
+  else if(errEl)errEl.textContent=r.data.message||'Google sign in failed.';
 }
 
 async function handleGoogleCallback(code){
@@ -183,7 +186,7 @@ async function handleGoogleCallback(code){
   var r=await api('/auth/google/mobile','POST',{code:code,redirect_uri:BACKEND+'/api/auth/google/callback'});
   resetGoogleBtns();
   if(r.ok)loginSuccess(r.data);
-  else if(errEl)errEl.textContent=r.data.detail||r.data.message||'Google sign in failed.';
+  else if(errEl)errEl.textContent=r.data.message||'Google sign in failed.';
 }
 
 async function exchangeGoogleToken(accessToken){
@@ -194,7 +197,7 @@ async function exchangeGoogleToken(accessToken){
     var r=await api('/auth/google/token','POST',{access_token:accessToken,user:gUser});
     resetGoogleBtns();
     if(r.ok)loginSuccess(r.data);
-    else if(errEl)errEl.textContent=r.data.detail||r.data.message||'Google sign in failed.';
+    else if(errEl)errEl.textContent=r.data.message||'Google sign in failed.';
   }catch(e){if(errEl)errEl.textContent='Google sign in failed. Try again.';}
 }
 
@@ -203,7 +206,7 @@ window.addEventListener('message',function(e){
 });
 
 // ── INIT ──────────────────────────
-// Runs when page loads — check if already logged in
+// Runs when page loads - check if already logged in
 window.onload=function(){
   var hash=window.location.hash;
   if(hash&&hash.indexOf('access_token')>-1){
@@ -215,6 +218,5 @@ window.onload=function(){
       return;
     }
   }
-  // Auto login if token exists
   if(token&&user)enterApp();
 };
