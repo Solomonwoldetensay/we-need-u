@@ -1,101 +1,349 @@
 <!DOCTYPE html>
+<!-- ══════════════════════════════════════════════════════
+     APP.HTML — THE MAIN APP FILE
+     ══════════════════════════════════════════════════════
+     
+     This is the SKELETON of your entire app!
+     It contains ALL screens/pages of YOU-HAVE-VALUE
+     
+     Screens inside:
+     1. LOGIN       → welcome back screen
+     2. SIGNUP      → create account screen
+     3. FEED        → TikTok-style video feed
+     4. MATCHES     → your collab/invest matches
+     5. POST        → post your idea screen
+     6. PROFILE     → your profile screen
+     7. CHAT        → private chat screen
+     8. MESSAGES    → all conversations list
+     
+     Plus these popups (modals):
+     - User profile popup
+     - Creator info popup
+     - Comments popup
+     - Post detail popup
+     - Install app banners
+     
+     HOW SCREENS WORK:
+     Only ONE screen shows at a time!
+     In styles.css:
+     .pg      { display: none }   ← all hidden by default
+     .pg.on   { display: flex }   ← only shown when 'on' added
+     
+     core.js show() function switches between screens:
+     show('pg-feed')    → shows feed, hides everything else
+     show('pg-login')   → shows login, hides everything else
+     ══════════════════════════════════════════════════════ -->
+
+<!-- Tells browser this is an HTML5 document -->
 <html lang="en">
+<!-- lang="en" tells browser the language is English -->
+
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
-<title>YOU-HAVE-VALUE</title>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="YOU-HAVE-VALUE"/>
-<meta name="mobile-web-app-capable" content="yes"/>
-<meta name="theme-color" content="#07070d"/>
-<meta name="description" content="Post your idea. Find who you need."/>
-<link rel="apple-touch-icon" sizes="180x180" href="./icon.png"/>
-<link rel="icon" type="image/png" sizes="192x192" href="./icon.png"/>
-<link rel="manifest" href="./manifest.json"/>
-<link rel="stylesheet" href="./styles.css"/>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+<!-- HEAD section — not visible to users
+     Contains settings and file imports -->
+
+  <!-- UTF-8 = supports all characters including emojis -->
+  <meta charset="UTF-8"/>
+
+  <!-- Makes app look correct on mobile phones
+       width=device-width  → use phone's actual width
+       initial-scale=1.0   → don't zoom in or out
+       maximum-scale=1.0   → prevent user zoom
+       user-scalable=no    → disable pinch to zoom -->
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+
+  <!-- Title shown in browser tab -->
+  <title>YOU-HAVE-VALUE</title>
+
+  <!-- Tells iOS: this can be used as a full screen app
+       Removes Safari browser bar when installed on iPhone -->
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+
+  <!-- Makes status bar transparent on iOS
+       So your dark app background shows through -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+
+  <!-- Name shown under the app icon on iPhone home screen -->
+  <meta name="apple-mobile-web-app-title" content="YOU-HAVE-VALUE"/>
+
+  <!-- Same as apple-mobile-web-app-capable but for Android -->
+  <meta name="mobile-web-app-capable" content="yes"/>
+
+  <!-- Color of browser toolbar on Android Chrome
+       #07070d = your app's dark background color -->
+  <meta name="theme-color" content="#07070d"/>
+
+  <!-- Description shown in search results and when sharing -->
+  <meta name="description" content="Post your idea. Find who you need."/>
+
+  <!-- App icon for iPhone home screen (180x180 required for iOS) -->
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png"/>
+
+  <!-- App icon for Android home screen (192x192 required for Android) -->
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon.png"/>
+
+  <!-- Links to manifest.json which tells browser:
+       → App name, icons, colors, display mode
+       → Makes the app installable on home screen! -->
+  <link rel="manifest" href="./manifest.json"/>
+
+  <!-- Links to your CSS file — ALL visual styling lives here
+       Colors, sizes, animations, layouts -->
+  <link rel="stylesheet" href="./styles.css"/>
+
+  <!-- Loads Google Sign In library from Google's servers
+       async = don't block page loading while fetching
+       defer = run after HTML is fully loaded
+       Used for "Continue with Google" button -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
 </head>
+
 <body>
+<!-- BODY — everything users actually SEE -->
+
+<!-- Main app container
+     All screens live inside this div
+     id="app" used by showAvatarToast() in core.js -->
 <div id="app">
 
-<!-- LOGIN -->
+
+<!-- ════════════════════════════════════════
+     SCREEN 1: LOGIN
+     ════════════════════════════════════════
+     First screen users see when not logged in
+     
+     Classes:
+     pg     = page/screen (hidden by default in CSS)
+     on     = currently visible (starts visible!)
+     auth-pg = authentication page styling
+     
+     auth.js handles all login logic -->
 <div class="pg on auth-pg" id="pg-login">
+
+  <!-- App logo -->
   <div class="logo">YOU-HAVE-<b>VALUE</b></div>
+
+  <!-- Tagline under logo -->
   <div class="sub">Post your idea. Find who you need.</div>
+
+  <!-- White card containing login form -->
   <div class="card">
+
+    <!-- Card title -->
     <div class="ctitle">Welcome back 👋</div>
+
+    <!-- Error message — empty until login fails
+         auth.js fills: lerr.textContent = 'Wrong password' -->
     <div class="errtxt" id="lerr"></div>
+
+    <!-- Google Sign In button
+         onclick calls triggerGoogleSignIn() in auth.js
+         SVG inside is the Google colored G logo -->
     <button class="gbtn" id="google-login-btn" onclick="triggerGoogleSignIn()">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
       Continue with Google
     </button>
+
+    <!-- Container where Google renders its official button
+         auth.js fills this with Google's button component -->
     <div id="g-btn-container" style="width:100%;margin-bottom:8px"></div>
+
+    <!-- Divider between Google and email login -->
     <div class="auth-divider"><span>or sign in with email</span></div>
+
+    <!-- Email input
+         type="email" = shows email keyboard on mobile
+         autocomplete = browser suggests saved emails -->
     <input class="inp" type="email" placeholder="Email address" id="lemail" autocomplete="email"/>
+
+    <!-- Password input
+         type="password" = hides characters with dots
+         autocomplete = browser suggests saved password -->
     <input class="inp" type="password" placeholder="Password" id="lpw" autocomplete="current-password"/>
+
+    <!-- Sign In button
+         auth.js: lbtn.onclick = calls POST /api/auth/login -->
     <button class="mbtn" id="lbtn">Sign In</button>
+
+    <!-- Switch to signup screen link
+         auth.js: gosu.onclick = show('pg-signup') -->
     <div class="sw">No account? <span id="gosu">Create one free</span></div>
+
   </div>
 </div>
 
-<!-- SIGNUP -->
+
+<!-- ════════════════════════════════════════
+     SCREEN 2: SIGNUP
+     ════════════════════════════════════════
+     Create new account screen
+     
+     auth.js handles signup:
+     sbtn.onclick calls POST /api/auth/register -->
 <div class="pg auth-pg" id="pg-signup">
+
   <div class="logo">YOU-HAVE-<b>VALUE</b></div>
   <div class="sub">Where builders meet investors</div>
+
   <div class="card">
     <div class="ctitle">Create account ✨</div>
+
+    <!-- Error message for signup failures -->
     <div class="errtxt" id="serr"></div>
+
+    <!-- Google signup button -->
     <button class="gbtn" id="google-signup-btn" onclick="triggerGoogleSignIn()">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
       Sign up with Google
     </button>
+
     <div class="auth-divider"><span>or create with email</span></div>
+
+    <!-- Full name input
+         autocomplete="name" = browser suggests saved name -->
     <input class="inp" type="text" placeholder="Full name" id="sname" autocomplete="name"/>
+
+    <!-- Email input for new account -->
     <input class="inp" type="email" placeholder="Email address" id="semail" autocomplete="email"/>
+
+    <!-- Password input
+         autocomplete="new-password" = browser offers to save it -->
     <input class="inp" type="password" placeholder="Password (min 6 chars)" id="spw" autocomplete="new-password"/>
+
+    <!-- Location input — optional
+         Shows where founder is based
+         Example: "St Paul MN" or "Addis Ababa" -->
     <input class="inp" type="text" placeholder="Location e.g. St Paul MN" id="sloc"/>
+
+    <!-- Create Account button
+         auth.js sends to POST /api/auth/register -->
     <button class="mbtn" id="sbtn">Create Account</button>
+
+    <!-- Link back to login screen -->
     <div class="sw">Have account? <span id="goli">Sign in</span></div>
+
   </div>
 </div>
 
-<!-- FEED -->
+
+<!-- ════════════════════════════════════════
+     SCREEN 3: FEED
+     ════════════════════════════════════════
+     The main TikTok-style video feed!
+     Users see this after logging in
+     
+     feed.js handles everything:
+     → loadFeed() fetches from GET /api/projects
+     → buildSlide() creates each video card
+     → pickAndPlayBestSlide() auto-plays videos -->
 <div class="pg feed-pg" id="pg-feed">
+
+  <!-- Top bar overlay — floats above videos
+       position:absolute = overlaps the video
+       pointer-events:none = lets touches pass to video below -->
   <div id="feed-topbar" style="position:absolute;top:0;left:0;right:0;z-index:10;background:linear-gradient(to bottom,rgba(0,0,0,0.85) 0%,transparent 100%);pointer-events:none;">
-    <!-- Top row: avatar + post button -->
+
+    <!-- Top row: avatar left, post button right
+         pointer-events:auto = re-enables clicks here -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:44px 14px 8px;pointer-events:auto;">
+
       <div style="display:flex;align-items:center;gap:8px;">
+        <!-- User avatar circle (top left)
+             enterApp() in core.js fills with user's photo
+             or first letter of name if no photo -->
         <div id="feed-avatar" style="width:34px;height:34px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,0.5);background:#333;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff;flex-shrink:0;"></div>
+        <!-- App name -->
         <div style="font-size:18px;font-weight:900;color:#fff;">YOU-HAVE-<b style="color:#fff;">VALUE</b></div>
       </div>
+
+      <!-- Post idea button (top right)
+           show('pg-post') goes to post screen -->
       <button onclick="show('pg-post')" style="background:rgba(124,106,247,0.85);border:none;color:#fff;font-size:11px;font-weight:600;padding:7px 14px;border-radius:20px;cursor:pointer;">+ Post idea</button>
     </div>
+
   </div>
+
+  <!-- Feed body — feed.js fills with video slide cards
+       Each card built by buildSlide() in feed.js -->
   <div class="feed-body" id="feed-body"></div>
+
+  <!-- Bottom navigation bar
+       auth.js connects buttons to navigation:
+       n1 = goFeed, n2 = goMatch
+       n3 = goMessages, n4 = goProf -->
   <div class="bnav">
-    <button class="nb on" id="n1"><div class="nb-ico">🔥</div><div class="nb-lbl" style="color:#7c6af7">Feed</div></button>
-    <button class="nb" id="n2"><div class="nb-ico">⚡</div><div class="nb-lbl">Matches</div></button>
-    <button class="nb" id="n3" style="position:relative"><div class="nb-ico">✉️</div><div class="nb-lbl">Messages</div><div id="msg-badge-1" class="msg-badge"></div></button>
-    <button class="nb" id="n4"><div class="nb-ico">👤</div><div class="nb-lbl">Profile</div></button>
+    <!-- Feed button — active here (purple color) -->
+    <button class="nb on" id="n1">
+      <div class="nb-ico">🔥</div>
+      <div class="nb-lbl" style="color:#7c6af7">Feed</div>
+    </button>
+    <!-- Matches button -->
+    <button class="nb" id="n2">
+      <div class="nb-ico">⚡</div>
+      <div class="nb-lbl">Matches</div>
+    </button>
+    <!-- Messages button with unread badge
+         msg-badge shows red number for unread messages
+         checkUnreadMessages() in profile.js updates it -->
+    <button class="nb" id="n3" style="position:relative">
+      <div class="nb-ico">✉️</div>
+      <div class="nb-lbl">Messages</div>
+      <div id="msg-badge-1" class="msg-badge"></div>
+    </button>
+    <!-- Profile button -->
+    <button class="nb" id="n4">
+      <div class="nb-ico">👤</div>
+      <div class="nb-lbl">Profile</div>
+    </button>
   </div>
 </div>
 
-<!-- MATCHES -->
+
+<!-- ════════════════════════════════════════
+     SCREEN 4: MATCHES
+     ════════════════════════════════════════
+     Shows all collab and invest matches
+     
+     profile.js loadMatches() fills this:
+     Calls GET /api/matches/my-matches
+     
+     Two tabs: 💰 Invest and ⚡ Collab -->
 <div class="pg" id="pg-matches">
   <div class="inner-pg">
+
     <div class="pg-top" style="padding-bottom:0;">
       <div class="pg-title" style="margin-bottom:12px;">Your Matches</div>
+
+      <!-- Tab buttons — switchTab() in profile.js handles switching -->
       <div class="match-tabs">
+        <!-- Invest tab starts active -->
         <div class="mtab invest-tab active" id="tab-invest" onclick="switchTab('invest')">💰 Invest</div>
         <div class="mtab collab-tab" id="tab-collab" onclick="switchTab('collab')">⚡ Collab</div>
       </div>
     </div>
+
+    <!-- Tab content panels — only one visible at a time -->
     <div class="match-panels">
-      <div class="match-panel active" id="panel-invest"><div class="m-empty"><div class="m-empty-ico">💰</div><div>No invest matches yet</div></div></div>
-      <div class="match-panel" id="panel-collab"><div class="m-empty"><div class="m-empty-ico">⚡</div><div>No collab matches yet</div></div></div>
+      <!-- Invest matches panel (starts visible)
+           profile.js loadMatches() fills with match cards -->
+      <div class="match-panel active" id="panel-invest">
+        <div class="m-empty">
+          <div class="m-empty-ico">💰</div>
+          <div>No invest matches yet</div>
+        </div>
+      </div>
+      <!-- Collab matches panel (hidden until tab clicked) -->
+      <div class="match-panel" id="panel-collab">
+        <div class="m-empty">
+          <div class="m-empty-ico">⚡</div>
+          <div>No collab matches yet</div>
+        </div>
+      </div>
     </div>
+
   </div>
+  <!-- Bottom nav — Matches tab active -->
   <div class="bnav">
     <button class="nb" id="n5"><div class="nb-ico">🔥</div><div class="nb-lbl">Feed</div></button>
     <button class="nb on" id="n6"><div class="nb-ico">⚡</div><div class="nb-lbl" style="color:#7c6af7">Matches</div></button>
@@ -104,35 +352,105 @@
   </div>
 </div>
 
-<!-- POST -->
+
+<!-- ════════════════════════════════════════
+     SCREEN 5: POST YOUR IDEA
+     ════════════════════════════════════════
+     Where founders post their startup pitch
+     
+     post.js handles:
+     → Video upload to POST /api/upload → Cloudinary
+     → Form submission to POST /api/projects
+     
+     User steps:
+     1. Upload 60 second pitch video
+     2. Add title and description
+     3. Choose category
+     4. Select: Collaborators/Investors/Both
+     5. Add skills needed
+     6. Tap Post to Feed -->
 <div class="pg" id="pg-post" style="flex-direction:column;">
   <div class="inner-pg" style="flex:1;display:flex;flex-direction:column;min-height:0;">
+
     <div class="pg-top"><div class="pg-title">Post Your Idea</div></div>
+
+    <!-- Scrollable form
+         -webkit-overflow-scrolling:touch = smooth scroll on iOS -->
     <div class="pg-body" style="flex:1;overflow-y:scroll;-webkit-overflow-scrolling:touch;min-height:0;">
+
+      <!-- Video upload box
+           post.js makes this clickable to open file picker -->
       <div class="upload-box" id="upbox">
         <div class="upload-ico">🎥</div>
         <div class="upload-ttl">Upload your pitch video</div>
         <div class="upload-sub">Tap to select from camera roll</div>
+        <!-- Hidden file input — only video files allowed -->
         <input type="file" id="vfile" accept="video/*" style="display:none"/>
       </div>
+
+      <!-- Video preview — hidden until video selected
+           post.js shows this after user picks a video -->
       <video class="vidprev" id="vprev" controls></video>
+
+      <!-- Uploading spinner — shown during Cloudinary upload -->
       <div class="uploading" id="uping">⏳ Uploading video...</div>
-      <div class="fg"><label class="fl">Project title *</label><input class="fi" type="text" placeholder="e.g. AI fitness coach app" id="ptitle"/></div>
-      <div class="fg"><label class="fl">What are you building? *</label><textarea class="fi" placeholder="Describe your idea..." id="pdesc"></textarea></div>
-      <div class="fg"><label class="fl">Category</label>
-        <select class="fi" id="pcat"><option>Technology</option><option>Design</option><option>Business</option><option>Healthcare</option><option>Education</option><option>Sustainability</option></select>
+
+      <!-- Project title — required -->
+      <div class="fg">
+        <label class="fl">Project title *</label>
+        <input class="fi" type="text" placeholder="e.g. AI fitness coach app" id="ptitle"/>
       </div>
-      <div class="fg"><label class="fl">Looking for *</label>
+
+      <!-- Description — required
+           textarea = multi-line text box -->
+      <div class="fg">
+        <label class="fl">What are you building? *</label>
+        <textarea class="fi" placeholder="Describe your idea..." id="pdesc"></textarea>
+      </div>
+
+      <!-- Category dropdown
+           select = dropdown menu with options -->
+      <div class="fg">
+        <label class="fl">Category</label>
+        <select class="fi" id="pcat">
+          <option>Technology</option>
+          <option>Design</option>
+          <option>Business</option>
+          <option>Healthcare</option>
+          <option>Education</option>
+          <option>Sustainability</option>
+        </select>
+      </div>
+
+      <!-- Looking for buttons — required
+           post.js tracks selected in postMode variable
+           postMode = 'collab' or 'invest' or 'both' -->
+      <div class="fg">
+        <label class="fl">Looking for *</label>
         <div class="mrow">
           <button class="mdb" id="mc">⚡ Collaborators</button>
           <button class="mdb" id="mi">💰 Investors</button>
           <button class="mdb" id="mb">⭐ Both</button>
         </div>
       </div>
-      <div class="fg"><label class="fl">Skills needed</label><input class="fi" type="text" placeholder="React, Marketing, Design..." id="pskills"/></div>
+
+      <!-- Skills needed — optional
+           Example: "React, Marketing, Design" -->
+      <div class="fg">
+        <label class="fl">Skills needed</label>
+        <input class="fi" type="text" placeholder="React, Marketing, Design..." id="pskills"/>
+      </div>
+
     </div>
   </div>
-  <div class="post-fixed"><button class="pbtn" id="pbtn">Post to Feed →</button></div>
+
+  <!-- Post button fixed at bottom
+       post.js: pbtn.onclick sends to POST /api/projects -->
+  <div class="post-fixed">
+    <button class="pbtn" id="pbtn">Post to Feed →</button>
+  </div>
+
+  <!-- Bottom nav -->
   <div class="bnav">
     <button class="nb" id="n9"><div class="nb-ico">🔥</div><div class="nb-lbl">Feed</div></button>
     <button class="nb" id="n10"><div class="nb-ico">⚡</div><div class="nb-lbl">Matches</div></button>
@@ -141,28 +459,74 @@
   </div>
 </div>
 
-<!-- PROFILE -->
+
+<!-- ════════════════════════════════════════
+     SCREEN 6: PROFILE
+     ════════════════════════════════════════
+     Shows logged-in user's own profile
+     
+     profile.js loadProfile() fills this:
+     → GET /api/auth/me for user data
+     → GET /api/projects/mine for projects -->
 <div class="pg" id="pg-profile">
   <div class="inner-pg">
+
     <div class="prof-top">
+
+      <!-- Avatar wrapper — clickable to change photo
+           auth.js: pav-wrap.onclick triggers avatar-file input -->
       <div class="pav-wrap" id="pav-wrap">
+        <!-- Profile photo circle
+             profile.js fills with photo or initials -->
         <div class="pav" id="pav">?</div>
+        <!-- Camera icon overlay -->
         <div class="pav-edit">📷</div>
+        <!-- Hidden file input for photo upload
+             auth.js handles upload to POST /api/upload -->
         <input type="file" id="avatar-file" accept="image/*" style="display:none"/>
       </div>
+
+      <!-- User's full name
+           profile.js: pname.textContent = user.full_name -->
       <div class="pname" id="pname">User</div>
+
+      <!-- User's location
+           profile.js: ploc.textContent = user.location -->
       <div class="ploc" id="ploc"></div>
+
+      <!-- Projects and matches counts
+           profile.js fills from GET /api/auth/me -->
       <div class="pstats">
-        <div><div class="psv" id="sp">0</div><div class="psl">Projects</div></div>
-        <div><div class="psv" id="sm">0</div><div class="psl">Matches</div></div>
+        <div>
+          <div class="psv" id="sp">0</div>
+          <div class="psl">Projects</div>
+        </div>
+        <div>
+          <div class="psv" id="sm">0</div>
+          <div class="psl">Matches</div>
+        </div>
       </div>
     </div>
+
     <div class="pg-body">
+
+      <!-- Sign Out button
+           auth.js: logbtn.onclick clears token → shows login -->
       <button class="logbtn" id="logbtn" style="margin-top:14px;">Sign Out</button>
+
+      <!-- My Projects section -->
       <div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:1px;margin:16px 0 10px;">My Projects</div>
-      <div id="myprojs"><div style="text-align:center;padding:2rem 0;font-size:13px;color:#666;">No projects yet.</div></div>
+
+      <!-- Projects grid — profile.js fills with video thumbnails
+           Shows your posted startup ideas -->
+      <div id="myprojs">
+        <div style="text-align:center;padding:2rem 0;font-size:13px;color:#666;">No projects yet.</div>
+      </div>
+
     </div>
   </div>
+
+  <!-- Bottom nav — Profile tab active -->
   <div class="bnav">
     <button class="nb" id="n13"><div class="nb-ico">🔥</div><div class="nb-lbl">Feed</div></button>
     <button class="nb" id="n14"><div class="nb-ico">⚡</div><div class="nb-lbl">Matches</div></button>
@@ -171,28 +535,78 @@
   </div>
 </div>
 
-<!-- CHAT -->
+
+<!-- ════════════════════════════════════════
+     SCREEN 7: CHAT
+     ════════════════════════════════════════
+     Private chat between two matched users
+     
+     profile.js openChat() loads messages:
+     → GET /api/messages/:conversationId
+     
+     profile.js sendMsg() sends messages:
+     → POST /api/messages/:conversationId -->
 <div class="pg" id="pg-chat" style="background:#07070d;">
   <div class="inner-pg">
+
+    <!-- Chat header -->
     <div class="chat-top">
+      <!-- Back button → returns to matches
+           auth.js: cbk.onclick = show('pg-matches') -->
       <button class="cbk" id="cbk">←</button>
+
+      <!-- Chat partner's avatar (initials circle) -->
       <div id="cav" style="width:36px;height:36px;border-radius:50%;background:#1e1a10;color:#e8a020;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;">?</div>
+
+      <!-- Chat partner's name
+           profile.js: cwho.textContent = their name -->
       <div class="cwho" id="cwho">Chat</div>
     </div>
+
+    <!-- Messages area — profile.js fills with bubbles
+         msg me   = your messages (right aligned)
+         msg them = their messages (left aligned) -->
     <div class="msgs" id="msgs"></div>
+
+    <!-- Message input bar -->
     <div class="cinput">
+      <!-- Type message here -->
       <input class="cbox" type="text" placeholder="Type a message..." id="cbox"/>
+      <!-- Send button
+           auth.js: csend.onclick = sendMsg()
+           auth.js: Enter key = sendMsg() -->
       <button class="csend" id="csend">→</button>
     </div>
+
   </div>
 </div>
 
-<!-- MESSAGES -->
+
+<!-- ════════════════════════════════════════
+     SCREEN 8: MESSAGES LIST
+     ════════════════════════════════════════
+     All your conversations in one list
+     Like WhatsApp's main conversations screen
+     
+     profile.js loadMessages() fills this:
+     → GET /api/matches/my-matches
+     Shows accepted matches with last message -->
 <div class="pg" id="pg-messages" style="background:#07070d;flex-direction:column;">
+
+  <!-- Messages screen header -->
   <div style="display:flex;align-items:center;gap:12px;padding:48px 16px 12px;border-bottom:1px solid #1a1a1a;flex-shrink:0;">
     <div style="font-size:18px;font-weight:700;color:#fff;flex:1;">Messages</div>
   </div>
+
+  <!-- Conversations list — profile.js fills this
+       Each conversation shows:
+       → User avatar and name
+       → Last message preview
+       → Time ago
+       → Purple dot if unread -->
   <div id="messages-list" style="flex:1;overflow-y:auto;"></div>
+
+  <!-- Bottom nav — Messages tab active -->
   <div class="bnav">
     <button class="nb" id="nm1"><div class="nb-ico">🔥</div><div class="nb-lbl">Feed</div></button>
     <button class="nb" id="nm2"><div class="nb-ico">⚡</div><div class="nb-lbl">Matches</div></button>
@@ -201,27 +615,54 @@
   </div>
 </div>
 
-<!-- USER PROFILE MODAL -->
+
+<!-- ════════════════════════════════════════
+     POPUP 1: USER PROFILE MODAL
+     ════════════════════════════════════════
+     Another user's profile slides up from bottom
+     
+     profile.js openUserProfile() opens this
+     Shows their avatar, name, location, projects
+     
+     cmask = dark overlay background
+     Clicking outside (on mask) closes popup -->
 <div class="cmask" id="user-profile-mask">
   <div style="background:#07070d;border-radius:24px 24px 0 0;width:100%;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;">
+
+    <!-- Popup header with close button -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 16px 10px;border-bottom:1px solid #1e1e1e;flex-shrink:0;">
       <div style="font-size:15px;font-weight:700;color:#fff;">Profile</div>
+      <!-- Close button — auth.js closes the mask -->
       <button id="user-profile-close" style="background:none;border:none;color:#666;font-size:22px;cursor:pointer;">✕</button>
     </div>
+
+    <!-- User info: avatar + name + location + stats -->
     <div style="display:flex;align-items:center;gap:14px;padding:16px;border-bottom:1px solid #1e1e1e;flex-shrink:0;">
+      <!-- Avatar — profile.js fills with photo or initials -->
       <div id="up-avatar" style="width:64px;height:64px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:22px;flex-shrink:0;"></div>
       <div>
         <div id="up-name" style="font-size:18px;font-weight:700;color:#fff;margin-bottom:2px;"></div>
         <div id="up-loc" style="font-size:12px;color:#666;margin-bottom:6px;"></div>
+        <!-- Shows "3 projects" -->
         <div id="up-stats" style="font-size:12px;color:#a99cf9;"></div>
       </div>
     </div>
+
     <div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:1px;padding:12px 16px 6px;flex-shrink:0;">Projects</div>
-    <div id="up-projects" style="flex:1;overflow-y:scroll;padding:0 12px 20px;"><div style="text-align:center;padding:2rem;color:#555;">Loading...</div></div>
+
+    <!-- Their projects grid — profile.js fills this -->
+    <div id="up-projects" style="flex:1;overflow-y:scroll;padding:0 12px 20px;">
+      <div style="text-align:center;padding:2rem;color:#555;">Loading...</div>
+    </div>
+
   </div>
 </div>
 
-<!-- CREATOR MODAL -->
+
+<!-- ════════════════════════════════════════
+     POPUP 2: CREATOR MODAL
+     ════════════════════════════════════════
+     Alternative creator info popup -->
 <div class="cmask" id="cmask">
   <div class="cmodal">
     <button class="cmx" id="cmx">✕</button>
@@ -234,70 +675,233 @@
   </div>
 </div>
 
-<!-- COMMENTS MODAL -->
+
+<!-- ════════════════════════════════════════
+     POPUP 3: COMMENTS MODAL
+     ════════════════════════════════════════
+     Shows comments on a project
+     Opens when 💬 comment button tapped
+     
+     comments.js handles:
+     → openComments() opens this
+     → Loads from GET /api/projects/:id/comments
+     → Posts to POST /api/projects/:id/comments -->
 <div class="cmask" id="comments-mask">
   <div class="cmodal" style="max-height:80vh;display:flex;flex-direction:column;">
+
     <button class="cmx" id="comments-close">✕</button>
+
+    <!-- Title shows project name -->
     <div style="clear:both;margin-bottom:12px;">
       <div style="font-size:16px;font-weight:700;color:#fff;" id="comments-title">Comments</div>
     </div>
+
+    <!-- Reply indicator — shown when replying to a comment
+         display:none = hidden by default
+         comments.js shows when reply tapped -->
     <div id="reply-bar" style="background:#1a1a2e;border-radius:8px;padding:8px 12px;margin-bottom:8px;font-size:12px;color:#a99cf9;display:none;justify-content:space-between;align-items:center;">
       <span id="reply-label">↩️ Replying to...</span>
       <button id="cancel-reply" style="background:none;border:none;color:#666;font-size:16px;cursor:pointer;">✕</button>
     </div>
+
+    <!-- Comments list — comments.js fills this -->
     <div id="comments-list" style="flex:1;overflow-y:scroll;-webkit-overflow-scrolling:touch;min-height:0;max-height:340px;margin-bottom:12px;"></div>
+
+    <!-- New comment input -->
     <div style="display:flex;gap:8px;padding-top:10px;border-top:1px solid #222;">
       <input id="comment-input" type="text" placeholder="Write a comment..." style="flex:1;background:#1a1a1a;border:1px solid #333;border-radius:20px;padding:10px 16px;color:#fff;font-size:13px;outline:none;"/>
       <button id="comment-send" style="width:40px;height:40px;border-radius:50%;background:#7c6af7;border:none;color:#fff;font-size:16px;cursor:pointer;flex-shrink:0;">→</button>
     </div>
+
   </div>
 </div>
 
-<!-- POST DETAIL MODAL -->
+
+<!-- ════════════════════════════════════════
+     POPUP 4: POST DETAIL MODAL
+     ════════════════════════════════════════
+     Full screen view of one project
+     Opens when a project card is tapped
+     
+     Shows:
+     → Full screen video
+     → Title, mode, description
+     → Stats: Invests, Collabs, Likes, Views
+     → Comments list
+     → Match requests sheet
+     → Liked by sheet -->
 <div class="post-detail-mask" id="post-detail-mask">
+
+  <!-- Video section -->
   <div class="pd-video-wrap" id="pd-video-wrap">
     <div class="pd-grad"></div>
+    <!-- Play/pause icon -->
     <div class="pd-play-ico" id="pd-play-ico">▶</div>
+    <!-- Back button to close -->
     <button class="pd-back" id="pd-back">←</button>
+    <!-- Match requests count button -->
     <button class="pd-requests-btn" id="pd-requests-btn">📩 Requests <span id="pd-req-count"></span></button>
   </div>
+
+  <!-- Project info scrolls up from bottom -->
   <div class="pd-body" id="pd-body">
     <div class="pd-handle" id="pd-handle"></div>
     <div class="pd-title" id="pd-title"></div>
+    <!-- Mode: "⚡ Seeking Collaborators" etc -->
     <div class="pd-mode" id="pd-mode"></div>
     <div class="pd-desc" id="pd-desc"></div>
+
+    <!-- Stats row — clicking shows WHO those users are -->
     <div class="pd-stats-row">
-      <div class="pd-stat invest" onclick="showStatUsers('invest')" style="cursor:pointer;"><div class="pd-stat-val" id="pd-invest">0</div><div class="pd-stat-lbl">💰 Invests</div></div>
-      <div class="pd-stat collab" onclick="showStatUsers('collab')" style="cursor:pointer;"><div class="pd-stat-val" id="pd-collab">0</div><div class="pd-stat-lbl">⚡ Collabs</div></div>
-      <div class="pd-stat likes" id="pd-likes-btn" onclick="showStatUsers('likes')" style="cursor:pointer;"><div class="pd-stat-val" id="pd-likes">0</div><div class="pd-stat-lbl">❤️ Likes</div></div>
-      <div class="pd-stat views" onclick="showStatUsers('views')" style="cursor:pointer;"><div class="pd-stat-val" id="pd-views">0</div><div class="pd-stat-lbl">👁 Views</div></div>
+      <div class="pd-stat invest" onclick="showStatUsers('invest')" style="cursor:pointer;">
+        <div class="pd-stat-val" id="pd-invest">0</div>
+        <div class="pd-stat-lbl">💰 Invests</div>
+      </div>
+      <div class="pd-stat collab" onclick="showStatUsers('collab')" style="cursor:pointer;">
+        <div class="pd-stat-val" id="pd-collab">0</div>
+        <div class="pd-stat-lbl">⚡ Collabs</div>
+      </div>
+      <div class="pd-stat likes" id="pd-likes-btn" onclick="showStatUsers('likes')" style="cursor:pointer;">
+        <div class="pd-stat-val" id="pd-likes">0</div>
+        <div class="pd-stat-lbl">❤️ Likes</div>
+      </div>
+      <div class="pd-stat views" onclick="showStatUsers('views')" style="cursor:pointer;">
+        <div class="pd-stat-val" id="pd-views">0</div>
+        <div class="pd-stat-lbl">👁 Views</div>
+      </div>
     </div>
+
     <div class="pd-comments-title">💬 Comments</div>
-    <div id="pd-comments-list"><div style="font-size:12px;color:#555;text-align:center;padding:1rem;">No comments yet</div></div>
+    <div id="pd-comments-list">
+      <div style="font-size:12px;color:#555;text-align:center;padding:1rem;">No comments yet</div>
+    </div>
   </div>
-  <div class="likes-sheet" id="likes-sheet"><div class="req-inner"><div class="req-top"><div class="req-top-title">❤️ Liked by</div><button class="req-close" id="likes-close">✕</button></div><div class="req-list" id="likes-list"><div class="req-empty">No likes yet</div></div></div></div>
-  <div class="req-sheet" id="req-sheet"><div class="req-inner"><div class="req-top"><div class="req-top-title">📩 Match Requests</div><button class="req-close" id="req-close">✕</button></div><div class="req-list" id="req-list"><div class="req-empty">No pending requests</div></div></div></div>
-  <div class="req-sheet" id="stat-users-sheet"><div class="req-inner"><div class="req-top"><div class="req-top-title" id="stat-users-title">Users</div><button class="req-close" onclick="document.getElementById('stat-users-sheet').classList.remove('on')">✕</button></div><div class="req-list" id="stat-users-list"><div class="req-empty">Loading...</div></div></div></div>
+
+  <!-- Liked by sheet — slides up -->
+  <div class="likes-sheet" id="likes-sheet">
+    <div class="req-inner">
+      <div class="req-top">
+        <div class="req-top-title">❤️ Liked by</div>
+        <button class="req-close" id="likes-close">✕</button>
+      </div>
+      <div class="req-list" id="likes-list">
+        <div class="req-empty">No likes yet</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Match requests sheet — slides up -->
+  <div class="req-sheet" id="req-sheet">
+    <div class="req-inner">
+      <div class="req-top">
+        <div class="req-top-title">📩 Match Requests</div>
+        <button class="req-close" id="req-close">✕</button>
+      </div>
+      <div class="req-list" id="req-list">
+        <div class="req-empty">No pending requests</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stat users sheet — shows who invested/collaborated/liked -->
+  <div class="req-sheet" id="stat-users-sheet">
+    <div class="req-inner">
+      <div class="req-top">
+        <!-- Title changes: "💰 Investors" or "⚡ Collaborators" etc -->
+        <div class="req-top-title" id="stat-users-title">Users</div>
+        <button class="req-close" onclick="document.getElementById('stat-users-sheet').classList.remove('on')">✕</button>
+      </div>
+      <div class="req-list" id="stat-users-list">
+        <div class="req-empty">Loading...</div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
-<!-- INSTALL BANNERS -->
+
+<!-- ════════════════════════════════════════
+     INSTALL BANNERS
+     ════════════════════════════════════════
+     Prompts users to install app on home screen
+     
+     pwa.js shows these at right time:
+     Android → install-banner (has Install button)
+     iOS     → ios-install-banner (manual instructions)
+     
+     Why different?
+     iOS doesn't allow direct install prompts
+     Must use Share menu manually -->
+
+<!-- Android install banner
+     display:none = hidden until pwa.js shows it -->
 <div id="install-banner" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);width:90%;max-width:380px;background:#1a1a2e;border:1px solid #7c6af7;border-radius:16px;padding:14px 16px;z-index:9999;box-shadow:0 4px 24px rgba(124,106,247,0.3);">
   <div style="display:flex;align-items:center;gap:12px;">
     <div style="width:44px;height:44px;border-radius:12px;background:#7c6af7;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">💡</div>
-    <div style="flex:1;"><div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:2px;">Add to Home Screen</div><div style="font-size:11px;color:#888;">Install YOU-HAVE-VALUE for quick access</div></div>
+    <div style="flex:1;">
+      <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:2px;">Add to Home Screen</div>
+      <div style="font-size:11px;color:#888;">Install YOU-HAVE-VALUE for quick access</div>
+    </div>
+    <!-- Install button — pwa.js handles the install prompt -->
     <button id="install-btn" style="background:#7c6af7;border:none;color:#fff;font-size:12px;font-weight:600;padding:8px 14px;border-radius:10px;cursor:pointer;flex-shrink:0;">Install</button>
+    <!-- Dismiss button -->
     <button id="install-close" style="background:none;border:none;color:#555;font-size:18px;cursor:pointer;padding:0 4px;">✕</button>
   </div>
 </div>
+
+<!-- iOS install banner — shows manual instructions
+     iOS requires: Share button → Add to Home Screen -->
 <div id="ios-install-banner" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);width:90%;max-width:380px;background:#1a1a2e;border:1px solid #7c6af7;border-radius:16px;padding:14px 16px;z-index:9999;box-shadow:0 4px 24px rgba(124,106,247,0.3);">
   <div style="display:flex;align-items:flex-start;gap:12px;">
     <div style="width:44px;height:44px;border-radius:12px;background:#7c6af7;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">💡</div>
-    <div style="flex:1;"><div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:4px;">Install YOU-HAVE-VALUE</div><div style="font-size:11px;color:#aaa;line-height:1.6;">Tap <strong style="color:#fff;">Share</strong> ⎙ at the bottom of your browser<br/>then tap <strong style="color:#fff;">"Add to Home Screen"</strong></div></div>
+    <div style="flex:1;">
+      <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:4px;">Install YOU-HAVE-VALUE</div>
+      <!-- Step by step iOS instructions -->
+      <div style="font-size:11px;color:#aaa;line-height:1.6;">
+        Tap <strong style="color:#fff;">Share</strong> ⎙ at the bottom of your browser<br/>
+        then tap <strong style="color:#fff;">"Add to Home Screen"</strong>
+      </div>
+    </div>
     <button id="ios-install-close" style="background:none;border:none;color:#555;font-size:18px;cursor:pointer;padding:0 4px;">✕</button>
   </div>
 </div>
 
-<!-- JS FILES LOADED IN ORDER -->
+
+<!-- ════════════════════════════════════════
+     JAVASCRIPT FILES — LOADED IN ORDER
+     ════════════════════════════════════════
+     ORDER MATTERS! Each file depends on
+     the ones loaded before it!
+     
+     1. env.js      → sets BACKEND_URL first
+                      (everything depends on this)
+     
+     2. core.js     → reads env.js
+                      sets up api() function
+                      sets up navigation
+                      (everything depends on this)
+     
+     3. feed.js     → uses api() from core.js
+                      builds TikTok video feed
+     
+     4. profile.js  → uses api() from core.js
+                      handles profile, matches, messages, chat
+     
+     5. post.js     → uses api() from core.js
+                      handles posting ideas + video upload
+     
+     6. comments.js → uses api() from core.js
+                      handles comments system
+     
+     7. auth.js     → uses EVERYTHING above
+                      handles login, signup, Google auth
+                      wires up all nav buttons
+                      runs window.onload to start app
+     
+     8. pwa.js      → runs last
+                      handles install prompts
+     ════════════════════════════════════════ -->
+
 <script src="./env.js"></script>
 <script src="./core.js"></script>
 <script src="./feed.js"></script>
@@ -306,6 +910,7 @@
 <script src="./comments.js"></script>
 <script src="./auth.js"></script>
 <script src="./pwa.js"></script>
+
 </div>
 </body>
 </html>
