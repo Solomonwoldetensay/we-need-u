@@ -5,7 +5,7 @@ var soundUnlocked = false;
 var liked = {};
 var saved = {};
 
-// ── Finds the most visible slide and plays its video ──
+// Finds the most visible slide and plays its video
 function pickAndPlayBestSlide() {
   var feedPg = document.getElementById('pg-feed');
   if (!feedPg || !feedPg.classList.contains('on')) {
@@ -20,9 +20,7 @@ function pickAndPlayBestSlide() {
     var visible = Math.max(0, visBot - visTop);
     if (visible > bestScore) { bestScore = visible; best = slide; }
   });
-  // Pause and mute all videos first
   document.querySelectorAll('.slide video').forEach(function(v) { v.pause(); v.muted = true; v.volume = 1; });
-  // Play only the best/most visible slide
   if (best) {
     var vid = best.querySelector('video');
     if (vid) {
@@ -37,7 +35,7 @@ function pickAndPlayBestSlide() {
   }
 }
 
-// ── Watches scroll and plays best video when user stops ──
+// Watches scroll and plays best video when user stops
 function setupFeedObserver() {
   if (window._feedObserver) window._feedObserver.disconnect();
   var feedBody = document.getElementById('feed-body');
@@ -55,7 +53,7 @@ function setupFeedObserver() {
   document.querySelectorAll('.slide').forEach(function(slide) { window._feedObserver.observe(slide); });
 }
 
-// ── Loads all projects from Python backend ──
+// Loads all projects from Node.js backend
 async function loadFeed() {
   var fb = document.getElementById('feed-body');
   fb.innerHTML = '<div style="height:80vh;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.4);font-size:13px;">Loading...</div>';
@@ -71,7 +69,6 @@ async function loadFeed() {
   r.data.projects.forEach(function(p) { fb.appendChild(buildSlide(p)); });
   setupFeedObserver();
   
-  // Auto play first video
   setTimeout(function() {
     var firstSlide = fb.querySelector('.slide');
     if (firstSlide) {
@@ -81,13 +78,12 @@ async function loadFeed() {
   }, 400);
 }
 
-// ── Shows who invested or collaborated on a project ──
+// Shows who invested or collaborated on a project
 async function showStatUsers(projectId, type) {
   var sheet = document.getElementById('stat-users-sheet');
   var title = document.getElementById('stat-users-title');
   var list = document.getElementById('stat-users-list');
   
-  // Set the title based on type
   if (type === 'invest') title.textContent = '💰 Investors';
   else if (type === 'collab') title.textContent = '⚡ Collaborators';
   else if (type === 'likes') title.textContent = '❤️ Liked by';
@@ -96,7 +92,6 @@ async function showStatUsers(projectId, type) {
   list.innerHTML = '<div style="text-align:center;padding:2rem;color:#555;">Loading...</div>';
   sheet.classList.add('on');
   
-  // Fetch from Python backend
   var r = await api('/projects/' + projectId + '/stat-users?type=' + type);
   
   if (!r.ok || !r.data.users || !r.data.users.length) {
@@ -122,19 +117,20 @@ async function showStatUsers(projectId, type) {
   });
 }
 
-// ── Builds a single video slide/card ──
+// Builds a single video slide/card
 function buildSlide(p) {
   var s = document.createElement('div');
   s.className = 'slide';
   var q = clr(p.id);
   
-  // FIX: Use looking_for instead of mode (matches Python backend)
-  var lookingFor = p.looking_for || p.mode || 'both';
-  var modeText = lookingFor === 'collab' ? '⚡ Seeking Collaborators' :
-                 lookingFor === 'invest' ? '💰 Seeking Investors' :
+  // FIX: Node.js backend sends p.mode NOT p.looking_for
+  // p.mode can be: 'collab', 'invest', or 'both'
+  var mode = p.mode || p.looking_for || 'both';
+  var modeText = mode === 'collab' ? '⚡ Seeking Collaborators' :
+                 mode === 'invest' ? '💰 Seeking Investors' :
                  '⚡💰 Collab + Invest';
 
-  // ── Video or placeholder ──
+  // Video or colored placeholder
   if (p.video_url) {
     var vid = document.createElement('video');
     vid.src = p.video_url;
@@ -144,14 +140,12 @@ function buildSlide(p) {
     vid.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;';
     s.appendChild(vid);
 
-    // Sound hint shown until user taps
     var soundHint = document.createElement('div');
     soundHint.className = 'sound-hint';
     soundHint.style.cssText = 'position:absolute;bottom:140px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.6);color:#fff;font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px;z-index:25;pointer-events:none;display:' + (soundUnlocked ? 'none' : 'flex') + ';align-items:center;gap:6px;white-space:nowrap;';
     soundHint.innerHTML = '🔊 Tap video for sound';
     s.appendChild(soundHint);
 
-    // Tap to unlock sound
     s.addEventListener('click', function(e) {
       if (e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.closest('.s-info') || e.target.closest('.s-acts') || e.target.closest('.s-right')) return;
       if (!soundUnlocked) {
@@ -167,7 +161,6 @@ function buildSlide(p) {
       }
     });
   } else {
-    // No video — show colored placeholder with initials
     var ph = document.createElement('div');
     ph.style.cssText = 'position:absolute;inset:0;background:linear-gradient(160deg,' + q.bg + ' 0%,#000 100%);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;';
     var av = document.createElement('div');
@@ -179,12 +172,12 @@ function buildSlide(p) {
     ph.appendChild(av); ph.appendChild(lbl); s.appendChild(ph);
   }
 
-  // ── Gradient overlay ──
+  // Gradient overlay
   var g = document.createElement('div');
   g.className = 's-grad';
   s.appendChild(g);
 
-  // ── Progress bar at top ──
+  // Progress bar at top
   var pr = document.createElement('div'); pr.className = 'prog';
   var pf = document.createElement('div'); pf.className = 'prog-fill'; pf.id = 'pf-' + p.id;
   pr.appendChild(pf); s.appendChild(pr);
@@ -197,7 +190,7 @@ function buildSlide(p) {
     el.style.width = w + '%';
   }, 100);
 
-  // ── Right side buttons (Like, Save, Comment, Share) ──
+  // Right side buttons (Like, Save, Comment, Share)
   var ra = document.createElement('div'); ra.className = 's-right';
   ra.innerHTML =
     '<button class="s-rbtn" id="lb-' + p.id + '"><div class="s-rico" id="li-' + p.id + '">🤍</div><div class="s-rlbl">Like</div></button>' +
@@ -228,7 +221,7 @@ function buildSlide(p) {
     };
   }, 0);
 
-  // ── Info area (avatar, name, title, description) ──
+  // Info area (avatar, name, title, description)
   var info = document.createElement('div'); info.className = 's-info';
   var avatarRow = document.createElement('button');
   avatarRow.style.cssText = 'display:flex;align-items:center;margin-bottom:4px;cursor:pointer;background:none;border:none;padding:4px 0;width:auto;-webkit-appearance:none;';
@@ -254,24 +247,24 @@ function buildSlide(p) {
   var titleDiv = document.createElement('div'); titleDiv.className = 's-title'; titleDiv.textContent = p.title;
   var descDiv = document.createElement('div'); descDiv.className = 's-desc'; descDiv.textContent = (p.description || '').substring(0, 110) + (p.description && p.description.length > 110 ? '...' : '');
 
-  // Stats row (Invests, Collabs, Likes, Views) — clicking shows WHO
+  // Stats row — clicking shows WHO invested/collaborated/liked
   var statsRow = document.createElement('div');
   statsRow.style.cssText = 'display:flex;gap:16px;margin-top:6px;';
   statsRow.innerHTML =
-    '<button onclick="showStatUsers(' + p.id + ',\'invest\')" style="background:none;border:none;color:rgba(255,255,255,0.7);font-size:11px;cursor:pointer;">💰 ' + (p.invest_count || 0) + '</button>' +
-    '<button onclick="showStatUsers(' + p.id + ',\'collab\')" style="background:none;border:none;color:rgba(255,255,255,0.7);font-size:11px;cursor:pointer;">⚡ ' + (p.collab_count || 0) + '</button>' +
-    '<button onclick="showStatUsers(' + p.id + ',\'likes\')" style="background:none;border:none;color:rgba(255,255,255,0.7);font-size:11px;cursor:pointer;">❤️ ' + (p.like_count || 0) + '</button>' +
+    '<button onclick="showStatUsers(\'' + p.id + '\',\'invest\')" style="background:none;border:none;color:rgba(255,255,255,0.7);font-size:11px;cursor:pointer;">💰 ' + (p.invest_count || 0) + '</button>' +
+    '<button onclick="showStatUsers(\'' + p.id + '\',\'collab\')" style="background:none;border:none;color:rgba(255,255,255,0.7);font-size:11px;cursor:pointer;">⚡ ' + (p.collab_count || 0) + '</button>' +
+    '<button onclick="showStatUsers(\'' + p.id + '\',\'likes\')" style="background:none;border:none;color:rgba(255,255,255,0.7);font-size:11px;cursor:pointer;">❤️ ' + (p.like_count || 0) + '</button>' +
     '<span style="color:rgba(255,255,255,0.4);font-size:11px;">👁 ' + (p.view_count || 0) + '</span>';
 
   info.appendChild(avatarRow); info.appendChild(modeDiv); info.appendChild(titleDiv); info.appendChild(descDiv); info.appendChild(statsRow);
   s.appendChild(info);
 
-  // ── Action buttons (Invest, Collab, Profile) ──
+  // Action buttons (Invest, Collab, Profile)
   var acts = document.createElement('div'); acts.className = 's-acts';
   var ib = null, cb = null;
 
-  // FIX: Use looking_for instead of mode
-  if (lookingFor === 'invest' || lookingFor === 'both') {
+  // FIX: Using p.mode (Node.js backend field name)
+  if (mode === 'invest' || mode === 'both') {
     ib = document.createElement('button'); ib.className = 's-btn btn-i'; ib.textContent = '💰 Invest';
     ib.onclick = function() {
       if (ib.classList.contains('btn-sent')) return;
@@ -282,7 +275,7 @@ function buildSlide(p) {
     acts.appendChild(ib);
   }
 
-  if (lookingFor === 'collab' || lookingFor === 'both') {
+  if (mode === 'collab' || mode === 'both') {
     cb = document.createElement('button'); cb.className = 's-btn btn-c'; cb.textContent = '⚡ Collab';
     cb.onclick = function() {
       if (cb.classList.contains('btn-sent')) return;
@@ -303,16 +296,16 @@ function buildSlide(p) {
   acts.appendChild(profb);
   s.appendChild(acts);
 
-  // ── Swipe overlays (show when swiping) ──
+  // Swipe overlays
   var si = null, sc2 = null;
-  if (lookingFor === 'invest' || lookingFor === 'both') {
+  if (mode === 'invest' || mode === 'both') {
     si = document.createElement('div'); si.className = 'swipe-invest'; si.textContent = '💰 Invest'; s.appendChild(si);
   }
-  if (lookingFor === 'collab' || lookingFor === 'both') {
+  if (mode === 'collab' || mode === 'both') {
     sc2 = document.createElement('div'); sc2.className = 'swipe-collab'; sc2.textContent = '⚡ Collab'; s.appendChild(sc2);
   }
 
-  // ── Touch swipe gestures ──
+  // Touch swipe gestures
   var txStart = 0, txCur = 0, swiping = false;
   s.addEventListener('touchstart', function(e) {
     if (e.touches.length !== 1) return;
@@ -333,7 +326,6 @@ function buildSlide(p) {
     var dx = txCur - txStart;
     if (si) si.style.opacity = 0; if (sc2) sc2.style.opacity = 0;
     if (Math.abs(dx) < 60) return;
-    // Swipe left = Invest, Swipe right = Collab
     if (dx < -60 && ib && !ib.classList.contains('btn-sent')) {
       ib.classList.add('btn-sent'); ib.textContent = '💰 Sent!';
       showToast(p.id, '💰 Investment request sent!', 'rgba(232,160,32,0.95)');
@@ -345,11 +337,11 @@ function buildSlide(p) {
     }
   }, { passive: true });
 
-  // Toast notification for this slide
+  // Toast element for this slide
   var t = document.createElement('div'); t.className = 'toast'; t.id = 't-' + p.id;
   s.appendChild(t);
 
-  // Track view count
+  // Track view count on Node.js backend
   api('/projects/' + p.id + '/view', 'POST');
 
   return s;
