@@ -1,8 +1,8 @@
 // ── OWN PROFILE ──────────────────────────
 async function loadProfile(){
   if(!user)return;
-  // FIX: use user.name instead of user.full_name
-  var n=user.name||user.full_name||'User';
+  // Node.js backend returns user.full_name
+  var n=user.full_name||user.name||'User';
   var pavEl=document.getElementById('pav');
   if(user.avatar_url){
     pavEl.innerHTML='<img src="'+user.avatar_url+'" alt="avatar"/>';
@@ -12,12 +12,12 @@ async function loadProfile(){
   document.getElementById('pname').textContent=n;
   document.getElementById('ploc').textContent=user.location||'Location not set';
 
-  // Fetch latest user data from Python backend
+  // Fetch latest user data from Node.js backend
+  // GET /api/auth/me returns current user info
   var r=await api('/auth/me');
   if(r.ok&&r.data.user){
     var u=r.data.user;
-    // Update name — handle both name and full_name
-    var newName=u.name||u.full_name||n;
+    var newName=u.full_name||u.name||n;
     document.getElementById('pname').textContent=newName;
     if(u.avatar_url){
       user.avatar_url=u.avatar_url;
@@ -29,8 +29,8 @@ async function loadProfile(){
     }
   }
 
-  // FIX: Use /projects/my/projects to match Python backend route
-  var r2=await api('/projects/my/projects');
+  // FIX: Node.js backend route is /projects/mine
+  var r2=await api('/projects/mine');
   var el=document.getElementById('myprojs');
   if(!r2.ok||!r2.data.projects||!r2.data.projects.length){
     el.innerHTML='<div style="text-align:center;padding:2rem 0;font-size:13px;color:#666;">No projects yet.</div>';
@@ -40,10 +40,10 @@ async function loadProfile(){
   var grid=document.createElement('div');grid.className='proj-grid';
   r2.data.projects.forEach(function(p){
     var q=clr(p.id);
-    // FIX: Use looking_for instead of mode
-    var lookingFor=p.looking_for||p.mode||'both';
-    var mc=lookingFor==='collab'?'#7c6af7':lookingFor==='invest'?'#e8a020':'#d4537e';
-    var ml=lookingFor==='collab'?'⚡ Collab':lookingFor==='invest'?'💰 Invest':'⭐ Both';
+    // Node.js backend sends p.mode
+    var mode=p.mode||p.looking_for||'both';
+    var mc=mode==='collab'?'#7c6af7':mode==='invest'?'#e8a020':'#d4537e';
+    var ml=mode==='collab'?'⚡ Collab':mode==='invest'?'💰 Invest':'⭐ Both';
     var cell=document.createElement('div');cell.className='proj-cell';
 
     if(p.video_url){
@@ -84,13 +84,11 @@ async function loadProfile(){
 // ── OTHER USER PROFILE ──────────────────────────
 async function openUserProfile(creatorId,creatorName,creatorAvatar,creatorLocation){
   try{
-    // Pause all videos while profile is open
     document.querySelectorAll('.feed-body video').forEach(function(v){v.pause();});
     var mask=document.getElementById('user-profile-mask');
     if(!mask){alert('Profile modal not found');return;}
     mask.classList.add('on');
 
-    // Set avatar
     var avEl=document.getElementById('up-avatar');
     var q=clr(creatorId);
     if(creatorAvatar){
@@ -110,7 +108,6 @@ async function openUserProfile(creatorId,creatorName,creatorAvatar,creatorLocati
     document.getElementById('up-stats').textContent='Loading...';
     document.getElementById('up-projects').innerHTML='<div style="text-align:center;padding:2rem;color:#555;font-size:13px;">Loading projects...</div>';
 
-    // Try fetching their projects
     var projects=[];
     try{
       var resp=await fetch(API+'/projects?limit=50');
@@ -121,7 +118,6 @@ async function openUserProfile(creatorId,creatorName,creatorAvatar,creatorLocati
       });
     }catch(e){console.log('fetch error:',e);}
 
-    // Fallback with auth token
     if(!projects.length){
       try{
         var r2=await api('/projects?limit=50');
@@ -131,9 +127,9 @@ async function openUserProfile(creatorId,creatorName,creatorAvatar,creatorLocati
       }catch(e2){}
     }
 
-    // If viewing own profile
+    // FIX: Node.js route is /projects/mine
     if(!projects.length&&user&&user.id===creatorId){
-      var r3=await api('/projects/my/projects');
+      var r3=await api('/projects/mine');
       if(r3.ok&&r3.data.projects)projects=r3.data.projects;
     }
 
@@ -148,10 +144,10 @@ async function openUserProfile(creatorId,creatorName,creatorAvatar,creatorLocati
     grid.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:4px 0;';
     projects.forEach(function(p){
       var qp=clr(p.id);
-      // FIX: Use looking_for instead of mode
-      var lookingFor=p.looking_for||p.mode||'both';
-      var mc=lookingFor==='collab'?'#7c6af7':lookingFor==='invest'?'#e8a020':'#d4537e';
-      var ml=lookingFor==='collab'?'⚡ Collab':lookingFor==='invest'?'💰 Invest':'⭐ Both';
+      // Node.js sends p.mode
+      var mode=p.mode||p.looking_for||'both';
+      var mc=mode==='collab'?'#7c6af7':mode==='invest'?'#e8a020':'#d4537e';
+      var ml=mode==='collab'?'⚡ Collab':mode==='invest'?'💰 Invest':'⭐ Both';
       var cell=document.createElement('div');
       cell.style.cssText='position:relative;border-radius:10px;overflow:hidden;background:#111;aspect-ratio:9/16;cursor:pointer;';
 
@@ -208,8 +204,8 @@ async function loadMatches(){
   pi.innerHTML='<div class="m-empty"><div class="m-empty-ico">⏳</div><div>Loading...</div></div>';
   pc.innerHTML='<div class="m-empty"><div class="m-empty-ico">⏳</div><div>Loading...</div></div>';
 
-  // FIX: Use /matches/ to match Python backend route
-  var r=await api('/matches/');
+  // FIX: Node.js backend route is /matches/my-matches
+  var r=await api('/matches/my-matches');
   if(!r.ok||!r.data.matches||!r.data.matches.length){
     pi.innerHTML='<div class="m-empty"><div class="m-empty-ico">💰</div><div>No invest matches yet</div></div>';
     pc.innerHTML='<div class="m-empty"><div class="m-empty-ico">⚡</div><div>No collab matches yet</div></div>';
@@ -217,23 +213,34 @@ async function loadMatches(){
   }
 
   function buildMatchCard(m){
-    var q=clr(m.user_id);
+    var q=clr(m.other_user_id||m.user_id);
     var isPending=m.status==='pending';
+    var isDenied=m.status==='denied';
     var d=document.createElement('div');
-    d.className='mrow-item '+(isPending?'pending':'accepted');
+    d.className='mrow-item '+(isPending||isDenied?'pending':'accepted');
     d.dataset.cid=m.conversation_id;
-    d.dataset.name=m.creator_name||'User';
-    d.dataset.pending=isPending?'1':'0';
-    var statusLabel=isPending?'⏳ Pending':'✅ Connected';
-    var statusClass=isPending?'pending':'accepted';
+    d.dataset.name=m.other_user_name||m.creator_name||'User';
+    d.dataset.pending=(isPending||isDenied)?'1':'0';
+    var statusLabel=isPending?'⏳ Pending':isDenied?'🕐 Check Back Later':'✅ Connected';
+    var statusClass=isPending?'pending':isDenied?'denied':'accepted';
     var mavDiv=document.createElement('div');mavDiv.className='mav';
-    mavDiv.style.cssText='background:'+q.bg+';color:'+q.c+(isPending?';opacity:0.6':'');
-    mavDiv.textContent=ini(m.creator_name||'U');
+    if(m.other_user_avatar){
+      mavDiv.style.cssText='padding:0;overflow:hidden;'+(isPending||isDenied?'opacity:0.6;':'');
+      var mI=document.createElement('img');
+      mI.src=m.other_user_avatar;
+      mI.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%;';
+      mI.onerror=function(){this.parentElement.textContent=ini(m.other_user_name);};
+      mavDiv.appendChild(mI);
+    }else{
+      mavDiv.style.cssText='background:'+q.bg+';color:'+q.c+(isPending||isDenied?';opacity:0.6':'');
+      mavDiv.textContent=ini(m.other_user_name||m.creator_name||'U');
+    }
     d.appendChild(mavDiv);
     d.innerHTML+=
       '<div style="flex:1;min-width:0;">'+
-        '<div class="mname">'+(m.creator_name||'User')+'</div>'+
+        '<div class="mname">'+(m.other_user_name||m.creator_name||'User')+'</div>'+
         '<div class="mproj">'+(m.project_title||'Project')+'</div>'+
+        '<div style="font-size:10px;color:#555;margin-top:2px;">'+(m.direction==='sent'?'You requested':'Requested you')+'</div>'+
       '</div>'+
       '<div class="mstatus '+statusClass+'">'+statusLabel+'</div>';
     d.onclick=function(){if(this.dataset.pending==='1')return;openChat(this.dataset.cid,this.dataset.name);};
@@ -254,7 +261,6 @@ async function loadMatches(){
 }
 
 // ── MESSAGES ──────────────────────────
-// Tracks which conversations have been read
 var readConversations=(function(){
   try{return JSON.parse(localStorage.getItem('wnu_read')||'{}');}catch(e){return {};}
 })();
@@ -272,7 +278,6 @@ function isConversationUnread(m){
   return new Date(m.last_message_at).getTime()>readAt;
 }
 
-// Updates the red unread badge on Messages tab
 function updateMsgBadge(count){
   document.querySelectorAll('.msg-badge').forEach(function(b){
     if(count>0){b.style.display='flex';b.textContent=count>9?'9+':count;}
@@ -280,11 +285,11 @@ function updateMsgBadge(count){
   });
 }
 
-// Checks for unread messages every 30 seconds
+// FIX: Node.js route is /matches/my-matches
 async function checkUnreadMessages(){
   if(!token)return;
   try{
-    var r=await api('/matches/');
+    var r=await api('/matches/my-matches');
     if(!r.ok)return;
     var unread=(r.data.matches||[]).filter(function(m){
       return m.status==='accepted'&&isConversationUnread(m);
@@ -300,7 +305,8 @@ async function loadMessages(){
   if(!list)return;
   list.innerHTML='<div style="text-align:center;padding:40px;color:#555;font-size:14px;">Loading...</div>';
 
-  var r=await api('/matches/');
+  // FIX: Node.js route is /matches/my-matches
+  var r=await api('/matches/my-matches');
   if(!r.ok){
     list.innerHTML='<div style="text-align:center;padding:40px;color:#555;">Failed to load</div>';
     return;
@@ -316,7 +322,7 @@ async function loadMessages(){
   list.innerHTML='';
   var unreadCount=0;
   accepted.forEach(function(m){
-    var q=clr(m.user_id);
+    var q=clr(m.other_user_id||m.user_id);
     var d=document.createElement('div');
     var hasUnread=isConversationUnread(m);
     if(hasUnread)unreadCount++;
@@ -324,7 +330,15 @@ async function loadMessages(){
 
     var av=document.createElement('div');
     av.style.cssText='width:46px;height:46px;border-radius:50%;background:'+q.bg+';color:'+q.c+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;position:relative;';
-    av.textContent=ini(m.creator_name||'U');
+    if(m.other_user_avatar){
+      var avImg=document.createElement('img');
+      avImg.src=m.other_user_avatar;
+      avImg.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%;';
+      avImg.onerror=function(){av.textContent=ini(m.other_user_name);};
+      av.appendChild(avImg);
+    }else{
+      av.textContent=ini(m.other_user_name||'U');
+    }
     if(hasUnread){
       var dot=document.createElement('div');
       dot.style.cssText='position:absolute;bottom:1px;right:1px;width:12px;height:12px;border-radius:50%;background:#7c6af7;border:2px solid #07070d;';
@@ -334,13 +348,21 @@ async function loadMessages(){
 
     var info=document.createElement('div');info.style.cssText='flex:1;min-width:0;';
     info.innerHTML=
-      '<div style="font-size:14px;font-weight:'+(hasUnread?700:600)+';color:#fff;margin-bottom:3px;">'+(m.creator_name||'User')+'</div>'+
+      '<div style="font-size:14px;font-weight:'+(hasUnread?700:600)+';color:#fff;margin-bottom:3px;">'+(m.other_user_name||'User')+'</div>'+
       '<div style="font-size:12px;color:'+(hasUnread?'#ccc':'#666')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(m.last_message||'🎉 Match! Tap to say hello')+'</div>';
     d.appendChild(info);
 
+    var timeStr=m.last_message_at||m.created_at;
+    if(timeStr){
+      var t=document.createElement('div');
+      t.style.cssText='font-size:10px;color:#555;flex-shrink:0;';
+      t.textContent=timeAgo(timeStr);
+      d.appendChild(t);
+    }
+
     d.onclick=function(){
       markConversationRead(m.conversation_id,m.last_message_at);
-      openChat(m.conversation_id,m.creator_name||'User');
+      openChat(m.conversation_id,m.other_user_name||'User');
     };
     list.appendChild(d);
   });
@@ -357,11 +379,10 @@ async function openChat(cid,name){
   var area=document.getElementById('msgs');area.innerHTML='';
   show('pg-chat');
 
-  // FIX: Use /messages/{conversation_id} to match Python backend
+  // FIX: Node.js route is /messages/:conversationId
   var r=await api('/messages/'+cid);
   if(r.ok&&r.data.messages){
     if(r.data.messages.length===0){
-      // Show greeting prompts for new conversations
       var greeting=document.createElement('div');
       greeting.style.cssText='display:flex;flex-direction:column;align-items:center;padding:30px 16px;gap:10px;';
       greeting.innerHTML=
@@ -385,7 +406,6 @@ async function openChat(cid,name){
   setTimeout(function(){var cbox=document.getElementById('cbox');if(cbox)cbox.focus();},300);
 }
 
-// Pre-fills message input with a quick reply
 function quickSay(text){
   var cbox=document.getElementById('cbox');
   if(cbox){cbox.value=text;cbox.focus();}
@@ -403,11 +423,10 @@ async function sendMsg(){
   area.appendChild(d);
   inp.value='';
   area.scrollTop=area.scrollHeight;
-  // FIX: Use /messages/ POST to match Python backend
-  await api('/messages/','POST',{conversation_id:convId,content:text});
+  // FIX: Node.js route is POST /messages/:conversationId
+  await api('/messages/'+convId,'POST',{content:text});
 }
 
-// ── POST DETAIL ──────────────────────────
 // Opens a full screen view of a project
 function openPostDetail(p){
   show('pg-feed');
