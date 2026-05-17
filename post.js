@@ -29,16 +29,29 @@ document.getElementById('pbtn').onclick=async function(){
   if(selVid){
     document.getElementById('uping').classList.add('on');
     try{
-      var reader=new FileReader();
-      video_url=await new Promise(function(resolve,reject){
-        reader.onload=async function(e){
-          var r=await api('/upload','POST',{data:e.target.result,type:selVid.type});
-          if(r.ok&&r.data.url)resolve(r.data.url);else reject(new Error(r.data.message||'Upload failed'));
-        };
-        reader.onerror=function(){reject(new Error('Read failed'));};
-        reader.readAsDataURL(selVid);
+      // Upload directly to Cloudinary from browser
+      // This is MUCH faster than sending through our backend
+      // Uses unsigned upload preset so no API secret needed
+      var formData=new FormData();
+      formData.append('file',selVid);
+      formData.append('upload_preset','we_need_u');
+      // Your Cloudinary cloud name
+      var cloudName='dcst6zq3z';
+      var uploadRes=await fetch('https://api.cloudinary.com/v1_1/'+cloudName+'/video/upload',{
+        method:'POST',
+        body:formData
       });
-    }catch(e){alert('Video upload failed. Posting without video.');video_url=null;}
+      var uploadData=await uploadRes.json();
+      if(uploadData.secure_url){
+        video_url=uploadData.secure_url;
+      }else{
+        throw new Error(uploadData.error&&uploadData.error.message||'Upload failed');
+      }
+    }catch(e){
+      console.error('Upload error:',e);
+      alert('Video upload failed. Posting without video.');
+      video_url=null;
+    }
     document.getElementById('uping').classList.remove('on');
   }
   var r=await api('/projects','POST',{title:title,description:desc,category:cat,mode:postMode,tags:skills?skills.split(',').map(function(s){return s.trim();}):[],video_url:video_url});
