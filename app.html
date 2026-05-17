@@ -1,319 +1,952 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
-  <title>YOU-HAVE-VALUE</title>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="apple-mobile-web-app-title" content="YOU-HAVE-VALUE"/>
-  <meta name="mobile-web-app-capable" content="yes"/>
-  <meta name="theme-color" content="#07070d"/>
-  <meta name="description" content="Post your idea. Find who you need."/>
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png"/>
-  <link rel="icon" type="image/png" sizes="192x192" href="./icon.png"/>
-  <link rel="manifest" href="./manifest.json"/>
-  <link rel="stylesheet" href="./styles.css"/>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-</head>
-<body>
-<div id="app">
+<!-- Tells the browser this is an HTML5 document -->
 
-<!-- LOGIN -->
+<html lang="en">
+<!-- Start of the HTML page. lang="en" tells the browser the language is English -->
+
+<head>
+  <!-- HEAD section: settings and links that don't show on screen -->
+
+  <meta charset="UTF-8"/>
+  <!-- Allows all characters including emojis and special letters to display correctly -->
+
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+  <!-- Makes the app fit perfectly on phone screens. Stops users from zooming in/out -->
+
+  <title>YOU-HAVE-VALUE</title>
+  <!-- The name that shows in the browser tab at the top -->
+
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <!-- Tells iPhones: this app can run fullscreen like a real app (no browser bar) -->
+
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <!-- Makes the iPhone status bar (battery, wifi) blend into the dark app background -->
+
+  <meta name="apple-mobile-web-app-title" content="YOU-HAVE-VALUE"/>
+  <!-- The name that shows under the icon when installed on an iPhone home screen -->
+
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <!-- Same as above but for Android phones (Chrome browser) -->
+
+  <meta name="theme-color" content="#07070d"/>
+  <!-- Sets the browser toolbar color to match the dark app background on Android -->
+
+  <meta name="description" content="Post your idea. Find who you need."/>
+  <!-- Short description of the app. Shows in Google search results -->
+
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png"/>
+  <!-- The app icon that shows on iPhone home screen when user installs the app -->
+
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon.png"/>
+  <!-- The app icon that shows in the browser tab (the small icon) -->
+
+  <link rel="manifest" href="./manifest.json"/>
+  <!-- Links to manifest.json which has all the PWA (installable app) settings -->
+
+  <link rel="stylesheet" href="./styles.css"/>
+  <!-- Loads all the visual styles (colors, sizes, layouts) from styles.css -->
+
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <!-- Loads Google's Sign In library from Google's servers -->
+  <!-- async = loads in background without slowing page down -->
+  <!-- defer = waits until page is ready before running -->
+
+</head>
+
+<body>
+<!-- BODY section: everything the user actually sees on screen -->
+
+<div id="app">
+<!-- Main container that holds the entire app. Max width 430px, centered on screen -->
+
+<!-- ============================================================ -->
+<!-- LOGIN SCREEN -->
+<!-- The first screen users see when they open the app -->
+<!-- class="pg on" means this page is VISIBLE (on = show this page) -->
+<!-- ============================================================ -->
 <div class="pg on auth-pg" id="pg-login">
+
   <div class="logo">YOU-HAVE-<b>VALUE</b></div>
+  <!-- App logo at the top. The word VALUE is bold and purple -->
+
   <div class="sub">Post your idea. Find who you need.</div>
+  <!-- Small tagline text under the logo -->
+
   <div class="card">
+  <!-- White/dark card container that holds the login form -->
+
     <div class="ctitle">Welcome back 👋</div>
+    <!-- Title at the top of the login card -->
+
     <div class="errtxt" id="lerr"></div>
+    <!-- Red error message area. Empty at start. auth.js fills this if login fails -->
+    <!-- Example: "Wrong password" or "Enter email and password." -->
+
     <button class="gbtn" id="google-login-btn" onclick="triggerGoogleSignIn()">
+    <!-- Google Sign In button. onclick calls triggerGoogleSignIn() from auth.js -->
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+      <!-- The Google "G" logo made from 4 colored SVG shapes (blue, green, yellow, red) -->
       Continue with Google
     </button>
-    <div id="g-btn-container" style="width:100%;margin-bottom:8px"></div>
-    <div class="auth-divider"><span>or sign in with email</span></div>
-    <input class="inp" type="email" placeholder="Email address" id="lemail" autocomplete="email"/>
-    <input class="inp" type="password" placeholder="Password" id="lpw" autocomplete="current-password"/>
-    <button class="mbtn" id="lbtn">Sign In</button>
-    <div class="sw">No account? <span id="gosu">Create one free</span></div>
-  </div>
-</div>
 
-<!-- SIGNUP -->
+    <div id="g-btn-container" style="width:100%;margin-bottom:8px"></div>
+    <!-- Empty box where Google's official sign-in button renders itself -->
+    <!-- Google's library fills this in automatically when triggerGoogleSignIn() runs -->
+
+    <div class="auth-divider"><span>or sign in with email</span></div>
+    <!-- The "─── or sign in with email ───" line that separates Google from email login -->
+
+    <input class="inp" type="email" placeholder="Email address" id="lemail" autocomplete="email"/>
+    <!-- Email input field. type="email" shows email keyboard on phones -->
+    <!-- autocomplete="email" lets browser suggest saved emails -->
+
+    <input class="inp" type="password" placeholder="Password" id="lpw" autocomplete="current-password"/>
+    <!-- Password input field. type="password" hides what user types (shows dots) -->
+    <!-- autocomplete="current-password" lets browser autofill saved passwords -->
+
+    <button class="mbtn" id="lbtn">Sign In</button>
+    <!-- The purple Sign In button. auth.js handles the click → calls backend /auth/login -->
+
+    <div class="sw">No account? <span id="gosu">Create one free</span></div>
+    <!-- Link to switch to signup screen. "Create one free" is purple and clickable -->
+    <!-- auth.js: document.getElementById('gosu').onclick = show('pg-signup') -->
+
+  </div>
+  <!-- End of login card -->
+
+</div>
+<!-- End of login screen -->
+
+
+<!-- ============================================================ -->
+<!-- SIGNUP SCREEN -->
+<!-- New user registration screen -->
+<!-- class="pg" without "on" means this page is HIDDEN by default -->
+<!-- ============================================================ -->
 <div class="pg auth-pg" id="pg-signup">
+
   <div class="logo">YOU-HAVE-<b>VALUE</b></div>
+  <!-- Same logo as login screen -->
+
   <div class="sub">Where builders meet investors</div>
+  <!-- Different tagline on signup screen -->
+
   <div class="card">
+  <!-- Same card style as login but for creating a new account -->
+
     <div class="ctitle">Create account ✨</div>
+    <!-- Title at top of signup card -->
+
     <div class="errtxt" id="serr"></div>
+    <!-- Red error message area for signup errors -->
+    <!-- Example: "Fill in all fields." or "Password needs 6+ characters." -->
+
     <button class="gbtn" id="google-signup-btn" onclick="triggerGoogleSignIn()">
+    <!-- Google Sign Up button. Same function as login — Google handles both -->
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
       Sign up with Google
     </button>
-    <div class="auth-divider"><span>or create with email</span></div>
-    <input class="inp" type="text" placeholder="Full name" id="sname" autocomplete="name"/>
-    <input class="inp" type="email" placeholder="Email address" id="semail" autocomplete="email"/>
-    <input class="inp" type="password" placeholder="Password (min 6 chars)" id="spw" autocomplete="new-password"/>
-    <input class="inp" type="text" placeholder="Location e.g. St Paul MN" id="sloc"/>
-    <button class="mbtn" id="sbtn">Create Account</button>
-    <div class="sw">Have account? <span id="goli">Sign in</span></div>
-  </div>
-</div>
 
-<!-- FEED -->
+    <div class="auth-divider"><span>or create with email</span></div>
+    <!-- Divider line between Google button and email fields -->
+
+    <input class="inp" type="text" placeholder="Full name" id="sname" autocomplete="name"/>
+    <!-- Full name field. Required for creating an account -->
+
+    <input class="inp" type="email" placeholder="Email address" id="semail" autocomplete="email"/>
+    <!-- Email field for new account -->
+
+    <input class="inp" type="password" placeholder="Password (min 6 chars)" id="spw" autocomplete="new-password"/>
+    <!-- Password field. autocomplete="new-password" stops browser suggesting old passwords -->
+
+    <input class="inp" type="text" placeholder="Location e.g. St Paul MN" id="sloc"/>
+    <!-- Optional location field. Shows on profile and feed cards -->
+
+    <button class="mbtn" id="sbtn">Create Account</button>
+    <!-- Purple Create Account button. auth.js handles click → calls backend /auth/signup -->
+
+    <div class="sw">Have account? <span id="goli">Sign in</span></div>
+    <!-- Link to go back to the login screen -->
+
+  </div>
+  <!-- End of signup card -->
+
+</div>
+<!-- End of signup screen -->
+
+
+<!-- ============================================================ -->
+<!-- FEED SCREEN (MAIN SCREEN) -->
+<!-- The TikTok-style video feed. Shows after login -->
+<!-- ============================================================ -->
 <div class="pg feed-pg" id="pg-feed">
+
   <div id="feed-topbar" style="position:absolute;top:0;left:0;right:0;z-index:10;background:linear-gradient(to bottom,rgba(0,0,0,0.85) 0%,transparent 100%);pointer-events:none;">
+  <!-- Top bar that floats above the video. Dark gradient fades to transparent -->
+  <!-- z-index:10 puts it above the video. pointer-events:none lets touches pass through -->
+
     <div style="display:flex;align-items:center;justify-content:space-between;padding:44px 14px 8px;pointer-events:auto;">
+    <!-- Flex row: avatar+logo on left, buttons on right -->
+    <!-- padding-top:44px = leaves space for iPhone notch/status bar -->
+    <!-- pointer-events:auto = buttons inside here CAN be clicked -->
+
       <div style="display:flex;align-items:center;gap:8px;">
+      <!-- Left side: user avatar circle + app name -->
+
         <div id="feed-avatar" style="width:34px;height:34px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,0.5);background:#333;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff;flex-shrink:0;"></div>
+        <!-- Small circle showing logged-in user's profile photo or their initials -->
+        <!-- core.js fills this in the enterApp() function after login -->
+
         <div style="font-size:18px;font-weight:900;color:#fff;">YOU-HAVE-<b style="color:#fff;">VALUE</b></div>
+        <!-- App name in the top bar. Bold white text -->
+
       </div>
-      <!-- FIX: Added Upgrade button next to Post idea -->
+
       <div style="display:flex;gap:8px;">
+      <!-- Right side: two action buttons -->
+
         <button onclick="showPricing()" style="background:rgba(232,160,32,0.85);border:none;color:#fff;font-size:11px;font-weight:600;padding:7px 14px;border-radius:20px;cursor:pointer;">⭐ Upgrade</button>
+        <!-- Gold Upgrade button. onclick calls showPricing() from payments.js -->
+        <!-- Opens the pricing/subscription screen -->
+
         <button onclick="show('pg-post')" style="background:rgba(124,106,247,0.85);border:none;color:#fff;font-size:11px;font-weight:600;padding:7px 14px;border-radius:20px;cursor:pointer;">+ Post idea</button>
+        <!-- Purple Post Idea button. onclick calls show('pg-post') from core.js -->
+        <!-- Switches to the post creation screen -->
+
       </div>
     </div>
   </div>
-  <div class="feed-body" id="feed-body"></div>
-  <div class="bnav">
-    <button class="nb on" id="n1"><div class="nb-ico">🔥</div><div class="nb-lbl" style="color:#7c6af7">Feed</div></button>
-    <button class="nb" id="n2"><div class="nb-ico">⚡</div><div class="nb-lbl">Matches</div></button>
-    <button class="nb" id="n3" style="position:relative"><div class="nb-ico">✉️</div><div class="nb-lbl">Messages</div><div id="msg-badge-1" class="msg-badge"></div></button>
-    <button class="nb" id="n4"><div class="nb-ico">👤</div><div class="nb-lbl">Profile</div></button>
-  </div>
-</div>
+  <!-- End of top bar -->
 
-<!-- MATCHES -->
+  <div class="feed-body" id="feed-body"></div>
+  <!-- The scrollable video feed container. feed.js fills this with video slides -->
+  <!-- Each slide = one startup pitch. User scrolls up/down to see more -->
+
+  <div class="bnav">
+  <!-- Bottom navigation bar with 4 icons -->
+
+    <button class="nb on" id="n1"><div class="nb-ico">🔥</div><div class="nb-lbl" style="color:#7c6af7">Feed</div></button>
+    <!-- Feed tab. class="nb on" = currently active (purple label) -->
+    <!-- auth.js: n1.onclick = goFeed() -->
+
+    <button class="nb" id="n2"><div class="nb-ico">⚡</div><div class="nb-lbl">Matches</div></button>
+    <!-- Matches tab. Goes to matches screen when clicked -->
+    <!-- auth.js: n2.onclick = goMatch() -->
+
+    <button class="nb" id="n3" style="position:relative"><div class="nb-ico">✉️</div><div class="nb-lbl">Messages</div><div id="msg-badge-1" class="msg-badge"></div></button>
+    <!-- Messages tab. position:relative allows the red unread badge to position itself -->
+    <!-- msg-badge-1 = the red number bubble showing unread message count -->
+    <!-- auth.js: n3.onclick = goMessages() -->
+
+    <button class="nb" id="n4"><div class="nb-ico">👤</div><div class="nb-lbl">Profile</div></button>
+    <!-- Profile tab. Goes to user's profile screen -->
+    <!-- auth.js: n4.onclick = goProf() -->
+
+  </div>
+  <!-- End of bottom nav -->
+
+</div>
+<!-- End of feed screen -->
+
+
+<!-- ============================================================ -->
+<!-- MATCHES SCREEN -->
+<!-- Shows all invest and collab connections -->
+<!-- ============================================================ -->
 <div class="pg" id="pg-matches">
   <div class="inner-pg">
+  <!-- Inner container handles the scrollable content area -->
+
     <div class="pg-top" style="padding-bottom:0;">
+    <!-- Top header area of the matches screen -->
+
       <div class="pg-title" style="margin-bottom:12px;">Your Matches</div>
+      <!-- "Your Matches" heading text -->
+
       <div class="match-tabs">
+      <!-- Tab bar to switch between Invest and Collab matches -->
+
         <div class="mtab invest-tab active" id="tab-invest" onclick="switchTab('invest')">💰 Invest</div>
+        <!-- Invest tab. class="active" = currently selected. Gold underline -->
+        <!-- onclick calls switchTab('invest') from profile.js -->
+
         <div class="mtab collab-tab" id="tab-collab" onclick="switchTab('collab')">⚡ Collab</div>
+        <!-- Collab tab. No "active" class = not selected by default -->
+        <!-- onclick calls switchTab('collab') from profile.js -->
+
       </div>
     </div>
+
     <div class="match-panels">
-      <div class="match-panel active" id="panel-invest"><div class="m-empty"><div class="m-empty-ico">💰</div><div>No invest matches yet</div></div></div>
-      <div class="match-panel" id="panel-collab"><div class="m-empty"><div class="m-empty-ico">⚡</div><div>No collab matches yet</div></div></div>
+    <!-- Container that holds both panel contents side by side -->
+
+      <div class="match-panel active" id="panel-invest">
+        <div class="m-empty"><div class="m-empty-ico">💰</div><div>No invest matches yet</div></div>
+      </div>
+      <!-- Invest matches panel. class="active" = visible by default -->
+      <!-- Shows empty state until profile.js loads real matches from backend -->
+
+      <div class="match-panel" id="panel-collab">
+        <div class="m-empty"><div class="m-empty-ico">⚡</div><div>No collab matches yet</div></div>
+      </div>
+      <!-- Collab matches panel. Hidden by default until tab is clicked -->
+
     </div>
+    <!-- End of match panels -->
+
   </div>
+
   <div class="bnav">
+  <!-- Bottom nav for matches screen. Same 4 buttons, different one is "active" -->
+
     <button class="nb" id="n5"><div class="nb-ico">🔥</div><div class="nb-lbl">Feed</div></button>
     <button class="nb on" id="n6"><div class="nb-ico">⚡</div><div class="nb-lbl" style="color:#7c6af7">Matches</div></button>
+    <!-- n6 has class="nb on" = Matches is the active tab on this screen -->
     <button class="nb" id="n7" style="position:relative"><div class="nb-ico">✉️</div><div class="nb-lbl">Messages</div><div id="msg-badge-2" class="msg-badge"></div></button>
     <button class="nb" id="n8"><div class="nb-ico">👤</div><div class="nb-lbl">Profile</div></button>
+
   </div>
 </div>
+<!-- End of matches screen -->
 
-<!-- POST -->
+
+<!-- ============================================================ -->
+<!-- POST SCREEN -->
+<!-- Where users create and upload new startup pitches -->
+<!-- ============================================================ -->
 <div class="pg" id="pg-post" style="flex-direction:column;">
   <div class="inner-pg" style="flex:1;display:flex;flex-direction:column;min-height:0;">
+  <!-- flex:1 = takes all available space. min-height:0 = allows shrinking on small screens -->
+
     <div class="pg-top"><div class="pg-title">Post Your Idea</div></div>
+    <!-- "Post Your Idea" heading at the top -->
+
     <div class="pg-body" style="flex:1;overflow-y:scroll;-webkit-overflow-scrolling:touch;min-height:0;">
+    <!-- Scrollable form area. -webkit-overflow-scrolling:touch = smooth scroll on iPhone -->
+
       <div class="upload-box" id="upbox">
+      <!-- Dashed purple border box. Tap to open file picker for video -->
+      <!-- post.js: upbox.onclick triggers vfile.click() to open camera roll -->
+
         <div class="upload-ico">🎥</div>
+        <!-- Camera emoji icon -->
+
         <div class="upload-ttl">Upload your pitch video</div>
+        <!-- Main instruction text -->
+
         <div class="upload-sub">Tap to select from camera roll</div>
+        <!-- Smaller instruction text below -->
+
         <input type="file" id="vfile" accept="video/*" style="display:none"/>
+        <!-- Hidden file input. display:none = invisible. Only opens when upbox is tapped -->
+        <!-- accept="video/*" = only shows video files in the picker -->
+
       </div>
+
       <video class="vidprev" id="vprev" controls></video>
+      <!-- Video preview player. Hidden until user picks a video -->
+      <!-- post.js shows this after user selects a video file -->
+      <!-- controls = shows play/pause/volume controls on the video -->
+
       <div class="uploading" id="uping">⏳ Uploading video...</div>
-      <div class="fg"><label class="fl">Project title *</label><input class="fi" type="text" placeholder="e.g. AI fitness coach app" id="ptitle"/></div>
-      <div class="fg"><label class="fl">What are you building? *</label><textarea class="fi" placeholder="Describe your idea..." id="pdesc"></textarea></div>
-      <div class="fg"><label class="fl">Category</label>
-        <select class="fi" id="pcat"><option>Technology</option><option>Design</option><option>Business</option><option>Healthcare</option><option>Education</option><option>Sustainability</option></select>
+      <!-- "Uploading video..." message. Hidden until video upload starts -->
+      <!-- post.js adds class "on" to show this during upload -->
+
+      <div class="fg">
+      <!-- Form group container with bottom margin -->
+        <label class="fl">Project title *</label>
+        <!-- Label above the input. * means required field -->
+        <input class="fi" type="text" placeholder="e.g. AI fitness coach app" id="ptitle"/>
+        <!-- Project title text input. post.js reads this when submitting -->
       </div>
-      <div class="fg"><label class="fl">Looking for *</label>
+
+      <div class="fg">
+        <label class="fl">What are you building? *</label>
+        <textarea class="fi" placeholder="Describe your idea..." id="pdesc"></textarea>
+        <!-- Multi-line text area for project description. Taller than a normal input -->
+      </div>
+
+      <div class="fg">
+        <label class="fl">Category</label>
+        <select class="fi" id="pcat">
+        <!-- Dropdown picker for project category -->
+          <option>Technology</option>
+          <option>Design</option>
+          <option>Business</option>
+          <option>Healthcare</option>
+          <option>Education</option>
+          <option>Sustainability</option>
+          <!-- The 6 category options users can choose from -->
+        </select>
+      </div>
+
+      <div class="fg">
+        <label class="fl">Looking for *</label>
         <div class="mrow">
+        <!-- Row of 3 mode selector buttons -->
+
           <button class="mdb" id="mc">⚡ Collaborators</button>
+          <!-- Collab button. post.js: mc.onclick = setMode('collab') → turns purple -->
+
           <button class="mdb" id="mi">💰 Investors</button>
+          <!-- Invest button. post.js: mi.onclick = setMode('invest') → turns gold -->
+
           <button class="mdb" id="mb">⭐ Both</button>
+          <!-- Both button. post.js: mb.onclick = setMode('both') → turns pink -->
+
         </div>
       </div>
-      <div class="fg"><label class="fl">Skills needed</label><input class="fi" type="text" placeholder="React, Marketing, Design..." id="pskills"/></div>
+
+      <div class="fg">
+        <label class="fl">Skills needed</label>
+        <input class="fi" type="text" placeholder="React, Marketing, Design..." id="pskills"/>
+        <!-- Optional comma-separated skills. post.js splits by comma when submitting -->
+      </div>
+
     </div>
+    <!-- End of scrollable form -->
+
   </div>
-  <div class="post-fixed"><button class="pbtn" id="pbtn">Post to Feed →</button></div>
+
+  <div class="post-fixed">
+  <!-- Fixed bottom area that stays visible while form scrolls -->
+    <button class="pbtn" id="pbtn">Post to Feed →</button>
+    <!-- Big purple Post button. post.js handles click → validates → uploads → posts -->
+  </div>
+
   <div class="bnav">
+  <!-- Bottom nav for post screen. No tab is "active" on this screen -->
     <button class="nb" id="n9"><div class="nb-ico">🔥</div><div class="nb-lbl">Feed</div></button>
     <button class="nb" id="n10"><div class="nb-ico">⚡</div><div class="nb-lbl">Matches</div></button>
     <button class="nb" id="n11" style="position:relative"><div class="nb-ico">✉️</div><div class="nb-lbl">Messages</div><div id="msg-badge-3" class="msg-badge"></div></button>
     <button class="nb" id="n12"><div class="nb-ico">👤</div><div class="nb-lbl">Profile</div></button>
   </div>
-</div>
 
-<!-- PROFILE -->
+</div>
+<!-- End of post screen -->
+
+
+<!-- ============================================================ -->
+<!-- PROFILE SCREEN -->
+<!-- User's own profile with their projects and stats -->
+<!-- ============================================================ -->
 <div class="pg" id="pg-profile">
   <div class="inner-pg">
+
     <div class="prof-top">
+    <!-- Top section with avatar, name, location, and stats -->
+
       <div class="pav-wrap" id="pav-wrap">
+      <!-- Wrapper around avatar. Clicking it opens the camera to change photo -->
+      <!-- auth.js: pav-wrap.onclick triggers avatar-file.click() -->
+
         <div class="pav" id="pav">?</div>
+        <!-- The circular profile photo. Shows "?" until profile loads -->
+        <!-- profile.js replaces this with the user's real photo or initials -->
+
         <div class="pav-edit">📷</div>
+        <!-- Small camera icon in the corner of the avatar circle -->
+        <!-- Shows the user they can tap to change their photo -->
+
         <input type="file" id="avatar-file" accept="image/*" style="display:none"/>
+        <!-- Hidden file picker for profile photo. Only opens when avatar is tapped -->
+        <!-- accept="image/*" = only shows image files (jpg, png, etc.) -->
+
       </div>
+
       <div class="pname" id="pname">User</div>
+      <!-- User's full name. Shows "User" until profile.js loads real name -->
+
       <div class="ploc" id="ploc"></div>
+      <!-- User's location. Empty until profile.js loads it from backend -->
+
       <div class="pstats">
+      <!-- Row showing project count and match count -->
+
         <div><div class="psv" id="sp">0</div><div class="psl">Projects</div></div>
+        <!-- Number of projects the user has posted. profile.js updates "sp" element -->
+
         <div><div class="psv" id="sm">0</div><div class="psl">Matches</div></div>
+        <!-- Number of matches the user has. profile.js updates "sm" element -->
+
       </div>
     </div>
+    <!-- End of profile top section -->
+
     <div class="pg-body">
+    <!-- Scrollable body area below the profile header -->
+
       <button class="logbtn" id="logbtn" style="margin-top:14px;">Sign Out</button>
-      <!-- Upgrade button in profile too -->
+      <!-- Red outlined Sign Out button. auth.js: clears token and shows login screen -->
+
       <button onclick="showPricing()" style="width:100%;margin-top:10px;padding:12px;background:linear-gradient(135deg,#e8a020,#f5c97a);border:none;border-radius:12px;color:#000;font-size:14px;font-weight:700;cursor:pointer;">⭐ Upgrade to Pro</button>
+      <!-- Gold gradient Upgrade button. Same as feed screen. Opens pricing page -->
+
       <div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:1px;margin:16px 0 10px;">My Projects</div>
-      <div id="myprojs"><div style="text-align:center;padding:2rem 0;font-size:13px;color:#666;">No projects yet.</div></div>
+      <!-- "MY PROJECTS" section label in small caps -->
+
+      <div id="myprojs">
+        <div style="text-align:center;padding:2rem 0;font-size:13px;color:#666;">No projects yet.</div>
+      </div>
+      <!-- Grid of user's posted projects. profile.js fills this from backend -->
+      <!-- Shows "No projects yet." until projects load -->
+
     </div>
   </div>
+
   <div class="bnav">
+  <!-- Bottom nav for profile screen. Profile tab is "active" -->
     <button class="nb" id="n13"><div class="nb-ico">🔥</div><div class="nb-lbl">Feed</div></button>
     <button class="nb" id="n14"><div class="nb-ico">⚡</div><div class="nb-lbl">Matches</div></button>
     <button class="nb" id="n15" style="position:relative"><div class="nb-ico">✉️</div><div class="nb-lbl">Messages</div><div id="msg-badge-4" class="msg-badge"></div></button>
     <button class="nb on" id="n16"><div class="nb-ico">👤</div><div class="nb-lbl" style="color:#7c6af7">Profile</div></button>
+    <!-- n16 has class="nb on" = Profile is the active tab on this screen -->
   </div>
-</div>
 
-<!-- CHAT -->
+</div>
+<!-- End of profile screen -->
+
+
+<!-- ============================================================ -->
+<!-- CHAT SCREEN -->
+<!-- One-on-one conversation between two matched users -->
+<!-- ============================================================ -->
 <div class="pg" id="pg-chat" style="background:#07070d;">
   <div class="inner-pg">
+
     <div class="chat-top">
+    <!-- Top bar with back button, avatar, and person's name -->
+
       <button class="cbk" id="cbk">←</button>
+      <!-- Back arrow button. auth.js: cbk.onclick = show('pg-matches') -->
+
       <div id="cav" style="width:36px;height:36px;border-radius:50%;background:#1e1a10;color:#e8a020;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;">?</div>
+      <!-- Small circle with the other person's initials. profile.js fills this in -->
+
       <div class="cwho" id="cwho">Chat</div>
+      <!-- The other person's name. profile.js fills this when chat opens -->
+
     </div>
+
     <div class="msgs" id="msgs"></div>
+    <!-- The message bubbles area. profile.js fills this with conversation history -->
+    <!-- Each message = a bubble (purple for sent, dark for received) -->
+
     <div class="cinput">
+    <!-- Bottom input bar for typing messages -->
+
       <input class="cbox" type="text" placeholder="Type a message..." id="cbox"/>
+      <!-- Text input where user types their message -->
+      <!-- auth.js: pressing Enter calls sendMsg() from profile.js -->
+
       <button class="csend" id="csend">→</button>
+      <!-- Send button (→ arrow). auth.js: csend.onclick calls sendMsg() from profile.js -->
+
     </div>
   </div>
 </div>
+<!-- End of chat screen -->
 
-<!-- MESSAGES -->
+
+<!-- ============================================================ -->
+<!-- MESSAGES SCREEN -->
+<!-- List of all conversations with matched users -->
+<!-- ============================================================ -->
 <div class="pg" id="pg-messages" style="background:#07070d;flex-direction:column;">
+
   <div style="display:flex;align-items:center;gap:12px;padding:48px 16px 12px;border-bottom:1px solid #1a1a1a;flex-shrink:0;">
+  <!-- Top header bar. padding-top:48px = space for iPhone notch -->
     <div style="font-size:18px;font-weight:700;color:#fff;flex:1;">Messages</div>
+    <!-- "Messages" heading text -->
   </div>
+
   <div id="messages-list" style="flex:1;overflow-y:auto;"></div>
+  <!-- Scrollable list of conversations. profile.js fills this from backend -->
+  <!-- Each row shows: avatar, name, last message, time ago -->
+
   <div class="bnav">
+  <!-- Bottom nav for messages screen. Messages tab is "active" -->
     <button class="nb" id="nm1"><div class="nb-ico">🔥</div><div class="nb-lbl">Feed</div></button>
     <button class="nb" id="nm2"><div class="nb-ico">⚡</div><div class="nb-lbl">Matches</div></button>
     <button class="nb on" id="nm3"><div class="nb-ico">✉️</div><div class="nb-lbl" style="color:#7c6af7">Messages</div></button>
+    <!-- nm3 has class="nb on" = Messages is active tab on this screen -->
     <button class="nb" id="nm4"><div class="nb-ico">👤</div><div class="nb-lbl">Profile</div></button>
   </div>
-</div>
 
+</div>
+<!-- End of messages screen -->
+
+
+<!-- ============================================================ -->
 <!-- USER PROFILE MODAL -->
+<!-- Popup sheet showing ANOTHER user's profile (not your own) -->
+<!-- Opens when you tap someone's name/avatar in the feed -->
+<!-- ============================================================ -->
 <div class="cmask" id="user-profile-mask">
+<!-- Dark overlay behind the modal. Clicking it closes the modal -->
+<!-- auth.js: user-profile-mask.onclick = closes if clicking the dark area -->
+
   <div style="background:#07070d;border-radius:24px 24px 0 0;width:100%;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;">
+  <!-- The white/dark sheet that slides up from the bottom -->
+  <!-- max-height:90vh = never taller than 90% of screen height -->
+
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 16px 10px;border-bottom:1px solid #1e1e1e;flex-shrink:0;">
+    <!-- Top row of modal: "Profile" title on left, ✕ close button on right -->
       <div style="font-size:15px;font-weight:700;color:#fff;">Profile</div>
+      <!-- "Profile" label at top of modal -->
       <button id="user-profile-close" style="background:none;border:none;color:#666;font-size:22px;cursor:pointer;">✕</button>
+      <!-- ✕ close button. auth.js: user-profile-close.onclick = hides modal -->
     </div>
+
     <div style="display:flex;align-items:center;gap:14px;padding:16px;border-bottom:1px solid #1e1e1e;flex-shrink:0;">
+    <!-- User info row: big avatar on left, name/location/stats on right -->
+
       <div id="up-avatar" style="width:64px;height:64px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:22px;flex-shrink:0;"></div>
+      <!-- Large circular avatar. profile.js fills with photo or colored initials -->
+
       <div>
         <div id="up-name" style="font-size:18px;font-weight:700;color:#fff;margin-bottom:2px;"></div>
+        <!-- Other user's full name. profile.js fills this in -->
+
         <div id="up-loc" style="font-size:12px;color:#666;margin-bottom:6px;"></div>
+        <!-- Other user's location. profile.js fills this in -->
+
         <div id="up-stats" style="font-size:12px;color:#a99cf9;"></div>
+        <!-- Shows "X projects" count. profile.js fills this in -->
       </div>
     </div>
+
     <div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:1px;padding:12px 16px 6px;flex-shrink:0;">Projects</div>
-    <div id="up-projects" style="flex:1;overflow-y:scroll;padding:0 12px 20px;"><div style="text-align:center;padding:2rem;color:#555;">Loading...</div></div>
+    <!-- "PROJECTS" section label in small caps -->
+
+    <div id="up-projects" style="flex:1;overflow-y:scroll;padding:0 12px 20px;">
+      <div style="text-align:center;padding:2rem;color:#555;">Loading...</div>
+    </div>
+    <!-- Grid of the other user's projects. profile.js fills this from backend -->
+
   </div>
 </div>
+<!-- End of user profile modal -->
 
-<!-- CREATOR MODAL -->
+
+<!-- ============================================================ -->
+<!-- CREATOR MODAL (OLD STYLE) -->
+<!-- Simple popup showing creator info. Used in some places -->
+<!-- ============================================================ -->
 <div class="cmask" id="cmask">
   <div class="cmodal">
     <button class="cmx" id="cmx">✕</button>
+    <!-- ✕ close button. auth.js: cmx.onclick = hides cmask -->
+
     <div style="clear:both;text-align:center;">
       <div class="cmav" id="cmav">?</div>
+      <!-- Creator's avatar initials circle in center -->
+
       <div class="cmname" id="cmname"></div>
+      <!-- Creator's name -->
+
       <div class="cmloc" id="cmloc"></div>
+      <!-- Creator's location -->
     </div>
+
     <div class="cmproj" id="cmproj"></div>
+    <!-- Creator's project info card below their name -->
+
   </div>
 </div>
+<!-- End of creator modal -->
 
+
+<!-- ============================================================ -->
 <!-- COMMENTS MODAL -->
+<!-- Bottom sheet for reading and writing comments on a project -->
+<!-- Opens when user taps the 💬 button on a feed slide -->
+<!-- ============================================================ -->
 <div class="cmask" id="comments-mask">
+<!-- Dark overlay. comments.js: clicking dark area closes modal -->
+
   <div class="cmodal" style="max-height:80vh;display:flex;flex-direction:column;">
+  <!-- The sliding up sheet. max-height:80vh = max 80% of screen -->
+
     <button class="cmx" id="comments-close">✕</button>
+    <!-- ✕ close button. comments.js: comments-close.onclick = hides modal -->
+
     <div style="clear:both;margin-bottom:12px;">
       <div style="font-size:16px;font-weight:700;color:#fff;" id="comments-title">Comments</div>
+      <!-- Shows "💬 [Project Title]" when opened. comments.js sets this -->
     </div>
+
     <div id="reply-bar" style="background:#1a1a2e;border-radius:8px;padding:8px 12px;margin-bottom:8px;font-size:12px;color:#a99cf9;display:none;justify-content:space-between;align-items:center;">
+    <!-- Purple bar that shows when user taps "Reply" on a comment -->
+    <!-- display:none = hidden until user taps Reply -->
+
       <span id="reply-label">↩️ Replying to...</span>
+      <!-- Shows "↩️ Replying to [Name]" when replying to someone -->
+
       <button id="cancel-reply" style="background:none;border:none;color:#666;font-size:16px;cursor:pointer;">✕</button>
+      <!-- ✕ button to cancel the reply and go back to normal comment mode -->
+
     </div>
+
     <div id="comments-list" style="flex:1;overflow-y:scroll;-webkit-overflow-scrolling:touch;min-height:0;max-height:340px;margin-bottom:12px;"></div>
+    <!-- Scrollable list of comments. comments.js fills this from backend -->
+    <!-- max-height:340px stops it from taking over the whole screen -->
+
     <div style="display:flex;gap:8px;padding-top:10px;border-top:1px solid #222;">
+    <!-- Bottom input row: text box + send button -->
+
       <input id="comment-input" type="text" placeholder="Write a comment..." style="flex:1;background:#1a1a1a;border:1px solid #333;border-radius:20px;padding:10px 16px;color:#fff;font-size:13px;outline:none;"/>
+      <!-- Comment text input. comments.js: pressing Enter sends the comment -->
+
       <button id="comment-send" style="width:40px;height:40px;border-radius:50%;background:#7c6af7;border:none;color:#fff;font-size:16px;cursor:pointer;flex-shrink:0;">→</button>
+      <!-- Purple circular send button. comments.js: onclick calls sendComment() -->
+
     </div>
   </div>
 </div>
+<!-- End of comments modal -->
 
+
+<!-- ============================================================ -->
 <!-- POST DETAIL MODAL -->
+<!-- Full screen view of a single project -->
+<!-- Opens when user taps a project in their profile grid -->
+<!-- Shows video, stats (invests/collabs/likes/views), comments -->
+<!-- ============================================================ -->
 <div class="post-detail-mask" id="post-detail-mask">
+<!-- Full screen overlay covering the entire app -->
+
   <div class="pd-video-wrap" id="pd-video-wrap">
+  <!-- Top 55% of screen: the project video or colored placeholder -->
+
     <div class="pd-grad"></div>
+    <!-- Dark gradient overlay on bottom of video so text is readable -->
+
     <div class="pd-play-ico" id="pd-play-ico">▶</div>
+    <!-- Play/pause icon that briefly appears when tapping the video -->
+    <!-- post.js shows ▶ or ⏸ then fades it out -->
+
     <button class="pd-back" id="pd-back">←</button>
+    <!-- Back arrow button (top left). post.js: pd-back.onclick = closes detail view -->
+
     <button class="pd-requests-btn" id="pd-requests-btn">📩 Requests <span id="pd-req-count"></span></button>
+    <!-- "📩 Requests (3)" button top right. Only visible to the project owner -->
+    <!-- post.js: opens the requests sheet below showing who wants to connect -->
+
   </div>
+
   <div class="pd-body" id="pd-body">
+  <!-- Bottom 45% of screen: scrollable project info and comments -->
+
     <div class="pd-handle" id="pd-handle"></div>
+    <!-- Shows "@username" handle of the project creator -->
+
     <div class="pd-title" id="pd-title"></div>
+    <!-- Project title in large bold text -->
+
     <div class="pd-mode" id="pd-mode"></div>
+    <!-- Colored badge: "⚡ Seeking Collaborators" or "💰 Seeking Investors" etc. -->
+
     <div class="pd-desc" id="pd-desc"></div>
+    <!-- Full project description text -->
+
     <div class="pd-stats-row">
-      <div class="pd-stat invest" onclick="showStatUsers('invest')" style="cursor:pointer;"><div class="pd-stat-val" id="pd-invest">0</div><div class="pd-stat-lbl">💰 Invests</div></div>
-      <div class="pd-stat collab" onclick="showStatUsers('collab')" style="cursor:pointer;"><div class="pd-stat-val" id="pd-collab">0</div><div class="pd-stat-lbl">⚡ Collabs</div></div>
-      <div class="pd-stat likes" id="pd-likes-btn" onclick="showStatUsers('likes')" style="cursor:pointer;"><div class="pd-stat-val" id="pd-likes">0</div><div class="pd-stat-lbl">❤️ Likes</div></div>
-      <div class="pd-stat views" onclick="showStatUsers('views')" style="cursor:pointer;"><div class="pd-stat-val" id="pd-views">0</div><div class="pd-stat-lbl">👁 Views</div></div>
+    <!-- Row of 4 clickable stat boxes -->
+
+      <div class="pd-stat invest" onclick="showStatUsers('invest')" style="cursor:pointer;">
+        <div class="pd-stat-val" id="pd-invest">0</div>
+        <div class="pd-stat-lbl">💰 Invests</div>
+      </div>
+      <!-- Gold invest count box. Clicking shows who wants to invest -->
+
+      <div class="pd-stat collab" onclick="showStatUsers('collab')" style="cursor:pointer;">
+        <div class="pd-stat-val" id="pd-collab">0</div>
+        <div class="pd-stat-lbl">⚡ Collabs</div>
+      </div>
+      <!-- Purple collab count box. Clicking shows who wants to collab -->
+
+      <div class="pd-stat likes" id="pd-likes-btn" onclick="showStatUsers('likes')" style="cursor:pointer;">
+        <div class="pd-stat-val" id="pd-likes">0</div>
+        <div class="pd-stat-lbl">❤️ Likes</div>
+      </div>
+      <!-- Red likes count box. Clicking shows who liked this project -->
+
+      <div class="pd-stat views" onclick="showStatUsers('views')" style="cursor:pointer;">
+        <div class="pd-stat-val" id="pd-views">0</div>
+        <div class="pd-stat-lbl">👁 Views</div>
+      </div>
+      <!-- Green view count box. Clicking shows total view count -->
+
     </div>
+    <!-- End of stats row -->
+
     <div class="pd-comments-title">💬 Comments</div>
-    <div id="pd-comments-list"><div style="font-size:12px;color:#555;text-align:center;padding:1rem;">No comments yet</div></div>
-  </div>
-  <div class="likes-sheet" id="likes-sheet"><div class="req-inner"><div class="req-top"><div class="req-top-title">❤️ Liked by</div><button class="req-close" id="likes-close">✕</button></div><div class="req-list" id="likes-list"><div class="req-empty">No likes yet</div></div></div></div>
-  <div class="req-sheet" id="req-sheet"><div class="req-inner"><div class="req-top"><div class="req-top-title">📩 Match Requests</div><button class="req-close" id="req-close">✕</button></div><div class="req-list" id="req-list"><div class="req-empty">No pending requests</div></div></div></div>
-  <div class="req-sheet" id="stat-users-sheet"><div class="req-inner"><div class="req-top"><div class="req-top-title" id="stat-users-title">Users</div><button class="req-close" onclick="document.getElementById('stat-users-sheet').classList.remove('on')">✕</button></div><div class="req-list" id="stat-users-list"><div class="req-empty">Loading...</div></div></div></div>
-</div>
+    <!-- "💬 Comments" section heading -->
 
+    <div id="pd-comments-list">
+      <div style="font-size:12px;color:#555;text-align:center;padding:1rem;">No comments yet</div>
+    </div>
+    <!-- List of comments on this project. post.js loads these from backend -->
+
+  </div>
+  <!-- End of scrollable body -->
+
+  <!-- LIKES SHEET: slides up when tapping ❤️ Likes stat -->
+  <div class="likes-sheet" id="likes-sheet">
+    <div class="req-inner">
+      <div class="req-top">
+        <div class="req-top-title">❤️ Liked by</div>
+        <button class="req-close" id="likes-close">✕</button>
+        <!-- ✕ closes the likes sheet. post.js handles this -->
+      </div>
+      <div class="req-list" id="likes-list">
+        <div class="req-empty">No likes yet</div>
+        <!-- List of users who liked this project. post.js fills from backend -->
+      </div>
+    </div>
+  </div>
+
+  <!-- REQUESTS SHEET: slides up when tapping 📩 Requests button -->
+  <div class="req-sheet" id="req-sheet">
+    <div class="req-inner">
+      <div class="req-top">
+        <div class="req-top-title">📩 Match Requests</div>
+        <button class="req-close" id="req-close">✕</button>
+        <!-- ✕ closes the requests sheet -->
+      </div>
+      <div class="req-list" id="req-list">
+        <div class="req-empty">No pending requests</div>
+        <!-- List of people who sent invest/collab requests. post.js fills from backend -->
+        <!-- Each request has Accept ✅ and "Check Back Later" buttons -->
+      </div>
+    </div>
+  </div>
+
+  <!-- STAT USERS SHEET: slides up when tapping invest/collab/likes/views stats -->
+  <div class="req-sheet" id="stat-users-sheet">
+    <div class="req-inner">
+      <div class="req-top">
+        <div class="req-top-title" id="stat-users-title">Users</div>
+        <!-- Title changes: "💰 Investors" or "⚡ Collaborators" etc. -->
+        <button class="req-close" onclick="document.getElementById('stat-users-sheet').classList.remove('on')">✕</button>
+        <!-- ✕ directly removes 'on' class to close this sheet -->
+      </div>
+      <div class="req-list" id="stat-users-list">
+        <div class="req-empty">Loading...</div>
+        <!-- List of users for that stat category. feed.js fills from backend -->
+      </div>
+    </div>
+  </div>
+
+</div>
+<!-- End of post detail modal -->
+
+
+<!-- ============================================================ -->
 <!-- INSTALL BANNERS -->
+<!-- Prompts to install the app on home screen -->
+<!-- ============================================================ -->
+
+<!-- ANDROID / CHROME INSTALL BANNER -->
 <div id="install-banner" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);width:90%;max-width:380px;background:#1a1a2e;border:1px solid #7c6af7;border-radius:16px;padding:14px 16px;z-index:9999;box-shadow:0 4px 24px rgba(124,106,247,0.3);">
+<!-- display:none = hidden by default. pwa.js shows this after 3 seconds -->
+<!-- position:fixed bottom:80px = floats above the bottom nav bar -->
+<!-- z-index:9999 = appears above everything else -->
+
   <div style="display:flex;align-items:center;gap:12px;">
+
     <div style="width:44px;height:44px;border-radius:12px;background:#7c6af7;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">💡</div>
-    <div style="flex:1;"><div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:2px;">Add to Home Screen</div><div style="font-size:11px;color:#888;">Install YOU-HAVE-VALUE for quick access</div></div>
+    <!-- Purple square app icon on the left -->
+
+    <div style="flex:1;">
+      <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:2px;">Add to Home Screen</div>
+      <!-- Bold title text -->
+      <div style="font-size:11px;color:#888;">Install YOU-HAVE-VALUE for quick access</div>
+      <!-- Smaller subtitle text -->
+    </div>
+
     <button id="install-btn" style="background:#7c6af7;border:none;color:#fff;font-size:12px;font-weight:600;padding:8px 14px;border-radius:10px;cursor:pointer;flex-shrink:0;">Install</button>
+    <!-- Purple Install button. pwa.js: triggers the browser's install prompt -->
+
     <button id="install-close" style="background:none;border:none;color:#555;font-size:18px;cursor:pointer;padding:0 4px;">✕</button>
+    <!-- ✕ dismisses the banner. pwa.js saves dismissal to localStorage so it doesn't show again -->
+
   </div>
 </div>
 
+<!-- IOS SAFARI INSTALL BANNER -->
 <div id="ios-install-banner" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);width:90%;max-width:380px;background:#1a1a2e;border:1px solid #7c6af7;border-radius:16px;padding:14px 16px;z-index:9999;box-shadow:0 4px 24px rgba(124,106,247,0.3);">
+<!-- Different banner for iPhone users. iOS Safari can't auto-install so we show manual instructions -->
+<!-- pwa.js detects iPhone and shows this instead of the Android banner -->
+
   <div style="display:flex;align-items:flex-start;gap:12px;">
+
     <div style="width:44px;height:44px;border-radius:12px;background:#7c6af7;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">💡</div>
-    <div style="flex:1;"><div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:4px;">Install YOU-HAVE-VALUE</div><div style="font-size:11px;color:#aaa;line-height:1.6;">Tap <strong style="color:#fff;">Share</strong> ⎙ at the bottom of your browser<br/>then tap <strong style="color:#fff;">"Add to Home Screen"</strong></div></div>
+    <!-- Same purple app icon -->
+
+    <div style="flex:1;">
+      <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:4px;">Install YOU-HAVE-VALUE</div>
+      <div style="font-size:11px;color:#aaa;line-height:1.6;">
+        Tap <strong style="color:#fff;">Share</strong> ⎙ at the bottom of your browser<br/>
+        then tap <strong style="color:#fff;">"Add to Home Screen"</strong>
+        <!-- Step by step iPhone install instructions -->
+      </div>
+    </div>
+
     <button id="ios-install-close" style="background:none;border:none;color:#555;font-size:18px;cursor:pointer;padding:0 4px;">✕</button>
+    <!-- ✕ dismisses the iOS banner permanently (saved to localStorage) -->
+
   </div>
 </div>
+<!-- End of install banners -->
 
-<!-- JS FILES IN ORDER -->
+
+<!-- ============================================================ -->
+<!-- JAVASCRIPT FILES — LOADED IN ORDER -->
+<!-- Each file depends on the ones above it being loaded first -->
+<!-- ============================================================ -->
+
 <script src="./env.js"></script>
+<!-- FIRST: Sets window.WNU_CONFIG.BACKEND_URL -->
+<!-- Example: { BACKEND_URL: 'https://workmatch-backend.onrender.com' } -->
+<!-- Docker writes this file at startup with the real backend URL -->
+
 <script src="./core.js"></script>
+<!-- SECOND: The engine of the app. MUST load before all other JS files -->
+<!-- Provides: api(), show(), clr(), ini(), timeAgo(), showToast() -->
+<!-- Sets global variables: token, user, API, BACKEND -->
+
 <script src="./feed.js"></script>
+<!-- THIRD: Builds the TikTok video feed. Needs core.js api() function -->
+<!-- Provides: loadFeed(), buildSlide(), pickAndPlayBestSlide() -->
+
 <script src="./profile.js"></script>
+<!-- FOURTH: Handles profile, matches, messages, and chat -->
+<!-- Provides: loadProfile(), loadMatches(), loadMessages(), openChat() -->
+
 <script src="./post.js"></script>
+<!-- FIFTH: Handles creating new posts and viewing post details -->
+<!-- Provides: openPostDetail(), openRequests(), showStatUsers() -->
+
 <script src="./comments.js"></script>
+<!-- SIXTH: Handles the comments system -->
+<!-- Provides: openComments(), loadComments(), sendComment() -->
+
 <script src="./auth.js"></script>
+<!-- SEVENTH: Handles login, signup, Google Sign In, and all button wiring -->
+<!-- Wires up ALL onclick handlers for buttons across all screens -->
+<!-- LAST because it needs ALL other functions to exist first -->
+
 <script src="./payments.js"></script>
+<!-- EIGHTH: Handles Stripe payment/subscription screen -->
+<!-- Provides: showPricing(), hidePricing(), startCheckout() -->
+
 <script src="./pwa.js"></script>
+<!-- NINTH: Handles PWA install prompts and service worker registration -->
+<!-- Shows install banners, handles beforeinstallprompt event -->
 
 </div>
+<!-- End of #app container -->
+
 </body>
 </html>
